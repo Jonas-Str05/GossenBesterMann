@@ -4401,7 +4401,8 @@ function boot() {
   }
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW', err));
+    // updateViaCache: 'none' → auch version.js wird bei der Update-Prüfung frisch geladen
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch((err) => console.warn('SW', err));
     // Neue Version wurde aktiv: sofort neu laden (wenn gerade nichts offen ist), sonst Hinweis
     const hadController = !!navigator.serviceWorker.controller;
     let reloading = false;

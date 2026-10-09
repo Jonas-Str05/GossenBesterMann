@@ -39,10 +39,11 @@ Die App muss einmal über **HTTPS** geöffnet werden; danach ist sie installiert
 
 ## Updates
 
-Bei **jedem** Update die Versionsnummer in `version.js` erhöhen (einzige Stelle). Daran erkennt der Service Worker die neue Version, lädt alle Dateien frisch und die App startet beim nächsten Öffnen neu. In der App: Einstellungen → „Nach Updates suchen“ prüft sofort.
+Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentarzeile oben in `sw.js` erhöhen. Daran erkennt der Service Worker die neue Version, lädt alle Dateien frisch und die App startet beim nächsten Öffnen neu. In der App: Einstellungen → „Nach Updates suchen“ prüft sofort.
 
 | Version | Inhalt |
 | --- | --- |
+| 1.9.3 | Fix: Updates werden sofort erkannt (sw.js trägt die Version, kein HTTP-Cache für version.js) |
 | 1.9.2 | Fix: App blieb beim Start schwarz (Ansichten wurden nicht gezeichnet) |
 | 1.9.1 | Statistik-Bausteine per langem Drücken direkt verschieben |
 | 1.9.0 | Statistik-Bausteine anordnen, Update-Prüfung, aufgeräumte Einstellungen |
