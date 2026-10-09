@@ -2351,7 +2351,7 @@ function renderStats() {
     body = `<div class="empty"><div class="empty-icon">${ICON.stats}</div><h2>Noch keine Daten</h2><p>Lege Karten an und lerne eine Runde – dann wird es hier spannend.</p></div>`;
   } else if (edit) {
     body = `
-      <p class="footnote" style="margin:0 36px 12px">Halte den Griff <b>≡</b> gedrückt und ziehe die Bausteine an die gewünschte Stelle.</p>
+      <p class="footnote" style="margin:0 36px 12px">Halte einen Baustein gedrückt oder fasse ihn am Griff <b>≡</b> und ziehe ihn an die gewünschte Stelle.</p>
       <div class="reorder-list" id="reorder-list">
         ${order.map((k) => `
           <div class="reorder-item" data-key="${k}">
@@ -2365,7 +2365,7 @@ function renderStats() {
     body = `
       <div class="chips stat-chips">${chip('all', 'Alle Karten')}${gs.map((g) => chip(g.id, groupShort(g), g.color)).join('')}</div>
       ${order.map((k) => `<div class="stat-section" data-key="${k}">${render[k]()}</div>`).join('')}
-      <p class="footnote">Tippe auf ein Diagramm, um genaue Werte zu sehen. Mit „Anordnen“ bestimmst du die Reihenfolge der Bausteine.</p>`;
+      <p class="footnote">Tippe auf ein Diagramm für genaue Werte. Halte einen Baustein gedrückt, um ihn zu verschieben.</p>`;
   }
 
   v.innerHTML = navbar('Statistik', { left: gearBtn(), right }) + `
@@ -2373,8 +2373,7 @@ function renderStats() {
       <h1 class="large-title">Statistik</h1>
       ${body}
     </div>`;
-  if (edit) bindReorder($('#reorder-list'));
-  else bindCharts(v);
+  if (!edit) bindCharts(v);
   v.scrollTop = st;
 }
 
@@ -2403,75 +2402,158 @@ function statOrder() {
   return [...new Set([...saved, ...DEFAULT_STAT_ORDER])];
 }
 
-// Ziehen am Griff: 1:1 mit dem Finger, die anderen Bausteine weichen weich aus
-function bindReorder(list) {
-  if (!list) return;
-  let drag = null;
-  const items = () => $$('.reorder-item', list);
+// Ziehen: 1:1 mit dem Finger, die anderen Bausteine weichen weich aus.
+// Start entweder am Griff ≡, per langem Drücken auf einen Listeneintrag
+// oder per langem Drücken auf einen Baustein in der normalen Statistik-Ansicht.
+const RO = { drag: null, scrollTimer: 0 };
+
+function roStart(el, clientY, grab) {
+  const list = el.parentElement;
+  const all = $$('.reorder-item', list);
+  const from = all.indexOf(el);
+  const rect = el.getBoundingClientRect();
+  const listTop = list.getBoundingClientRect().top;
+  const step = all.length > 1 ? all[1].getBoundingClientRect().top - all[0].getBoundingClientRect().top : rect.height + 8;
+  RO.drag = { list, el, from, idx: from, count: all.length, step, grab, startTop: rect.top - listTop, lastY: clientY };
+  list.classList.add('reordering');
+  el.classList.add('dragging');
+  haptic(12);
+  roMove(clientY);
+}
+
+function roMove(clientY) {
+  const d = RO.drag;
+  if (!d) return;
+  d.lastY = clientY;
+  const top = d.list.getBoundingClientRect().top;
+  const y = clientY - top - d.grab; // gewünschte Oberkante des gezogenen Elements
+  d.el.style.transform = `translate3d(0, ${y - d.startTop}px, 0) scale(1.03)`;
+  const idx = clamp(Math.round(y / d.step), 0, d.count - 1);
+  if (idx !== d.idx) { d.idx = idx; haptic(4); }
+  $$('.reorder-item', d.list).forEach((it, i) => {
+    if (it === d.el) return;
+    let shift = 0;
+    if (i > d.from && i <= d.idx) shift = -d.step;
+    if (i < d.from && i >= d.idx) shift = d.step;
+    it.style.transform = shift ? `translate3d(0, ${shift}px, 0)` : '';
+  });
+  // am Rand automatisch scrollen
+  clearInterval(RO.scrollTimer);
   const view = $('#view-stats');
-  let scrollTimer = 0;
+  const dir = clientY < 150 ? -1 : clientY > window.innerHeight - 150 ? 1 : 0;
+  if (dir) RO.scrollTimer = setInterval(() => { view.scrollTop += dir * 8; roMove(RO.drag ? RO.drag.lastY : clientY); }, 16);
+}
 
-  const move = (clientY) => {
-    if (!drag) return;
-    const top = list.getBoundingClientRect().top;
-    const y = clientY - top - drag.grab; // gewünschte Oberkante des gezogenen Elements
-    drag.el.style.transform = `translate3d(0, ${y - drag.startTop}px, 0) scale(1.03)`;
-    const idx = clamp(Math.round(y / drag.step), 0, drag.count - 1);
-    if (idx !== drag.idx) { drag.idx = idx; haptic(4); }
-    items().forEach((it, i) => {
-      if (it === drag.el) return;
-      let shift = 0;
-      if (i > drag.from && i <= drag.idx) shift = -drag.step;
-      if (i < drag.from && i >= drag.idx) shift = drag.step;
-      it.style.transform = shift ? `translate3d(0, ${shift}px, 0)` : '';
-    });
-    // am Rand automatisch scrollen
-    clearInterval(scrollTimer);
-    const edge = 90;
-    const dir = clientY < edge + 60 ? -1 : clientY > window.innerHeight - edge - 60 ? 1 : 0;
-    if (dir) scrollTimer = setInterval(() => { view.scrollTop += dir * 8; move(drag.lastY); }, 16);
+function roEnd() {
+  const d = RO.drag;
+  clearInterval(RO.scrollTimer);
+  if (!d) return;
+  RO.drag = null;
+  const order = $$('.reorder-item', d.list).map((it) => it.dataset.key);
+  const [k] = order.splice(d.from, 1);
+  order.splice(d.idx, 0, k);
+  // in die Zielposition einrasten lassen, dann neu aufbauen
+  d.el.style.transition = 'transform .25s var(--spring)';
+  d.el.style.transform = `translate3d(0, ${(d.idx - d.from) * d.step}px, 0)`;
+  setTimeout(() => {
+    DB.settings.statOrder = order;
+    save();
+    renderStats();
+  }, reduceMotion.matches ? 0 : 230);
+}
+
+// Baustein aus der normalen Ansicht „anheben“: in die kompakte Liste wechseln,
+// den Eintrag unter den Finger legen und ohne Absetzen weiterziehen
+function liftSection(key, clientY, keepEl) {
+  UI.statEdit = true;
+  renderStats();
+  const view = $('#view-stats');
+  // Der Browser schickt alle weiteren Touch-Events an das ursprünglich berührte Element.
+  // Es muss deshalb im Dokument bleiben (unsichtbar), sonst kommen die Bewegungen nicht an.
+  if (keepEl) {
+    const keeper = document.createElement('div');
+    keeper.hidden = true;
+    keeper.appendChild(keepEl);
+    view.appendChild(keeper);
+  }
+  const item = $(`.reorder-item[data-key="${key}"]`, view);
+  if (!item) return;
+  const r = item.getBoundingClientRect();
+  view.scrollTop += r.top + r.height / 2 - clientY;
+  roStart(item, clientY, item.offsetHeight / 2);
+}
+
+function setupStatsGestures(view) {
+  const LONG = 450;
+  let press = null; // { timer, x, y, id, kind }
+  const cancelPress = () => { if (press) clearTimeout(press.timer); press = null; };
+  const fire = (target, x, y) => {
+    UI.suppressAnyClick = true;
+    setTimeout(() => { UI.suppressAnyClick = false; }, 700);
+    const item = target.closest('.reorder-item');
+    if (item) {
+      roStart(item, y, y - item.getBoundingClientRect().top);
+      return;
+    }
+    const sec = target.closest('.stat-section');
+    if (sec) liftSection(sec.dataset.key, y, target);
   };
+  const pressable = (t) => !t.closest('.ri-handle') && (t.closest('.stat-section') || t.closest('.reorder-item'));
 
-  list.addEventListener('pointerdown', (e) => {
+  // Griff ≡: sofort ziehen (Maus und Touch)
+  view.addEventListener('pointerdown', (e) => {
     const handle = e.target.closest('.ri-handle');
-    if (!handle || e.button !== 0) return;
-    e.preventDefault();
-    const el = handle.closest('.reorder-item');
-    const all = items();
-    const from = all.indexOf(el);
-    const rect = el.getBoundingClientRect();
-    const listTop = list.getBoundingClientRect().top;
-    const step = all.length > 1 ? all[1].getBoundingClientRect().top - all[0].getBoundingClientRect().top : rect.height + 8;
-    drag = { el, from, idx: from, count: all.length, step, grab: e.clientY - rect.top, startTop: rect.top - listTop, lastY: e.clientY, id: e.pointerId };
-    list.classList.add('reordering');
-    el.classList.add('dragging');
-    handle.setPointerCapture(e.pointerId);
-    haptic(10);
+    if (handle && e.button === 0) {
+      e.preventDefault();
+      const item = handle.closest('.reorder-item');
+      roStart(item, e.clientY, e.clientY - item.getBoundingClientRect().top);
+      press = { id: e.pointerId, kind: 'handle' };
+      return;
+    }
+    // Maus: langes Drücken
+    if (e.pointerType === 'mouse' && e.button === 0 && pressable(e.target)) {
+      const t = e.target;
+      press = { id: e.pointerId, kind: 'mouse', x: e.clientX, y: e.clientY, timer: setTimeout(() => fire(t, e.clientX, press ? press.y : e.clientY), LONG) };
+    }
   });
-  list.addEventListener('pointermove', (e) => {
-    if (!drag || e.pointerId !== drag.id) return;
-    drag.lastY = e.clientY;
-    move(e.clientY);
+  window.addEventListener('pointermove', (e) => {
+    if (!press || press.kind === 'touch' || e.pointerId !== press.id) return;
+    if (RO.drag) { roMove(e.clientY); return; }
+    if (Math.hypot(e.clientX - press.x, e.clientY - press.y) > 8) cancelPress();
   });
-  const end = (e) => {
-    if (!drag || e.pointerId !== drag.id) return;
-    clearInterval(scrollTimer);
-    const d = drag;
-    drag = null;
-    const order = items().map((it) => it.dataset.key);
-    const [k] = order.splice(d.from, 1);
-    order.splice(d.idx, 0, k);
-    // in die Zielposition einrasten lassen, dann neu aufbauen
-    d.el.style.transition = 'transform .25s var(--spring)';
-    d.el.style.transform = `translate3d(0, ${(d.idx - d.from) * d.step}px, 0)`;
-    setTimeout(() => {
-      DB.settings.statOrder = order;
-      save();
-      renderStats();
-    }, reduceMotion.matches ? 0 : 230);
+  const pointerEnd = (e) => {
+    if (!press || press.kind === 'touch' || e.pointerId !== press.id) return;
+    cancelPress();
+    roEnd();
   };
-  list.addEventListener('pointerup', end);
-  list.addEventListener('pointercancel', end);
+  window.addEventListener('pointerup', pointerEnd);
+  window.addEventListener('pointercancel', pointerEnd);
+
+  // Touch: langes Drücken, danach Scrollen unterbinden und ziehen
+  view.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1 || RO.drag) return;
+    const t = e.touches[0];
+    if (!pressable(e.target)) return;
+    const target = e.target;
+    press = { kind: 'touch', id: t.identifier, x: t.clientX, y: t.clientY };
+    press.timer = setTimeout(() => { if (press) fire(target, press.x, press.y); }, LONG);
+  }, { passive: true });
+  view.addEventListener('touchmove', (e) => {
+    if (!press || press.kind !== 'touch') return;
+    const t = [...e.changedTouches].find((x) => x.identifier === press.id);
+    if (!t) return;
+    if (RO.drag) { e.preventDefault(); roMove(t.clientY); return; }
+    if (Math.hypot(t.clientX - press.x, t.clientY - press.y) > 10) cancelPress();
+    else { press.x = t.clientX; press.y = t.clientY; }
+  }, { passive: false });
+  const touchEnd = () => {
+    if (!press || press.kind !== 'touch') return;
+    cancelPress();
+    roEnd();
+  };
+  view.addEventListener('touchend', touchEnd);
+  view.addEventListener('touchcancel', touchEnd);
+  view.addEventListener('contextmenu', (e) => { if (e.target.closest('.stat-section, .reorder-item')) e.preventDefault(); });
 }
 
 // Kategorie im Detail
@@ -4063,6 +4145,7 @@ const ACTIONS = {
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-action]');
   if (!b || b.disabled) return;
+  if (UI.suppressAnyClick) return; // direkt nach dem Anheben eines Statistik-Bausteins
   // Klick direkt nach langem Drücken ignorieren
   if (UI.suppressClick && b.classList.contains('card-row')) { UI.suppressClick = false; return; }
   const fn = ACTIONS[b.dataset.action];
@@ -4071,6 +4154,7 @@ document.addEventListener('click', (e) => {
 
 // Statistik: Bereich, Zeitraum, Kalendertage
 document.addEventListener('click', (e) => {
+  if (UI.suppressAnyClick) return;
   const scope = e.target.closest('[data-stat-scope]');
   if (scope) { UI.statScope = scope.dataset.statScope; renderStats(); haptic(4); return; }
   const range = e.target.closest('[data-stat-range]');
@@ -4268,7 +4352,7 @@ function boot() {
   applyTheme();
   renderTabbar();
   initCardsView();
-  refresh();
+  setupStatsGestures($('#view-stats'));
   $('#view-learn').classList.add('active');
   for (const v of $$('.view')) {
     v.addEventListener('scroll', () => v.classList.toggle('scrolled', v.scrollTop > 40), { passive: true });

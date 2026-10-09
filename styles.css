@@ -1149,6 +1149,7 @@ button.bold { font-weight: 600; }
 .card-row.pressing { background: var(--fill2); transform: scale(.985); transition: transform .45s ease, background-color .2s ease; }
 
 /* Statistik-Bausteine anordnen */
+.stat-section, .reorder-item { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .reorder-list { display: grid; gap: 8px; margin: 0 16px; position: relative; }
 .reorder-item {
   display: flex;
