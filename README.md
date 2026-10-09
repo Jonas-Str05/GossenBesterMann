@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` erhöhen (einzige Stelle
 
 | Version | Inhalt |
 | --- | --- |
+| 1.9.2 | Fix: App blieb beim Start schwarz (Ansichten wurden nicht gezeichnet) |
 | 1.9.1 | Statistik-Bausteine per langem Drücken direkt verschieben |
 | 1.9.0 | Statistik-Bausteine anordnen, Update-Prüfung, aufgeräumte Einstellungen |
 | 1.8 | Zahnrad in allen Tabs, Auswahl per langem Drücken |

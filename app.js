@@ -4353,6 +4353,7 @@ function boot() {
   renderTabbar();
   initCardsView();
   setupStatsGestures($('#view-stats'));
+  refresh(); // alle Ansichten zeichnen – ohne diesen Aufruf bleibt die App leer
   $('#view-learn').classList.add('active');
   for (const v of $$('.view')) {
     v.addEventListener('scroll', () => v.classList.toggle('scrolled', v.scrollTop > 40), { passive: true });
