@@ -1,10 +1,10 @@
 @version 1
-// Aufbau: "# id | Bereich | Farbe", "## id | Kategorie", "### Unterthema (wird Hinweis)"
+// Aufbau: "# id | Bereich | Farbe", "## id | Kategorie | Symbol", "### Unterthema (wird Hinweis)"
 // Karte: "Vorderseite | Ausgeschriebener Name | Kurze Erklärung" oder "Vorderseite | Kurze Erklärung"
 
 # k1 | Klausur 1: IT-Systemlösung | blue
 
-## k1-sec | IT-Sicherheit & Datenschutz
+## k1-sec | IT-Sicherheit & Datenschutz | shield
 ### Schutzziele
 Vertraulichkeit | Nur Berechtigte können die Daten einsehen.
 Integrität | Daten sind vollständig und unverändert – keine unbemerkte Manipulation.
@@ -51,7 +51,7 @@ BDSG | Bundesdatenschutzgesetz | Ergänzt die DSGVO in Deutschland (z. B. Besch�
 DSGVO | Datenschutz-Grundverordnung | EU-Verordnung zum Schutz personenbezogener Daten.
 GoBD | Grundsätze ordnungsmäßiger Buchführung in elektronischer Form | Regeln für digitale Buchführung und Archivierung.
 
-## k1-pm | Projektmanagement
+## k1-pm | Projektmanagement | calendar
 ### Projektplanung und -steuerung
 Machbarkeitsanalyse | Prüft, ob ein Projekt technisch, wirtschaftlich und organisatorisch umsetzbar ist.
 Terminplanung | Legt Dauer, Reihenfolge und Termine der Vorgänge fest.
@@ -82,7 +82,7 @@ Transparenz | Alle Beteiligten haben Einblick in Stand, Entscheidungen und Probl
 Servicemanagement | Planung, Steuerung und Verbesserung von IT-Services.
 ITIL | IT Infrastructure Library | Best-Practice-Sammlung für IT-Servicemanagement.
 
-## k1-req | Anforderungsanalyse & Geschäftsprozesse
+## k1-req | Anforderungsanalyse & Geschäftsprozesse | clipboard
 ### Anforderungsanalyse
 Lastenheft | Vom Auftraggeber: beschreibt WAS und WOFÜR – die Anforderungen.
 Pflichtenheft | Vom Auftragnehmer: beschreibt WIE und WOMIT die Anforderungen umgesetzt werden.
@@ -115,7 +115,7 @@ Datenanalyse | Auswerten von Daten, um Muster und Entscheidungsgrundlagen zu gew
 Datenanalyse-Tools | z. B. Excel, Power BI, Tableau, Python.
 KI | Künstliche Intelligenz | Systeme, die aus Daten lernen und z. B. erkennen oder vorhersagen.
 
-## k1-sys | Systemarchitektur & Komponenten
+## k1-sys | Systemarchitektur & Komponenten | cpu
 ### Bewertungskriterien von IT-Systemen
 Leistungsfähigkeit | Wie schnell und belastbar ein System ist (z. B. CPU, RAM, Durchsatz).
 Funktionalität | Welche Funktionen ein System bietet und ob sie die Anforderungen erfüllen.
@@ -142,7 +142,7 @@ Aufbauorganisation | Legt Stellen, Abteilungen und Hierarchien fest (Organigramm
 Ablauforganisation | Legt fest, wie Arbeitsprozesse zeitlich und räumlich ablaufen.
 Wertschöpfungskette | Kette aus Primär- und Unterstützungsaktivitäten, die Wert schaffen (nach Porter).
 
-## k1-net | Netzwerke & Kommunikation
+## k1-net | Netzwerke & Kommunikation | network
 ### Netzwerkinfrastruktur
 Kabelgebundenes Netz | Verbindung über Kupfer (Twisted Pair) oder Glasfaser – stabil und schnell.
 WLAN | Wireless Local Area Network | Kabelloses lokales Netz nach IEEE 802.11.
@@ -190,7 +190,7 @@ GB | Gigabyte | 10⁹ Byte.
 TB | Terabyte | 10¹² Byte.
 Binär- vs. Dezimalpräfix | Datenmengen mit Binärpräfixen (Basis 2), physikalische Größen wie Übertragungsraten dezimal (Basis 10).
 
-## k1-cloud | Cloud & Betriebskonzepte
+## k1-cloud | Cloud & Betriebskonzepte | cloud
 ### Cloud und Online-Dienste
 Cloud Computing | Bereitstellung von IT-Ressourcen über das Internet nach Bedarf.
 Public Cloud | Öffentliche Cloud eines Anbieters, von vielen Kunden geteilt.
@@ -228,7 +228,7 @@ VMI | Vendor Managed Inventory | Lieferant überwacht und füllt das Lager des K
 SMI | Supplier Managed Inventory | Wie VMI: Lieferant verantwortet die Bestände beim Kunden.
 Smart Contract | Digitaler Vertrag, der sich bei erfüllten Bedingungen automatisch ausführt.
 
-## k1-lic | Lizenzmodelle
+## k1-lic | Lizenzmodelle | key
 ### Lizenzarten
 EULA | End User License Agreement | Lizenzvertrag zwischen Hersteller und Endnutzer.
 OEM-Lizenz | Original Equipment Manufacturer | Günstige Lizenz, an die mitgelieferte Hardware gebunden.
@@ -241,7 +241,7 @@ Subscription | Software-Abo | Regelmäßige Gebühr für das Nutzungsrecht, inkl
 Lizenzierung | Einräumen von Nutzungsrechten an Software, z. B. pro Gerät, Nutzer oder CPU-Kern.
 Urheberrecht | Schützt geistige Werke wie Software – Nutzung nur mit Erlaubnis bzw. Lizenz.
 
-## k1-dev | Softwareentwicklung
+## k1-dev | Softwareentwicklung | code
 ### Fehler erkennen und beheben
 Debugging | Systematisches Finden und Beheben von Fehlern im Code.
 Breakpoint | Haltepunkt, an dem das Programm beim Debuggen anhält.
@@ -284,7 +284,7 @@ Barrierefreiheit | Nutzbar für alle Menschen, auch mit Einschränkungen – z. 
 
 # k2 | Klausur 2: Kaufmännische Prozesse | orange
 
-## k2-eco | Wirtschaftlichkeit & Finanzen
+## k2-eco | Wirtschaftlichkeit & Finanzen | coins
 ### Analyseverfahren
 Kosten-Nutzen-Analyse | Stellt Kosten und Nutzen einer Investition gegenüber.
 Rentabilitätsberechnung | Berechnet, wie sich das eingesetzte Kapital verzinst.
@@ -366,7 +366,7 @@ Zahlungsverzug | Kunde zahlt trotz Fälligkeit nicht – spätestens 30 Tage nac
 Datenquellen | z. B. ERP, Warenwirtschaft, Zeiterfassung, Bankdaten.
 Schnittstelle | Technische Verbindung für den Datenaustausch zwischen Systemen.
 
-## k2-mkt | Marketing & Vertrieb
+## k2-mkt | Marketing & Vertrieb | megaphone
 ### Markt- und Kundenanalyse
 Wettbewerbsbeobachtung | Laufende Analyse der Konkurrenz: Preise, Produkte, Strategie.
 Trendforschung | Erkennt künftige Entwicklungen in Markt und Gesellschaft.
@@ -425,7 +425,7 @@ B2C | Business to Consumer | Geschäfte zwischen Unternehmen und Privatkunden.
 B2A | Business to Administration | Geschäfte zwischen Unternehmen und Behörden.
 Marketplace | Online-Marktplatz, auf dem viele Händler verkaufen, z. B. Amazon.
 
-## k2-com | Kundenberatung & Kommunikation
+## k2-com | Kundenberatung & Kommunikation | chat
 ### Präsentation
 Präsentationstechnik | Methoden, Inhalte verständlich vorzustellen: Struktur, Medien, Körpersprache.
 Diagrammarten | Balken = Vergleich, Linie = Verlauf, Kreis = Anteile.
@@ -449,7 +449,7 @@ Schulungsarten | z. B. Präsenzschulung, Online-Schulung, Webinar, Einzelschulun
 Schulungsmethoden | z. B. Vortrag, praktische Übung, Gruppenarbeit, E-Learning.
 Schulungsdurchführung | Planen, durchführen und den Erfolg prüfen (z. B. per Feedback).
 
-## k2-qm | Qualitätsmanagement
+## k2-qm | Qualitätsmanagement | seal
 ### Qualitätsmanagement
 PDCA-Zyklus | Plan, Do, Check, Act | Kreislauf zur ständigen Verbesserung (Deming-Kreis).
 KVP | Kontinuierlicher Verbesserungsprozess | Ständige Verbesserung in kleinen Schritten.
@@ -463,7 +463,7 @@ Abnahmeprotokoll | Kunde bestätigt die Abnahme einer Leistung, inklusive festge
 Parität | Prüfbit macht die Anzahl der Einsen gerade bzw. ungerade – erkennt einfache Bitfehler.
 Redundanz | Mehrfach vorhandene Komponenten oder Daten für mehr Ausfallsicherheit.
 
-## k2-db | Datenbanken & SQL
+## k2-db | Datenbanken & SQL | database
 ### Datenbankmodelle
 Relationale Datenbank | Speichert Daten in Tabellen, verknüpft über Schlüssel.
 Nicht-relationale Datenbank | Speichert Daten ohne feste Tabellenstruktur.
@@ -550,7 +550,7 @@ HOUR / MINUTE | Gibt Stunde bzw. Minute eines Zeitwerts zurück.
 DATEADD | Addiert ein Zeitintervall zu einem Datum.
 DATEDIFF | Berechnet die Differenz zwischen zwei Datumswerten.
 
-## k2-law | Recht & Verträge
+## k2-law | Recht & Verträge | scale
 ### Vertragsarten
 Kaufvertrag | Übergabe und Eigentum einer Sache gegen Kaufpreis (§ 433 BGB).
 Werkvertrag | Geschuldet ist ein ERFOLG, z. B. fertige Software (§ 631 BGB).
@@ -598,7 +598,7 @@ Mängelarten | Sachmangel, Rechtsmangel, Falsch- und Zuweniglieferung – offen,
 Nacherfüllung | Erstes Recht des Käufers bei Mängeln: Reparatur oder Ersatzlieferung.
 Vertragsgestaltung | Preis und Bedingungen werden in Verhandlungen festgelegt.
 
-## k2-buy | Beschaffung
+## k2-buy | Beschaffung | cart
 ### Beschaffungsplanung
 Beschaffungsstrategie | z. B. Single, Dual oder Multiple Sourcing, Global Sourcing.
 Single Sourcing | Nur ein Lieferant für ein Gut.
@@ -672,7 +672,7 @@ Qualitätsvorausplanung | Qualitätsanforderungen schon vor der Lieferung festle
 
 # k3 | Klausur 3: WiSo | green
 
-## k3-job | Berufsbildung, Arbeits- & Tarifrecht
+## k3-job | Berufsbildung, Arbeits- & Tarifrecht | graduation
 ### Berufsbildung
 Ausbildungsvertrag | Vor Beginn schriftlich: Vertragspartner, Beginn/Dauer, Probezeit, Vergütung, Urlaub, Kündigung.
 Probezeit in der Ausbildung | 1 bis 4 Monate – Kündigung jederzeit ohne Frist und ohne Grund.
@@ -759,7 +759,7 @@ Europäische Sozialcharta | Vertrag des Europarats, der soziale Grundrechte gara
 Potenzialanalyse | Ermittelt Stärken und Entwicklungsmöglichkeiten einer Person.
 Existenzgründung | Sich selbstständig machen – Chance: Freiheit; Risiko: Kapital, Haftung, Unsicherheit.
 
-## k3-org | Aufbau & Organisation des Betriebs
+## k3-org | Aufbau & Organisation des Betriebs | building
 ### Wirtschaft und Märkte
 Primärer Sektor | Urproduktion: Land- und Forstwirtschaft, Fischerei, Bergbau.
 Sekundärer Sektor | Verarbeitung: Industrie und Handwerk.
@@ -805,7 +805,7 @@ Behörden | Erfüllen öffentliche Aufgaben, z. B. Finanzamt, Gewerbeaufsicht, A
 Vertrauensvolle Zusammenarbeit | BetrVG-Grundsatz: Arbeitgeber und Betriebsrat arbeiten zum Wohl aller zusammen.
 Personalvertretungsgesetz | Wie das BetrVG, aber für den öffentlichen Dienst (Personalrat).
 
-## k3-safe | Sicherheit & Gesundheitsschutz
+## k3-safe | Sicherheit & Gesundheitsschutz | aid
 ### Vorschriften
 ASiG | Arbeitssicherheitsgesetz | Pflicht zur Bestellung von Betriebsärzten und Fachkräften für Arbeitssicherheit.
 BetrSichV | Betriebssicherheitsverordnung | Regelt die sichere Bereitstellung und Nutzung von Arbeitsmitteln.
@@ -860,7 +860,7 @@ Grundsätze der DSGVO | Rechtmäßigkeit, Zweckbindung, Datenminimierung, Richti
 IT-Sicherheitskonzept | Dokument mit Schutzbedarf, Risiken und Maßnahmen für die IT eines Betriebs.
 Clean Desk | Keine vertraulichen Unterlagen offen liegen lassen, Bildschirm beim Verlassen sperren.
 
-## k3-env | Umweltschutz
+## k3-env | Umweltschutz | leaf
 ### Ressourcenmanagement
 Rationelle Energieverwendung | Energie sparsam und effizient einsetzen.
 Regenerative Energien | Erneuerbar: Sonne, Wind, Wasser, Biomasse, Erdwärme.
@@ -886,7 +886,7 @@ USV | Unterbrechungsfreie Stromversorgung | Überbrückt Stromausfälle per Akku
 ### Nachhaltigkeit
 Nachhaltigkeit | Ökologisch, ökonomisch und sozial so handeln, dass auch künftige Generationen gut leben können.
 
-## k3-digi | Vernetztes Zusammenarbeiten
+## k3-digi | Vernetztes Zusammenarbeiten | people
 ### Kommunikation
 Interdisziplinarität | Zusammenarbeit von Personen verschiedener Fachrichtungen.
 Interkulturalität | Zusammenarbeit verschiedener Kulturen – mit Offenheit und Respekt.

@@ -99,7 +99,80 @@ const ICON = {
   info: svg('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/>', 2),
   sort: svg('<path d="M7 4v16M3.5 16.5L7 20l3.5-3.5M17 20V4M13.5 7.5L17 4l3.5 3.5"/>', 2),
   share: svg('<path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>', 2),
+  bookmark: svg('<path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/>', 2),
+  bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg>',
+  pencil: svg('<path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5z"/><path d="M13.5 7l3 3"/>', 2),
 };
+
+// Symbole für Kategorien (auswählbar)
+const CAT_ICONS = {
+  folder: ICON.folder,
+  tray: svg('<path d="M3 13h5l1.5 2.5h5L16 13h5"/><path d="M5.5 5h13l2.5 8v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/>'),
+  shield: svg('<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'),
+  lock: ICON.lock,
+  calendar: svg('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M7.5 14h2M11 14h2M14.5 14h2"/>'),
+  clipboard: svg('<rect x="5" y="4.5" width="14" height="16.5" rx="2.5"/><path d="M9 4.5V3h6v1.5M8.5 10h7M8.5 14h7M8.5 18h4"/>'),
+  cpu: svg('<rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/>'),
+  server: svg('<rect x="4" y="4" width="16" height="7" rx="2"/><rect x="4" y="13" width="16" height="7" rx="2"/><path d="M8 7.5h.01M8 16.5h.01"/>', 2.2),
+  network: svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>'),
+  wifi: svg('<path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.5 16a5 5 0 0 1 7 0"/><path d="M12 19.5h.01"/>', 2.2),
+  cloud: svg('<path d="M7 18.5a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4.5 4.5 0 0 1-.5 9z"/>'),
+  key: svg('<circle cx="8" cy="15" r="4"/><path d="M11 12l8-8M16 7l2.5 2.5M13.5 9.5l2 2"/>'),
+  code: svg('<path d="M8.5 7L3.5 12l5 5M15.5 7l5 5-5 5M13.5 4.5l-3 15"/>'),
+  coins: svg('<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5a4 4 0 1 0 0 7M7 10.5h6M7 13.5h6"/>'),
+  chart: svg('<path d="M4 20V11M10 20V4M16 20v-7M21 20H3"/>'),
+  megaphone: svg('<path d="M3 10v4a1 1 0 0 0 1 1h3l6 4V5L7 9H4a1 1 0 0 0-1 1z"/><path d="M17 8.5a5 5 0 0 1 0 7M7 15l1 5"/>'),
+  chat: svg('<path d="M20 15a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 12.5h5"/>'),
+  seal: svg('<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.8 2.8L16.5 9.5"/>'),
+  database: svg('<ellipse cx="12" cy="5.5" rx="7.5" ry="2.5"/><path d="M4.5 5.5v13c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5v-13M4.5 12c0 1.4 3.4 2.5 7.5 2.5s7.5-1.1 7.5-2.5"/>'),
+  scale: svg('<path d="M12 3v17M7.5 21h9M5 6.5h14M5 6.5L2.5 13a2.5 2.5 0 0 0 5 0zM19 6.5L16.5 13a2.5 2.5 0 0 0 5 0z"/>'),
+  cart: svg('<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3.5h3l2.4 11.2a1.5 1.5 0 0 0 1.5 1.3h8.7a1.5 1.5 0 0 0 1.5-1.2l1.4-7.3H6.3"/>'),
+  graduation: svg('<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5M22 9v6"/>'),
+  building: svg('<rect x="4" y="3" width="11" height="18" rx="1.5"/><path d="M15 9h4a1 1 0 0 1 1 1v11h-5M8 7h3M8 11h3M8 15h3M3 21h18"/>'),
+  aid: svg('<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/>', 2.2),
+  leaf: svg('<path d="M20 4c-9 0-15 4-15 11 0 2 .6 3.6 1.6 5 1.4 0 3-.4 4.4-1C17 16 20 11 20 4z"/><path d="M4 21c3-5 7-8.5 11-10.5"/>'),
+  people: svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-6 6.5-6s5.9 2.4 6.5 6"/><circle cx="17" cy="9" r="2.8"/><path d="M16.5 14.2c2.6.2 4.5 2.4 5 5.3"/>'),
+  mail: svg('<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/>'),
+  book: svg('<path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 19a2 2 0 0 0 2 2h13v-3"/>'),
+  bulb: ICON.bulb,
+  star: svg('<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>'),
+  heart: svg('<path d="M12 20s-7.5-4.6-9-9.5C2 7 4.2 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3 0 5.2 2.5 4.2 6C19.5 15.4 12 20 12 20z"/>'),
+  bolt: svg('<path d="M13 3L4.5 13.5H11L10 21l8.5-10.5H12z"/>'),
+  flask: svg('<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7 15h10"/>'),
+  gear: ICON.gear,
+  learn: ICON.learn,
+};
+
+// Passendes Symbol aus dem Kategorienamen ableiten
+const ICON_GUESS = [
+  [/sicherheit|security|schutz(?!.*umwelt)|datenschutz|hack/i, 'shield'],
+  [/projekt|planung|termin|zeit/i, 'calendar'],
+  [/anforderung|prozess|analyse|dokument/i, 'clipboard'],
+  [/hardware|system|architektur|komponent|rechner/i, 'cpu'],
+  [/server|rechenzentrum/i, 'server'],
+  [/netz|network|internet|osi|ip\b|tcp/i, 'network'],
+  [/wlan|funk|wireless/i, 'wifi'],
+  [/cloud|betrieb/i, 'cloud'],
+  [/lizenz|recht.*software|schlüssel/i, 'key'],
+  [/software|programm|code|entwicklung|java|python/i, 'code'],
+  [/wirtschaft|finanz|kosten|geld|buchführung|rechnungswesen|kalkulation/i, 'coins'],
+  [/kennzahl|statistik|auswertung/i, 'chart'],
+  [/marketing|vertrieb|werbung/i, 'megaphone'],
+  [/kommunikation|beratung|kunde|gespräch/i, 'chat'],
+  [/qualität|test|prüf/i, 'seal'],
+  [/datenbank|sql|daten\b/i, 'database'],
+  [/recht|gesetz|vertrag|jura/i, 'scale'],
+  [/beschaffung|einkauf|kauf|lager/i, 'cart'],
+  [/ausbildung|berufsbildung|schule|lernen|bildung/i, 'graduation'],
+  [/organisation|unternehmen|betrieb|firma/i, 'building'],
+  [/gesundheit|erste hilfe|unfall|arbeitsschutz/i, 'aid'],
+  [/umwelt|nachhaltig|green|energie/i, 'leaf'],
+  [/team|zusammen|sozial|personal|mitarbeiter/i, 'people'],
+  [/mail|e-mail/i, 'mail'],
+  [/wiso|allgemein|wissen/i, 'book'],
+];
+const guessIcon = (name) => (ICON_GUESS.find(([re]) => re.test(name)) || [, 'folder'])[1];
+const catIcon = (c) => CAT_ICONS[c && c.icon] || CAT_ICONS.folder;
 
 // ---------------------------------------------------------------------------
 // Datenhaltung
@@ -110,7 +183,7 @@ let DB = null;
 function defaultDB() {
   return {
     version: 1,
-    categories: [{ id: 'inbox', name: 'Unsortiert', color: 'gray', keywords: [], created: Date.now() }],
+    categories: [{ id: 'inbox', name: 'Unsortiert', color: 'gray', icon: 'tray', keywords: [], created: Date.now() }],
     cards: [],
     log: {},
     settings: {
@@ -143,6 +216,10 @@ function normalize(d) {
       if (c.kind === 'group' && c.id !== 'inbox') cat.kind = 'group';
       if (Number.isFinite(c.order)) cat.order = c.order;
       if (c.deck) cat.deck = true;
+      // Symbol: gespeichert, sonst automatisch aus dem Namen geraten (bleibt änderbar)
+      if (cat.id === 'inbox') cat.icon = 'tray';
+      else if (CAT_ICONS[c.icon]) { cat.icon = c.icon; if (c.iconAuto) cat.iconAuto = true; }
+      else { cat.icon = guessIcon(cat.name); cat.iconAuto = true; }
       return cat;
     });
   const seen = new Set();
@@ -175,6 +252,7 @@ function normalize(d) {
         wrong: Math.max(0, +c.wrong || 0),
         last: +c.last || 0,
         ...(c.deck ? { deck: true } : {}),
+        ...(c.pinned ? { pinned: true } : {}),
       };
     });
   const log = {};
@@ -251,7 +329,7 @@ function nextColor() {
   return COLORS.find((c) => !used.includes(c)) || COLORS[DB.categories.length % COLORS.length];
 }
 function createCategory(name, extra = {}) {
-  const cat = { id: uid(), name: name.trim(), color: nextColor(), keywords: [], created: Date.now(), parentId: null, ...extra };
+  const cat = { id: uid(), name: name.trim(), color: nextColor(), icon: guessIcon(name), keywords: [], created: Date.now(), parentId: null, ...extra };
   DB.categories.push(cat);
   return cat;
 }
@@ -430,7 +508,8 @@ function openSheet({ title, body, left, right, compact, onMount, beforeClose, on
     </div>`);
   const sheetEl = $('.sheet', root);
   const scrim = $('.scrim', root);
-  const isBase = !stack.some((o) => o.kind === 'sheet');
+  // Nur das unterste Sheet schiebt die App nach hinten – nicht über einer Lernsession
+  const isBase = !stack.some((o) => o.kind === 'sheet' || o.kind === 'session');
   let H = 800;
   const spring = new Spring(H, { damping: 1, response: 0.38, precision: 0.5 }, (y) => {
     sheetEl.style.transform = `translate3d(0, ${y}px, 0)`;
@@ -919,6 +998,7 @@ const weightOf = (level) => 2 ** ((MAX - level) / 2);
 function poolFor(spec) {
   if (spec.type === 'category') return DB.cards.filter((c) => c.categoryId === spec.categoryId);
   if (spec.type === 'group') return cardsInGroup(spec.groupId);
+  if (spec.type === 'pinned') return DB.cards.filter((c) => c.pinned);
   if (spec.type === 'level') return DB.cards.filter((c) => c.level === spec.level);
   if (spec.type === 'retry') return spec.ids.map(cardById).filter(Boolean);
   return DB.cards;
@@ -1049,6 +1129,7 @@ function renderLearn() {
   const totW = DB.cards.reduce((a, c) => a + c.wrong, 0);
   const rate = totR + totW ? Math.round((totR / (totR + totW)) * 100) : null;
   const weak = DB.cards.filter((c) => c.level < 0).length;
+  const pinnedN = DB.cards.filter((c) => c.pinned).length;
   const size = DB.settings.sessionSize;
   const catsWithCards = DB.categories.filter((c) => cardsIn(c.id).length).length;
   const showInstall = UI.installEvt && !isStandalone() && !DB.settings.installDismissed;
@@ -1129,6 +1210,11 @@ function renderLearn() {
           ${rowIcon(ICON.layers, 'green')}
           <div class="row-main"><div class="row-title">Eine Ebene</div><div class="row-sub">${weak ? `${plural(weak, 'Karte', 'Karten')} im negativen Bereich` : 'z. B. nur deine schwächsten Karten'}</div></div>${chev}
         </button>
+        ${pinnedN ? `
+        <button class="row" data-action="start-pinned">
+          ${rowIcon(ICON.bookmark, 'orange')}
+          <div class="row-main"><div class="row-title">Gemerkte Karten</div><div class="row-sub">${plural(pinnedN, 'Karte', 'Karten')} zum Überarbeiten markiert</div></div>${chev}
+        </button>` : ''}
       </div>
       <p class="footnote">Gewusst → ein Fach nach oben, nicht gewusst → ein Fach nach unten. Neue Karten starten bei 0, der Bereich reicht von −5 bis +5.</p>
     `}
@@ -1164,7 +1250,7 @@ const SORTS = {
 const ungroupedCardCats = () => new Set(ungrouped().map((c) => c.id));
 function filterGroup() {
   const f = UI.cardsFilter;
-  if (f === 'all') return null;
+  if (f === 'all' || f === 'pinned') return null;
   if (f.startsWith('g:')) return f.slice(2);
   const c = catById(f);
   return c ? (c.parentId || 'none') : null;
@@ -1174,7 +1260,8 @@ function filteredCards() {
   const q = UI.search.trim().toLowerCase();
   const f = UI.cardsFilter;
   let list = DB.cards;
-  if (f === 'g:none') { const ids = ungroupedCardCats(); list = list.filter((c) => ids.has(c.categoryId)); }
+  if (f === 'pinned') list = list.filter((c) => c.pinned);
+  else if (f === 'g:none') { const ids = ungroupedCardCats(); list = list.filter((c) => ids.has(c.categoryId)); }
   else if (f.startsWith('g:')) list = cardsInGroup(f.slice(2));
   else if (f !== 'all') list = list.filter((c) => c.categoryId === f);
   if (q) list = list.filter((c) => `${c.front}\n${c.back}\n${c.hint}`.toLowerCase().includes(q));
@@ -1184,7 +1271,7 @@ function filteredCards() {
 
 function renderCardsList() {
   const f = UI.cardsFilter;
-  const valid = f === 'all' || f === 'g:none' || (f.startsWith('g:') ? isGroup(catById(f.slice(2))) : catById(f) && !isGroup(catById(f)));
+  const valid = f === 'all' || f === 'g:none' || f === 'pinned' || (f.startsWith('g:') ? isGroup(catById(f.slice(2))) : catById(f) && !isGroup(catById(f)));
   if (!valid) UI.cardsFilter = 'all';
   const chips = $('#card-chips');
   const gs = groups();
@@ -1193,14 +1280,18 @@ function renderCardsList() {
   const active = filterGroup();
   const chip = (key, label, n, color, on) =>
     `<button class="chip ${on ? 'on' : ''}" ${color ? `style="--c:var(--${color})"` : ''} data-action="filter" data-cat="${esc(key)}">${color ? '<span class="dot"></span>' : ''}${esc(label)} <span class="n">${n}</span></button>`;
+  const pinnedN = DB.cards.filter((c) => c.pinned).length;
+  const pinChip = pinnedN || UI.cardsFilter === 'pinned'
+    ? `<button class="chip pin ${UI.cardsFilter === 'pinned' ? 'on' : ''}" style="--c:var(--orange)" data-action="filter" data-cat="pinned">${ICON.bookmarkFill}Gemerkt <span class="n">${pinnedN}</span></button>`
+    : '';
 
   if (!gs.length) {
     // ohne Bereiche: eine Zeile mit allen Kategorien
-    chips.innerHTML = chip('all', 'Alle', DB.cards.length, null, UI.cardsFilter === 'all') +
+    chips.innerHTML = chip('all', 'Alle', DB.cards.length, null, UI.cardsFilter === 'all') + pinChip +
       sortedCats().map((c) => chip(c.id, c.name, cardsIn(c.id).length, c.color, UI.cardsFilter === c.id)).join('');
     $('#card-subchips').hidden = true;
   } else {
-    chips.innerHTML = chip('all', 'Alle', DB.cards.length, null, UI.cardsFilter === 'all') +
+    chips.innerHTML = chip('all', 'Alle', DB.cards.length, null, UI.cardsFilter === 'all') + pinChip +
       gs.map((g) => chip(`g:${g.id}`, groupShort(g), cardsInGroup(g.id).length, g.color, active === g.id)).join('') +
       (ugCount || ug.length > 1 ? chip('g:none', 'Weitere', ugCount, 'gray', active === 'none') : '');
     const sub = $('#card-subchips');
@@ -1232,7 +1323,7 @@ function renderCardsList() {
   if (!DB.cards.length) {
     box.innerHTML = `<div class="empty"><div class="empty-icon">${ICON.cards}</div><h2>Noch keine Karten</h2><p>Tippe auf +, um deine erste Karte anzulegen.</p><button class="btn-primary" data-action="new-card">${ICON.plus}<span>Karte anlegen</span></button></div>`;
   } else if (!list.length) {
-    box.innerHTML = `<div class="empty"><h2>Keine Treffer</h2><p>${UI.search ? 'Keine Karte passt zu deiner Suche.' : 'In dieser Kategorie sind noch keine Karten.'}</p></div>`;
+    box.innerHTML = `<div class="empty"><h2>Keine Treffer</h2><p>${UI.search ? 'Keine Karte passt zu deiner Suche.' : UI.cardsFilter === 'pinned' ? 'Du hast keine Karten gemerkt. Beim Lernen kannst du Karten nach dem Aufdecken mit „Merken“ markieren.' : 'In dieser Kategorie sind noch keine Karten.'}</p></div>`;
   } else {
     box.innerHTML = `
       <div class="list-meta"><span>${plural(list.length, 'Karte', 'Karten')}</span>
@@ -1246,7 +1337,7 @@ function renderCardsList() {
             ${sel ? `<span class="check ${UI.selected.has(c.id) ? 'on' : ''}">${ICON.check}</span>` : ''}
             <span class="lvl" style="--c:${levelColor(c.level)}">${fmtLevel(c.level)}</span>
             <div class="row-main">
-              <div class="row-title clamp2">${esc(c.front)}</div>
+              <div class="row-title clamp2">${c.pinned ? `<span class="row-pin" aria-label="Gemerkt">${ICON.bookmarkFill}</span>` : ''}${esc(c.front)}</div>
               <div class="row-sub clamp1"><span class="cat-dot" style="--c:var(--${cat.color})"></span>${esc(cat.name)} · ${esc(c.back.replace(/\s+/g, ' '))}</div>
             </div>
             ${sel ? '' : chev}
@@ -1285,7 +1376,7 @@ function renderCategories() {
     const cs = cardsIn(c.id);
     const avg = cs.length ? cs.reduce((a, x) => a + x.level, 0) / cs.length : null;
     return `<button class="row" data-action="edit-category" data-id="${esc(c.id)}">
-      ${rowIcon(c.id === 'inbox' ? ICON.cards : ICON.folder, c.color, true)}
+      ${rowIcon(catIcon(c), c.color, true)}
       <div class="row-main">
         <div class="row-title clamp1">${esc(c.name)}</div>
         <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')}${avg != null ? ` · Ø Ebene ${avg > 0 ? '+' : avg < 0 ? '−' : ''}${Math.abs(avg).toLocaleString('de-DE', { maximumFractionDigits: 1 })}` : ''}</div>
@@ -1486,6 +1577,7 @@ function openCardEditor(card = null, opts = {}) {
   let manualCat = !!card || !!opts.categoryId;
   let autoPicked = false;
   let level = card ? card.level : 0;
+  let pinned = !!(card && card.pinned);
   const initial = card ? { front: card.front, back: card.back, hint: card.hint, cat: card.categoryId, level: card.level } : { front: '', back: '', hint: '', cat: catId, level: 0 };
 
   const body = `
@@ -1507,6 +1599,11 @@ function openCardEditor(card = null, opts = {}) {
               <button type="button" data-ed="lvl-up" aria-label="Ebene hoch">${ICON.plus}</button>
             </div>
           </div>
+          <div class="row">
+            <span class="row-icon" style="--c:var(--orange)">${ICON.bookmark}</span>
+            <div class="row-main"><div class="row-title">Gemerkt</div><div class="row-sub">Zum späteren Überarbeiten markiert</div></div>
+            <label class="switch"><input type="checkbox" data-ed-pin ${card.pinned ? 'checked' : ''} aria-label="Gemerkt"><span></span></label>
+          </div>
         </div>` : ''}
       <div class="btn-stack">
         ${isNew
@@ -1519,7 +1616,7 @@ function openCardEditor(card = null, opts = {}) {
   let sheet;
   const val = (k) => $(`[data-f="${k}"]`, sheet.body).value;
   const valid = () => val('front').trim() && val('back').trim();
-  const dirty = () => val('front') !== initial.front || val('back') !== initial.back || val('hint') !== initial.hint || catId !== initial.cat || level !== initial.level;
+  const dirty = () => val('front') !== initial.front || val('back') !== initial.back || val('hint') !== initial.hint || catId !== initial.cat || level !== initial.level || (!!card && pinned !== !!card.pinned);
 
   const renderPicker = () => {
     $('#cat-picker', sheet.body).innerHTML = catChipsHTML(catId, 'data-ed="cat" data-id', `<button type="button" class="chip dashed" data-ed="new-cat">${ICON.plus}Neu</button>`);
@@ -1565,6 +1662,7 @@ function openCardEditor(card = null, opts = {}) {
     } else {
       const textChanged = data.front !== card.front || data.back !== card.back || data.hint !== card.hint;
       Object.assign(card, data, { level, updated: Date.now() });
+      if (pinned) card.pinned = true; else delete card.pinned;
       if (textChanged) delete card.deck; // eigene Änderung: Kartensatz-Updates überschreiben sie nicht mehr
     }
     if (manualCat) DB.settings.lastCategory = catId;
@@ -1586,6 +1684,7 @@ function openCardEditor(card = null, opts = {}) {
         haptic(10);
         toast(isNew ? 'Karte gesichert' : 'Änderungen gesichert');
         sh.close();
+        if (opts.onSaved) opts.onSaved();
       },
     },
     beforeClose: async () => {
@@ -1601,6 +1700,9 @@ function openCardEditor(card = null, opts = {}) {
     },
   });
 
+  sheet.body.addEventListener('change', (e) => {
+    if (e.target.matches('[data-ed-pin]')) { pinned = e.target.checked; haptic(5); }
+  });
   sheet.body.addEventListener('input', (e) => {
     if (e.target.matches('textarea')) {
       autoGrow(e.target);
@@ -1660,6 +1762,7 @@ function openCardEditor(card = null, opts = {}) {
         refresh();
         sheet.close();
         toast('Karte gelöscht');
+        if (opts.onDeleted) opts.onDeleted();
       }
     } else if (act === 'save-next') {
       if (!valid()) {
@@ -1699,6 +1802,8 @@ function openCategoryEditor(cat = null, opts = {}) {
   const isInbox = cat && cat.id === 'inbox';
   let parentId = cat ? cat.parentId : (opts.parentId || null);
   let color = cat ? cat.color : (parentId ? catById(parentId).color : nextColor());
+  let icon = cat ? cat.icon : 'folder';
+  let iconPicked = !!cat && !cat.iconAuto; // bei neuen Kategorien folgt das Symbol dem Namen, bis man selbst wählt
   const cs = cat ? cardsIn(cat.id) : [];
   const counts = levelCounts(cs);
   const maxC = Math.max(1, ...Object.values(counts));
@@ -1715,6 +1820,8 @@ function openCategoryEditor(cat = null, opts = {}) {
       ${isInbox ? '' : `
       <div class="form-label">Farbe</div>
       <div class="colors" id="colors"></div>
+      <div class="form-label">Symbol</div>
+      <div class="icon-grid" id="icons"></div>
       <div class="form-group">
         <div class="form-label">Stichwörter <span class="opt">· optional</span></div>
         <div class="field"><textarea data-c="keywords" rows="1" placeholder="z. B. Subnetz, IPv4, Router, OSI">${esc(cat ? cat.keywords.join(', ') : '')}</textarea></div>
@@ -1740,6 +1847,14 @@ function openCategoryEditor(cat = null, opts = {}) {
     const box = $('#colors', sheet.body);
     if (!box) return;
     box.innerHTML = COLORS.map((c) => `<button type="button" class="swatch ${c === color ? 'on' : ''}" style="--c:var(--${c})" data-color="${c}" aria-label="Farbe ${c}"></button>`).join('');
+    renderIcons();
+  };
+  const renderIcons = () => {
+    const box = $('#icons', sheet.body);
+    if (!box) return;
+    box.style.setProperty('--c', `var(--${color})`);
+    box.innerHTML = Object.keys(CAT_ICONS).filter((k) => k !== 'tray').map((k) =>
+      `<button type="button" class="icon-pick ${k === icon ? 'on' : ''}" data-icon="${k}" aria-label="Symbol ${k}" aria-pressed="${k === icon}">${CAT_ICONS[k]}</button>`).join('');
   };
   const renderGroups = () => {
     const box = $('#grp-picker', sheet.body);
@@ -1748,7 +1863,7 @@ function openCategoryEditor(cat = null, opts = {}) {
       `<button type="button" class="chip ${!parentId ? 'on' : ''}" style="--c:var(--gray)" data-grp=""><span class="dot"></span>Kein Bereich</button>`;
   };
   const initialKw = cat ? cat.keywords.join('|') : '';
-  const dirty = () => (cat ? nameVal() !== cat.name || color !== cat.color || kwVal().join('|') !== initialKw || (parentId || null) !== (cat.parentId || null) : !!nameVal());
+  const dirty = () => (cat ? nameVal() !== cat.name || color !== cat.color || icon !== cat.icon || kwVal().join('|') !== initialKw || (parentId || null) !== (cat.parentId || null) : !!nameVal());
 
   sheet = openSheet({
     title: isNew ? 'Neue Kategorie' : 'Kategorie',
@@ -1762,9 +1877,10 @@ function openCategoryEditor(cat = null, opts = {}) {
         if (!name) return;
         const dupe = DB.categories.find((c) => c !== cat && !isGroup(c) && c.name.toLowerCase() === name.toLowerCase());
         if (dupe) { toast('Diese Kategorie gibt es schon', 'error'); return; }
-        if (isNew) createCategory(name, { color, keywords: kwVal(), parentId });
+        if (isNew) createCategory(name, { color, icon, keywords: kwVal(), parentId });
         else {
           Object.assign(cat, { name, color: isInbox ? 'gray' : color, keywords: isInbox ? [] : kwVal(), parentId: isInbox ? null : parentId });
+          if (!isInbox && icon !== cat.icon) { cat.icon = icon; delete cat.iconAuto; }
           delete cat.deck;
         }
         save();
@@ -1784,11 +1900,17 @@ function openCategoryEditor(cat = null, opts = {}) {
 
   sheet.body.addEventListener('input', (e) => {
     if (e.target.matches('textarea')) autoGrow(e.target);
+    if (e.target.dataset.c === 'name' && !iconPicked) {
+      const g = guessIcon(nameVal());
+      if (g !== icon) { icon = g; renderIcons(); }
+    }
     sheet.setRight(null, !nameVal());
   });
   sheet.body.addEventListener('click', async (e) => {
     const sw = e.target.closest('[data-color]');
     if (sw) { color = sw.dataset.color; renderColors(); haptic(5); return; }
+    const ip = e.target.closest('[data-icon]');
+    if (ip) { icon = ip.dataset.icon; iconPicked = true; renderIcons(); haptic(5); return; }
     const gp = e.target.closest('[data-grp]');
     if (gp) {
       parentId = gp.dataset.grp || null;
@@ -2022,7 +2144,7 @@ function pickCategorySheet() {
     const cs = cardsIn(c.id);
     const weak = cs.filter((x) => x.level < 0).length;
     return `<button class="row" data-cat="${esc(c.id)}" ${cs.length ? '' : 'disabled'}>
-      ${rowIcon(c.id === 'inbox' ? ICON.cards : ICON.folder, c.color, true)}
+      ${rowIcon(catIcon(c), c.color, true)}
       <div class="row-main"><div class="row-title clamp1">${esc(c.name)}</div><div class="row-sub">${plural(cs.length, 'Karte', 'Karten')}${weak ? ` · ${weak} schwach` : ''}</div></div>${chev}
     </button>`;
   };
@@ -2162,27 +2284,37 @@ function startSession(spec) {
       return;
     }
     const card = currentCard();
+    // Werkzeuge erst nach dem Aufdecken – der Platz bleibt reserviert, damit die Karte nicht springt
+    const tools = `
+      <div class="tool-row ${S.revealed ? 'show' : ''}" ${S.revealed ? '' : 'aria-hidden="true"'}>
+        <button class="tool-btn ${card.pinned ? 'on' : ''}" data-s="pin" ${S.revealed ? '' : 'disabled tabindex="-1"'} aria-pressed="${!!card.pinned}">${card.pinned ? ICON.bookmarkFill : ICON.bookmark}<span>${card.pinned ? 'Gemerkt' : 'Merken'}</span></button>
+        <button class="tool-btn" data-s="edit" ${S.revealed ? '' : 'disabled tabindex="-1"'}>${ICON.pencil}<span>Bearbeiten</span></button>
+        <button class="tool-btn destructive" data-s="delete" ${S.revealed ? '' : 'disabled tabindex="-1"'}>${ICON.trash}<span>Löschen</span></button>
+      </div>`;
     if (!S.revealed) {
-      actions.innerHTML = `
-        ${card.hint ? `<button class="pill-btn hint" data-s="hint" ${S.hintShown ? 'disabled' : ''}>${ICON.bulb}<span>Hinweis</span></button>` : ''}
-        <button class="pill-btn primary" data-s="flip">${ICON.flip}<span>Umdrehen</span></button>`;
+      actions.innerHTML = `${tools}
+        <div class="act-row">
+          ${card.hint ? `<button class="pill-btn hint" data-s="hint" ${S.hintShown ? 'disabled' : ''}>${ICON.bulb}<span>Hinweis</span></button>` : ''}
+          <button class="pill-btn primary" data-s="flip">${ICON.flip}<span>Umdrehen</span></button>
+        </div>`;
     } else {
-      const l = card.level;
-      const move = (to) => (to === l ? `bleibt bei ${fmtLevel(l)}` : `${fmtLevel(l)} → ${fmtLevel(to)}`);
-      actions.innerHTML = `
-        <button class="rate-btn no" data-s="no"><b>${ICON.x}Nicht gewusst</b><small>${move(clampLevel(l - 1))}</small></button>
-        <button class="rate-btn yes" data-s="yes"><b>${ICON.check}Gewusst</b><small>${move(clampLevel(l + 1))}</small></button>`;
+      actions.innerHTML = `${tools}
+        <div class="act-row">
+          <button class="rate-btn no" data-s="no"><b>${ICON.x}Nicht gewusst</b><small>−1</small></button>
+          <button class="rate-btn yes" data-s="yes"><b>${ICON.check}Gewusst</b><small>+1</small></button>
+        </div>`;
     }
   };
 
   // ---- Eine Karte als physisches Objekt -----------------------------------
-  function CardView(card, { from = 0, revealed = false } = {}) {
+  function CardView(card, { from = 0, revealed = false, instant = false } = {}) {
     const cat = catById(card.categoryId) || catById('inbox');
+    const pin = `<span class="pin-badge" ${card.pinned ? '' : 'hidden'} aria-label="Gemerkt">${ICON.bookmarkFill}</span>`;
     const node = el(`
       <div class="flash ${reduceMotion.matches ? 'reduce' : ''}" role="group" aria-label="Karteikarte">
         <div class="flash-inner">
           <div class="face front" aria-hidden="${revealed}">
-            <div class="face-top"><span class="face-label">Frage</span><span class="face-cat" style="--c:var(--${cat.color})"><i></i><span>${esc(cat.name)}</span></span></div>
+            <div class="face-top"><span class="face-label">Frage${pin}</span><span class="face-cat" style="--c:var(--${cat.color})"><i></i><span>${esc(cat.name)}</span></span></div>
             <div class="face-scroll"><div class="face-content">
               <div class="face-text ${sizeClass(card.front)}">${esc(card.front)}</div>
               ${card.hint ? `<div class="hint-wrap"><div><div class="hint-box"><div class="hint-label">${ICON.bulb}Hinweis</div>${esc(card.hint)}</div></div></div>` : ''}
@@ -2190,7 +2322,7 @@ function startSession(spec) {
             <div class="face-foot">Tippen zum Umdrehen</div>
           </div>
           <div class="face back" aria-hidden="${!revealed}">
-            <div class="face-top"><span class="face-label">Antwort</span><span class="lvl" style="--c:${levelColor(card.level)}">${fmtLevel(card.level)}</span></div>
+            <div class="face-top"><span class="face-label">Antwort${pin}</span><span class="lvl" style="--c:${levelColor(card.level)}">${fmtLevel(card.level)}</span></div>
             <div class="face-scroll"><div class="face-content">
               <div class="face-q">${esc(card.front)}</div>
               ${backHTML(card)}
@@ -2205,7 +2337,7 @@ function startSession(spec) {
     const tYes = $('.tint.yes', node);
     const tNo = $('.tint.no', node);
     const W = () => stage.clientWidth || 320;
-    const st = { x: from ? from * W() * 1.3 : 0, enter: from ? 1 : 0, angle: revealed ? 180 : 0 };
+    const st = { x: from ? from * W() * 1.3 : 0, enter: from || instant ? 1 : 0, angle: revealed ? 180 : 0 };
 
     const apply = () => {
       const w = W();
@@ -2239,6 +2371,7 @@ function startSession(spec) {
       },
       get flipped() { return fs.target === 180 || node.classList.contains('flipped'); },
       showHint() { const h = $('.hint-wrap', node); if (h) h.classList.add('show'); },
+      setPinned(on) { for (const b of $$('.pin-badge', node)) b.hidden = !on; },
       leave(dir, velocity) {
         node.classList.add('locked');
         node.style.zIndex = '3';
@@ -2261,6 +2394,8 @@ function startSession(spec) {
       drag = { id: e.pointerId, x0: e.clientX, y0: e.clientY, sx: st.x, axis: null, vt: new VelocityTracker(), t0: performance.now() };
       drag.vt.add(e.clientX, e.clientY);
       xs.stop();
+      // sofort einfangen: Bewegungen kommen auch an, wenn der Finger die Karte verlässt
+      try { node.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
     });
     node.addEventListener('pointermove', (e) => {
       if (!drag || e.pointerId !== drag.id) return;
@@ -2361,6 +2496,69 @@ function startSession(spec) {
     haptic(6);
   }
 
+  // ---- Werkzeuge nach dem Aufdecken -----------------------------------------
+  function togglePin() {
+    if (!S.revealed || !S.view) return;
+    const card = currentCard();
+    if (card.pinned) delete card.pinned; else card.pinned = true;
+    save();
+    S.view.setPinned(!!card.pinned);
+    renderActions();
+    haptic(8);
+    toast(card.pinned ? 'Für später gemerkt' : 'Nicht mehr gemerkt');
+  }
+
+  // Karte an Ort und Stelle neu zeichnen (nach dem Bearbeiten), aufgedeckt
+  function redrawCurrent() {
+    if (!S.view) return;
+    S.view.node.remove();
+    const view = CardView(currentCard(), { revealed: true, instant: true });
+    stage.appendChild(view.node);
+    S.view = view;
+    view.enter();
+    renderActions();
+  }
+
+  function editCurrent() {
+    if (!S.revealed || !S.view) return;
+    openCardEditor(currentCard(), { onSaved: redrawCurrent, onDeleted: () => removeCurrent(true) });
+  }
+
+  // Aktuelle Karte aus der Runde entfernen (z. B. nach dem Löschen)
+  function removeCurrent(alreadyDeleted) {
+    const id = queue[S.i];
+    if (!alreadyDeleted) {
+      DB.cards = DB.cards.filter((c) => c.id !== id);
+      save();
+    }
+    if (S.view) { S.view.sink(); S.view = null; }
+    // Warteschlange und bisherige Ergebnisse ohne diese Karte neu aufbauen (Positionen bleiben 1:1 zugeordnet)
+    const q = [];
+    const res = [];
+    for (let k = 0; k < queue.length; k++) {
+      if (queue[k] === id) continue;
+      q.push(queue[k]);
+      if (k < S.i) res.push(S.results[k]);
+    }
+    queue.length = 0;
+    queue.push(...q);
+    S.results = res;
+    S.i = res.length;
+    if (S.i < queue.length) mount();
+    else if (S.results.length) showSummary();
+    else { closeOverlay(ov); return; }
+    updateTop();
+  }
+
+  async function deleteCurrent() {
+    if (!S.revealed || !S.view) return;
+    const ok = await confirmDialog({ title: 'Karte löschen?', message: 'Die Karte wird endgültig gelöscht.', confirm: 'Löschen', destructive: true });
+    if (!ok) return;
+    removeCurrent(false);
+    haptic([10, 40, 10]);
+    toast('Karte gelöscht');
+  }
+
   function showSummary() {
     S.done = true;
     const right = S.results.filter((r) => r.correct).length;
@@ -2438,6 +2636,9 @@ function startSession(spec) {
     else if (a === 'hint') showHint();
     else if (a === 'yes') rate(true);
     else if (a === 'no') rate(false);
+    else if (a === 'pin') togglePin();
+    else if (a === 'edit') editCurrent();
+    else if (a === 'delete') deleteCurrent();
     else if (a === 'retry') {
       const ids = [...new Set(S.results.filter((r) => !r.correct).map((r) => r.id))];
       closeOverlay(ov);
@@ -2610,6 +2811,7 @@ const ACTIONS = {
   'start-weighted': () => startSession({ type: 'weighted' }),
   'start-equal': () => startSession({ type: 'equal' }),
   'start-level': (b) => { const l = +b.dataset.level; startSession({ type: 'level', level: l, label: `Ebene ${fmtLevel(l)}` }); },
+  'start-pinned': () => startSession({ type: 'pinned', label: 'Gemerkte Karten' }),
   'start-group': (b) => { const g = catById(b.dataset.id); if (g) startSession({ type: 'group', groupId: g.id, label: g.name }); },
   'pick-category': () => pickCategorySheet(),
   'pick-level': () => pickLevelSheet(),
@@ -2777,8 +2979,8 @@ function parseDeck(txt) {
     if (!line || line.startsWith('//') || line.startsWith('@')) continue;
     if (line.startsWith('###')) { topic = line.slice(3).trim(); continue; }
     if (line.startsWith('##')) {
-      const [id, name] = line.slice(2).split('|').map((s) => s.trim());
-      cat = { id: `deck-${id}`, name, parentId: group && group.id, color: group ? group.color : 'blue', order: deck.cats.length };
+      const [id, name, icon] = line.slice(2).split('|').map((s) => s.trim());
+      cat = { id: `deck-${id}`, name, icon: CAT_ICONS[icon] ? icon : guessIcon(name), parentId: group && group.id, color: group ? group.color : 'blue', order: deck.cats.length };
       deck.cats.push(cat);
       topic = '';
       continue;
@@ -2812,13 +3014,15 @@ function mergeDeck(deck, { restore = false } = {}) {
   for (const d of [...deck.groups.map((g) => ({ ...g, kind: 'group' })), ...deck.cats]) {
     const ex = catById(d.id);
     if (!ex && (!seenCats.has(d.id) || restore)) {
-      const cat = { id: d.id, name: d.name, color: d.color, keywords: [], created: now, parentId: d.parentId || null, order: d.order, deck: true };
+      const cat = { id: d.id, name: d.name, color: d.color, icon: d.icon || 'folder', keywords: [], created: now, parentId: d.parentId || null, order: d.order, deck: true };
       if (d.kind === 'group') cat.kind = 'group';
       DB.categories.push(cat);
     } else if (ex && ex.deck) {
       Object.assign(ex, { name: d.name, order: d.order });
       if (!isGroup(ex) && d.parentId && catById(d.parentId)) ex.parentId = d.parentId;
     }
+    // Symbol aus dem Kartensatz übernehmen, solange es nicht selbst gewählt wurde
+    if (ex && d.icon && ex.iconAuto) { ex.icon = d.icon; delete ex.iconAuto; }
     seenCats.add(d.id);
   }
 

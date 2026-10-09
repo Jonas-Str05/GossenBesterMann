@@ -763,6 +763,28 @@ button.row:active, .row.tappable:active { background: var(--fill2); transition: 
 }
 .swatch.on { box-shadow: inset 0 0 0 3px var(--bg2); }
 
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  padding: 14px;
+  margin: 0 16px;
+  background: var(--bg2);
+  border-radius: 12px;
+}
+.icon-pick {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--fill);
+  color: var(--label2);
+  transition: background-color .15s ease, color .15s ease, transform .12s ease;
+}
+.icon-pick svg { width: 22px; height: 22px; }
+.icon-pick:active { transform: scale(.9); }
+.icon-pick.on { background: var(--c); color: #fff; }
+
 .mini-bars { display: flex; gap: 3px; height: 34px; align-items: flex-end; padding: 12px 16px 14px; box-sizing: content-box; }
 .mini-bars span { flex: 1; border-radius: 3px; min-height: 3px; background: var(--fill); }
 
@@ -951,6 +973,8 @@ button.bold { font-weight: 600; }
   transition: opacity .3s ease;
 }
 .flash-under.none { opacity: 0; }
+/* Wichtig fürs Wischen am Handy: auch der scrollbare Textbereich darf horizontale Gesten nicht übernehmen */
+.flash, .flash * { touch-action: pan-y; }
 .flash { touch-action: pan-y; perspective: 1600px; user-select: none; -webkit-user-select: none; will-change: transform; }
 .flash.locked { pointer-events: none; }
 .flash-inner { position: absolute; inset: 0; transform-style: preserve-3d; }
@@ -1078,7 +1102,46 @@ button.bold { font-weight: 600; }
 .tint.no { background: color-mix(in srgb, var(--red) 14%, transparent); box-shadow: inset 0 0 0 2.5px var(--red); }
 .tint.no span { background: var(--red); }
 
-.session-actions { display: flex; gap: 12px; padding: 14px 20px 18px; min-height: 100px; align-items: center; }
+.session-actions { display: flex; flex-direction: column; gap: 10px; padding: 10px 20px 18px; }
+.act-row { display: flex; gap: 12px; min-height: 66px; align-items: center; }
+.session-actions > .pill-btn { width: 100%; }
+.session-actions:has(> .pill-btn) { flex-direction: row; min-height: 96px; align-items: center; }
+
+.tool-row {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity .25s ease, transform .35s var(--spring);
+}
+.tool-row.show { opacity: 1; transform: none; pointer-events: auto; }
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 13px;
+  border-radius: 17px;
+  background: var(--bg2);
+  color: var(--label);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--card-shadow);
+  transition: transform .12s ease, background-color .2s ease, color .2s ease;
+}
+.tool-btn svg { width: 17px; height: 17px; }
+.tool-btn:active { transform: scale(.95); }
+.tool-btn.on { background: color-mix(in srgb, var(--orange) 18%, var(--bg2)); color: color-mix(in srgb, var(--orange) 85%, var(--label)); }
+.tool-btn.destructive { color: var(--red); }
+
+.pin-badge { display: inline-flex; color: var(--orange); margin-left: 8px; vertical-align: -3px; }
+.pin-badge svg { width: 14px; height: 14px; }
+.row-pin { display: inline-flex; color: var(--orange); margin-right: 6px; vertical-align: -2px; }
+.row-pin svg { width: 14px; height: 14px; }
+.chip.pin svg { width: 14px; height: 14px; color: var(--orange); }
+.chip.pin.on svg { color: #fff; }
 .pill-btn {
   flex: 1;
   height: 58px;
