@@ -1148,6 +1148,38 @@ button.bold { font-weight: 600; }
 .card-row { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
 .card-row.pressing { background: var(--fill2); transform: scale(.985); transition: transform .45s ease, background-color .2s ease; }
 
+/* Statistik-Bausteine anordnen */
+.reorder-list { display: grid; gap: 8px; margin: 0 16px; position: relative; }
+.reorder-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 0 6px 0 14px;
+  background: var(--bg2);
+  border-radius: 14px;
+  position: relative;
+  will-change: transform;
+}
+.reordering .reorder-item:not(.dragging) { transition: transform .25s var(--spring); }
+.reorder-item.dragging {
+  z-index: 5;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .2), 0 0 0 .5px var(--sep);
+  transition: box-shadow .2s ease;
+}
+.ri-title { flex: 1; font-size: 17px; font-weight: 500; }
+.ri-handle {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  color: var(--label3);
+  touch-action: none;
+  cursor: grab;
+}
+.ri-handle svg { width: 22px; height: 22px; }
+.dragging .ri-handle { color: var(--blue); cursor: grabbing; }
+
 .restore-btn {
   flex: none;
   width: 40px;

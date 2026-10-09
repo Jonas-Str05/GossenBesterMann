@@ -39,7 +39,19 @@ Die App muss einmal über **HTTPS** geöffnet werden; danach ist sie installiert
 
 ## Updates
 
-Nach Änderungen in `sw.js` die Versionsnummer in `CACHE` erhöhen. Die App lädt die neue Version im Hintergrund und zeigt sie beim nächsten Start.
+Bei **jedem** Update die Versionsnummer in `version.js` erhöhen (einzige Stelle). Daran erkennt der Service Worker die neue Version, lädt alle Dateien frisch und die App startet beim nächsten Öffnen neu. In der App: Einstellungen → „Nach Updates suchen“ prüft sofort.
+
+| Version | Inhalt |
+| --- | --- |
+| 1.9.0 | Statistik-Bausteine anordnen, Update-Prüfung, aufgeräumte Einstellungen |
+| 1.8 | Zahnrad in allen Tabs, Auswahl per langem Drücken |
+| 1.7 | Papierkorb |
+| 1.6 | „Jetzt lernen“, Wisch-Hinweise |
+| 1.5 | Design hell/dunkel/System |
+| 1.4 | Statistik-Tab, neues Icon |
+| 1.3 | Kategorie-Symbole, Merken/Bearbeiten/Löschen beim Lernen |
+| 1.2 | 747 Prüfungskarten, Bereiche |
+| 1.0 | Erste Version |
 
 ## Daten
 

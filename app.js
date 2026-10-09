@@ -6,7 +6,8 @@
 (() => {
 
 const KEY = 'karteikarten-ap2';
-const APP_VERSION = '1.0.0';
+const APP_VERSION = self.APP_VERSION || '?';
+const APP_DATE = self.APP_DATE || '';
 const MIN = -5;
 const MAX = 5;
 const LEVELS = Array.from({ length: MAX - MIN + 1 }, (_, i) => MIN + i);
@@ -104,6 +105,7 @@ const ICON = {
   share: svg('<path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>', 2),
   bookmark: svg('<path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/>', 2),
   bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg>',
+  grip: svg('<path d="M5 8h14M5 12h14M5 16h14"/>', 2.2),
   play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.4-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"/></svg>',
   arrowL: svg('<path d="M19 12H5M11 6l-6 6 6 6"/>', 2.4),
   arrowR: svg('<path d="M5 12h14M13 6l6 6-6 6"/>', 2.4),
@@ -1691,31 +1693,19 @@ function renderSettings() {
         <div class="row-main"><div class="row-title">Karten aus Text importieren</div><div class="row-sub">Viele Karten auf einmal einfügen</div></div>${chev}
       </button>
     </div>
-    <p class="footnote">Deine Karten liegen nur auf diesem Gerät. Exportiere regelmäßig ein Backup – z. B. in Google Drive.</p>
 
-    <div class="section-header">Papierkorb</div>
+    <div class="section-header">Papierkorb & Lernstand</div>
     <div class="list icons">
       <button class="row" data-action="open-trash">
         ${rowIcon(ICON.trash, 'gray')}
         <div class="row-main"><div class="row-title">Zuletzt gelöscht</div><div class="row-sub">Karten ${TRASH_DAYS} Tage lang wiederherstellen</div></div>
         <span class="row-value">${DB.trash.length || ''}</span>${chev}
       </button>
-    </div>
-
-    ${DB.meta.deckTotal ? `
-    <div class="section-header">Prüfungskarten AP2</div>
-    <div class="list icons">
-      <div class="row">
-        ${rowIcon(ICON.learn, 'indigo')}
-        <div class="row-main"><div class="row-title">Mitgelieferte Karten</div><div class="row-sub">Werden bei App-Updates automatisch ergänzt</div></div>
-        <span class="row-value">${(() => { const s = new Set(DB.meta.deckIds || []); return DB.cards.filter((c) => s.has(c.id)).length; })()} / ${DB.meta.deckTotal}</span>
-      </div>
-      <button class="row" data-action="restore-deck">
-        ${rowIcon(ICON.reset, 'teal')}
-        <div class="row-main"><div class="row-title">Fehlende wiederherstellen</div><div class="row-sub">Gelöschte Prüfungskarten und -kategorien zurückholen</div></div>${chev}
+      <button class="row" data-action="reset-levels">
+        ${rowIcon(ICON.reset, 'orange')}
+        <div class="row-main"><div class="row-title">Lernstand zurücksetzen</div><div class="row-sub">Alle Karten zurück auf Ebene 0</div></div>${chev}
       </button>
     </div>
-    <p class="footnote">Dein Lernstand und eigene Änderungen an Karten bleiben dabei erhalten.</p>` : ''}
 
     <div class="section-header">Spracheingabe</div>
     <div class="list icons">
@@ -1732,57 +1722,30 @@ function renderSettings() {
       ${toggle('voicePunct', 'Satzzeichen sprechen', '„Punkt“, „Komma“, „Fragezeichen“, „neue Zeile“', ICON.wave, 'pink')}
       ${toggle('voiceAutoNext', 'Automatisch weiter', 'Nach der Vorderseite direkt die Rückseite diktieren', ICON.chev, 'teal')}
     </div>
-    <p class="footnote">Funktioniert das Diktieren offline nicht, nutze das Mikrofon-Symbol der Gboard-Tastatur – auf dem Pixel arbeitet es auch ohne Internet.</p>
 
     <div class="section-header">Lernen</div>
     <div class="list icons">
       ${toggle('haptics', 'Vibration', 'Kurzes Feedback beim Bewerten', ICON.phone, 'gray')}
-      <button class="row" data-action="reset-levels">
-        ${rowIcon(ICON.reset, 'orange')}
-        <div class="row-main"><div class="row-title">Lernstand zurücksetzen</div><div class="row-sub">Alle Karten zurück auf Ebene 0</div></div>${chev}
-      </button>
     </div>
 
     <div class="section-header">App</div>
     <div class="list icons">
-      ${UI.installEvt && !isStandalone() ? `
-      <button class="row" data-action="install">
-        ${rowIcon(ICON.phone, 'blue')}
-        <div class="row-main"><div class="row-title">Als App installieren</div><div class="row-sub">Startbildschirm-Icon, Vollbild, offline</div></div>${chev}
-      </button>` : `
-      <div class="row">
-        ${rowIcon(ICON.phone, 'blue')}
-        <div class="row-main"><div class="row-title">Installation</div></div>
-        <span class="row-value">${isStandalone() ? 'Installiert' : 'Über Chrome-Menü'}</span>
-      </div>`}
-      <div class="row">
-        ${rowIcon(ICON.lock, 'green')}
-        <div class="row-main"><div class="row-title">Dauerhafter Speicher</div></div>
-        <span class="row-value" id="persist-status">…</span>
-      </div>
       <div class="row">
         ${rowIcon(ICON.info, 'gray')}
-        <div class="row-main"><div class="row-title">Version</div></div>
+        <div class="row-main"><div class="row-title">Version</div><div class="row-sub">${esc(APP_DATE)}</div></div>
         <span class="row-value">${APP_VERSION}</span>
       </div>
+      <button class="row accent" data-action="check-update" id="update-row">
+        ${rowIcon(ICON.download, 'blue')}
+        <div class="row-main"><div class="row-title">Nach Updates suchen</div></div>
+      </button>
     </div>
 
     <div class="section-header">Gefahrenzone</div>
     <div class="list">
       <button class="row destructive" data-action="wipe"><div class="row-main"><div class="row-title">Alle Daten löschen</div></div></button>
     </div>
-    <p class="footnote">GossensBesterMann · funktioniert vollständig offline · keine Daten verlassen dein Gerät (außer beim Diktieren, falls kein Offline-Sprachpaket installiert ist).</p>
   </div>`;
-  updatePersistStatus();
-}
-
-async function updatePersistStatus() {
-  const elx = $('#persist-status');
-  if (!elx) return;
-  try {
-    const p = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : null;
-    elx.textContent = p == null ? 'Unbekannt' : p ? 'Aktiv' : 'Nicht aktiv';
-  } catch (e) { elx.textContent = 'Unbekannt'; }
 }
 
 // ---------------------------------------------------------------------------
@@ -2363,30 +2326,152 @@ function renderStats() {
   const gs = groups();
   const chip = (key, label, color) => `<button class="chip ${scopeKey === key ? 'on' : ''}" ${color ? `style="--c:var(--${color})"` : ''} data-stat-scope="${esc(key)}">${color ? '<span class="dot"></span>' : ''}${esc(label)}</button>`;
 
-  v.innerHTML = navbar('Statistik', { left: gearBtn() }) + `
+  const edit = !!UI.statEdit && DB.cards.length > 0;
+  const right = DB.cards.length
+    ? `<button class="nav-btn ${edit ? 'bold' : ''}" data-action="stat-edit">${edit ? 'Fertig' : 'Anordnen'}</button>`
+    : '';
+  const render = {
+    today: () => `<div class="section-header">Heute</div>${todayBlock()}`,
+    exams: () => examBlock(scopeKey === 'all' ? gs : gs.filter((g) => g.id === scopeKey)),
+    mastery: () => masteryBlock(sc, scopeKey === 'all' ? 'Wissensstand' : `Wissensstand · ${groupShort(catById(scopeKey))}`),
+    facher: () => facherBlock(sc),
+    activity: () => activityBlock(sc, range),
+    accuracy: () => accuracyBlock(sc),
+    heatmap: () => heatmapBlock(sc),
+    time: () => timeBlock(sc),
+    hours: () => hoursBlock(sc),
+    categories: () => categoriesBlock(sc),
+    problems: () => problemBlock(sc),
+    records: () => recordsBlock(sc),
+  };
+  const order = statOrder();
+
+  let body;
+  if (!DB.cards.length) {
+    body = `<div class="empty"><div class="empty-icon">${ICON.stats}</div><h2>Noch keine Daten</h2><p>Lege Karten an und lerne eine Runde – dann wird es hier spannend.</p></div>`;
+  } else if (edit) {
+    body = `
+      <p class="footnote" style="margin:0 36px 12px">Halte den Griff <b>≡</b> gedrückt und ziehe die Bausteine an die gewünschte Stelle.</p>
+      <div class="reorder-list" id="reorder-list">
+        ${order.map((k) => `
+          <div class="reorder-item" data-key="${k}">
+            <span class="row-icon" style="--c:var(--${STAT_BLOCKS[k][2]})">${STAT_BLOCKS[k][1]}</span>
+            <span class="ri-title">${STAT_BLOCKS[k][0]}</span>
+            <span class="ri-handle" aria-label="${STAT_BLOCKS[k][0]} verschieben">${ICON.grip}</span>
+          </div>`).join('')}
+      </div>
+      <div class="btn-stack"><button class="btn-plain" data-action="stat-reset-order">Standard-Reihenfolge</button></div>`;
+  } else {
+    body = `
+      <div class="chips stat-chips">${chip('all', 'Alle Karten')}${gs.map((g) => chip(g.id, groupShort(g), g.color)).join('')}</div>
+      ${order.map((k) => `<div class="stat-section" data-key="${k}">${render[k]()}</div>`).join('')}
+      <p class="footnote">Tippe auf ein Diagramm, um genaue Werte zu sehen. Mit „Anordnen“ bestimmst du die Reihenfolge der Bausteine.</p>`;
+  }
+
+  v.innerHTML = navbar('Statistik', { left: gearBtn(), right }) + `
     <div class="content">
       <h1 class="large-title">Statistik</h1>
-      ${DB.cards.length ? `
-      <div class="section-header" style="margin-top:0">Heute</div>
-      ${todayBlock()}
-      ${examBlock(scopeKey === 'all' ? gs : gs.filter((g) => g.id === scopeKey))}
-      <div class="chips stat-chips">${chip('all', 'Alle Karten')}${gs.map((g) => chip(g.id, groupShort(g), g.color)).join('')}</div>
-      ${masteryBlock(sc, scopeKey === 'all' ? 'Wissensstand' : `Wissensstand · ${groupShort(catById(scopeKey))}`)}
-      ${facherBlock(sc)}
-      ${activityBlock(sc, range)}
-      ${accuracyBlock(sc)}
-      ${heatmapBlock(sc)}
-      ${timeBlock(sc)}
-      ${hoursBlock(sc)}
-      ${categoriesBlock(sc)}
-      ${problemBlock(sc)}
-      ${recordsBlock(sc)}
-      <p class="footnote">Lernzeit, Tageszeit und Kategorie-Verläufe werden seit diesem Update erfasst. Tippe auf ein Diagramm, um genaue Werte zu sehen.</p>
-      ` : `
-      <div class="empty"><div class="empty-icon">${ICON.stats}</div><h2>Noch keine Daten</h2><p>Lege Karten an und lerne eine Runde – dann wird es hier spannend.</p></div>`}
+      ${body}
     </div>`;
-  bindCharts(v);
+  if (edit) bindReorder($('#reorder-list'));
+  else bindCharts(v);
   v.scrollTop = st;
+}
+
+// ---- Bausteine anordnen ------------------------------------------------------
+
+// Schlüssel → [Name, Symbol, Farbe]
+const STAT_BLOCKS = {
+  today: ['Heute', ICON.flame, 'pink'],
+  exams: ['Prüfungen', ICON.learn, 'blue'],
+  mastery: ['Wissensstand', ICON.layers, 'green'],
+  facher: ['Fächer', ICON.stats, 'gray'],
+  activity: ['Aktivität', ICON.stats, 'green'],
+  accuracy: ['Trefferquote', ICON.check, 'blue'],
+  heatmap: ['Lernkalender', CAT_ICONS.calendar, 'green'],
+  time: ['Lernzeit', CAT_ICONS.bolt, 'cyan'],
+  hours: ['Tageszeit', CAT_ICONS.star, 'indigo'],
+  categories: ['Kategorien', ICON.folder, 'purple'],
+  problems: ['Problemkarten', ICON.flame, 'orange'],
+  records: ['Rekorde & Kennzahlen', CAT_ICONS.seal, 'yellow'],
+};
+const DEFAULT_STAT_ORDER = Object.keys(STAT_BLOCKS);
+
+// gespeicherte Reihenfolge; neue Bausteine (z. B. nach Updates) werden hinten angehängt
+function statOrder() {
+  const saved = Array.isArray(DB.settings.statOrder) ? DB.settings.statOrder.filter((k) => STAT_BLOCKS[k]) : [];
+  return [...new Set([...saved, ...DEFAULT_STAT_ORDER])];
+}
+
+// Ziehen am Griff: 1:1 mit dem Finger, die anderen Bausteine weichen weich aus
+function bindReorder(list) {
+  if (!list) return;
+  let drag = null;
+  const items = () => $$('.reorder-item', list);
+  const view = $('#view-stats');
+  let scrollTimer = 0;
+
+  const move = (clientY) => {
+    if (!drag) return;
+    const top = list.getBoundingClientRect().top;
+    const y = clientY - top - drag.grab; // gewünschte Oberkante des gezogenen Elements
+    drag.el.style.transform = `translate3d(0, ${y - drag.startTop}px, 0) scale(1.03)`;
+    const idx = clamp(Math.round(y / drag.step), 0, drag.count - 1);
+    if (idx !== drag.idx) { drag.idx = idx; haptic(4); }
+    items().forEach((it, i) => {
+      if (it === drag.el) return;
+      let shift = 0;
+      if (i > drag.from && i <= drag.idx) shift = -drag.step;
+      if (i < drag.from && i >= drag.idx) shift = drag.step;
+      it.style.transform = shift ? `translate3d(0, ${shift}px, 0)` : '';
+    });
+    // am Rand automatisch scrollen
+    clearInterval(scrollTimer);
+    const edge = 90;
+    const dir = clientY < edge + 60 ? -1 : clientY > window.innerHeight - edge - 60 ? 1 : 0;
+    if (dir) scrollTimer = setInterval(() => { view.scrollTop += dir * 8; move(drag.lastY); }, 16);
+  };
+
+  list.addEventListener('pointerdown', (e) => {
+    const handle = e.target.closest('.ri-handle');
+    if (!handle || e.button !== 0) return;
+    e.preventDefault();
+    const el = handle.closest('.reorder-item');
+    const all = items();
+    const from = all.indexOf(el);
+    const rect = el.getBoundingClientRect();
+    const listTop = list.getBoundingClientRect().top;
+    const step = all.length > 1 ? all[1].getBoundingClientRect().top - all[0].getBoundingClientRect().top : rect.height + 8;
+    drag = { el, from, idx: from, count: all.length, step, grab: e.clientY - rect.top, startTop: rect.top - listTop, lastY: e.clientY, id: e.pointerId };
+    list.classList.add('reordering');
+    el.classList.add('dragging');
+    handle.setPointerCapture(e.pointerId);
+    haptic(10);
+  });
+  list.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    drag.lastY = e.clientY;
+    move(e.clientY);
+  });
+  const end = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    clearInterval(scrollTimer);
+    const d = drag;
+    drag = null;
+    const order = items().map((it) => it.dataset.key);
+    const [k] = order.splice(d.from, 1);
+    order.splice(d.idx, 0, k);
+    // in die Zielposition einrasten lassen, dann neu aufbauen
+    d.el.style.transition = 'transform .25s var(--spring)';
+    d.el.style.transform = `translate3d(0, ${(d.idx - d.from) * d.step}px, 0)`;
+    setTimeout(() => {
+      DB.settings.statOrder = order;
+      save();
+      renderStats();
+    }, reduceMotion.matches ? 0 : 230);
+  };
+  list.addEventListener('pointerup', end);
+  list.addEventListener('pointercancel', end);
 }
 
 // Kategorie im Detail
@@ -3928,11 +4013,9 @@ const ACTIONS = {
     setSelectMode(false);
     refresh();
   },
-  'restore-deck': async () => {
-    const r = await loadDeck({ restore: true });
-    if (!r) toast('Kartensatz konnte nicht geladen werden', 'error');
-    else if (!r.added) toast('Es fehlen keine Prüfungskarten');
-  },
+  'check-update': (b) => checkForUpdate(b),
+  'stat-edit': () => { UI.statEdit = !UI.statEdit; renderStats(); $('#view-stats').scrollTop = 0; haptic(5); },
+  'stat-reset-order': () => { delete DB.settings.statOrder; save(); renderStats(); toast('Standard-Reihenfolge wiederhergestellt'); },
   'auto-distribute': () => openAutoDistribute(),
   'manual-distribute': () => { UI.cardsFilter = cardsIn('inbox').length ? 'inbox' : 'all'; setTab('cards'); setSelectMode(true); },
   export: () => exportBackup(),
@@ -4135,11 +4218,49 @@ async function loadDeck(opts = {}) {
   return { ...r, total: deck.cards.length };
 }
 
+// ---------------------------------------------------------------------------
+// Nach Updates suchen
+// ---------------------------------------------------------------------------
+
+async function checkForUpdate(btn) {
+  const title = btn && $('.row-title', btn);
+  const setLabel = (t) => { if (title) title.textContent = t; };
+  if (!navigator.onLine) { toast('Keine Internetverbindung', 'error'); return; }
+  if (!('serviceWorker' in navigator)) { toast('Updates werden hier nicht unterstützt', 'error'); return; }
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (!reg) { location.reload(); return; }
+  if (btn) btn.disabled = true;
+  setLabel('Suche nach Updates …');
+  try {
+    await reg.update();
+    const nw = reg.installing || reg.waiting;
+    if (!nw) {
+      setLabel('Nach Updates suchen');
+      toast(`Du hast die neueste Version (${APP_VERSION})`);
+      return;
+    }
+    setLabel('Update wird installiert …');
+    UI.updateRequested = true; // nach dem Aktivieren automatisch neu laden
+    await new Promise((resolve) => {
+      if (nw.state === 'activated') return resolve();
+      nw.addEventListener('statechange', () => { if (nw.state === 'activated' || nw.state === 'redundant') resolve(); });
+      setTimeout(resolve, 15000);
+    });
+    save();
+    location.reload();
+  } catch (e) {
+    setLabel('Nach Updates suchen');
+    toast('Update-Prüfung fehlgeschlagen', 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
 let persistAsked = false;
 function requestPersist() {
   if (persistAsked || !navigator.storage || !navigator.storage.persist) return;
   persistAsked = true;
-  navigator.storage.persist().then(updatePersistStatus).catch(() => {});
+  navigator.storage.persist().catch(() => {});
 }
 
 function boot() {
@@ -4196,6 +4317,14 @@ function boot() {
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch((err) => console.warn('SW', err));
+    // Neue Version wurde aktiv: sofort neu laden (wenn gerade nichts offen ist), sonst Hinweis
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloading) return;
+      if (!stack.length || UI.updateRequested) { reloading = true; location.reload(); }
+      else toast('Update installiert – wird beim nächsten Öffnen aktiv');
+    });
   }
 }
 

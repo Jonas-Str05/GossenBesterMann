@@ -1,10 +1,12 @@
 /* Service Worker: hält die App komplett offline verfügbar. */
-const CACHE = 'karteikarten-ap2-v10';
+importScripts('version.js');
+const CACHE = `karteikarten-ap2-${self.APP_VERSION}`;
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './version.js',
   './manifest.webmanifest',
   './deck/ap2.txt',
   './icons/app-icon-v2-64.png',
@@ -15,7 +17,8 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache: 'reload' umgeht den HTTP-Cache – sonst könnten alte Dateien im neuen Cache landen
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {
