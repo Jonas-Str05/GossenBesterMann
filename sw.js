@@ -1,5 +1,5 @@
 /* Service Worker: hält die App komplett offline verfügbar. */
-const CACHE = 'karteikarten-ap2-v5';
+const CACHE = 'karteikarten-ap2-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -7,11 +7,11 @@ const ASSETS = [
   './app.js',
   './manifest.webmanifest',
   './deck/ap2.txt',
-  './icons/favicon.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/maskable-512.png',
-  './icons/apple-touch-icon.png',
+  './icons/app-icon-v2-64.png',
+  './icons/app-icon-v2-192.png',
+  './icons/app-icon-v2-512.png',
+  './icons/app-icon-v2-maskable-512.png',
+  './icons/app-icon-v2-apple-180.png',
 ];
 
 self.addEventListener('install', (e) => {
