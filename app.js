@@ -2462,25 +2462,80 @@ function roEnd() {
   }, reduceMotion.matches ? 0 : 230);
 }
 
-// Baustein aus der normalen Ansicht „anheben“: in die kompakte Liste wechseln,
-// den Eintrag unter den Finger legen und ohne Absetzen weiterziehen
-function liftSection(key, clientY, keepEl) {
-  UI.statEdit = true;
-  renderStats();
+// Baustein direkt in der normalen Ansicht verschieben: in voller Größe anheben,
+// mit dem Finger ziehen, die anderen Bausteine rutschen um seinen Platz weiter.
+const SD = { d: null, scrollTimer: 0 };
+
+function sdStart(sec, clientY) {
   const view = $('#view-stats');
-  // Der Browser schickt alle weiteren Touch-Events an das ursprünglich berührte Element.
-  // Es muss deshalb im Dokument bleiben (unsichtbar), sonst kommen die Bewegungen nicht an.
-  if (keepEl) {
-    const keeper = document.createElement('div');
-    keeper.hidden = true;
-    keeper.appendChild(keepEl);
-    view.appendChild(keeper);
-  }
-  const item = $(`.reorder-item[data-key="${key}"]`, view);
-  if (!item) return;
-  const r = item.getBoundingClientRect();
-  view.scrollTop += r.top + r.height / 2 - clientY;
-  roStart(item, clientY, item.offsetHeight / 2);
+  const secs = $$('.stat-section', view);
+  const from = secs.indexOf(sec);
+  if (from < 0) return;
+  // Positionen beim Anheben (Viewport-Koordinaten); Scrollen wird später herausgerechnet
+  const rects = secs.map((s) => { const r = s.getBoundingClientRect(); return { top: r.top, h: r.height }; });
+  // Platz, den der Baustein inklusive Abstand belegt
+  const slot = from < secs.length - 1 ? rects[from + 1].top - rects[from].top : rects[from].h + 12;
+  SD.d = { view, secs, from, idx: from, rects, slot, startY: clientY, startScroll: view.scrollTop, lastY: clientY };
+  view.classList.add('sec-reordering');
+  sec.classList.add('sec-dragging');
+  sec.style.transform = 'scale(1.02)';
+  haptic(12);
+}
+
+function sdMove(clientY) {
+  const d = SD.d;
+  if (!d) return;
+  d.lastY = clientY;
+  const dy = clientY - d.startY + (d.view.scrollTop - d.startScroll);
+  d.secs[d.from].style.transform = `translate3d(0, ${dy}px, 0) scale(1.02)`;
+  const center = d.rects[d.from].top + d.rects[d.from].h / 2 + dy;
+  let idx = d.from;
+  for (let i = d.from + 1; i < d.secs.length; i++) if (d.rects[i].top + d.rects[i].h / 2 < center) idx = i;
+  for (let i = d.from - 1; i >= 0; i--) if (d.rects[i].top + d.rects[i].h / 2 > center) idx = i;
+  if (idx !== d.idx) { d.idx = idx; haptic(4); }
+  d.secs.forEach((s, i) => {
+    if (i === d.from) return;
+    let shift = 0;
+    if (i > d.from && i <= idx) shift = -d.slot;
+    if (i < d.from && i >= idx) shift = d.slot;
+    s.style.transform = shift ? `translate3d(0, ${shift}px, 0)` : '';
+  });
+  // am oberen/unteren Rand automatisch scrollen
+  clearInterval(SD.scrollTimer);
+  const dir = clientY < 140 ? -1 : clientY > window.innerHeight - 160 ? 1 : 0;
+  if (dir) SD.scrollTimer = setInterval(() => { d.view.scrollTop += dir * 10; sdMove(d.lastY); }, 16);
+}
+
+function sdEnd() {
+  const d = SD.d;
+  clearInterval(SD.scrollTimer);
+  if (!d) return;
+  SD.d = null;
+  const el = d.secs[d.from];
+  const before = el.getBoundingClientRect().top;
+  // DOM in die neue Reihenfolge bringen
+  const order = d.secs.map((s) => s.dataset.key);
+  const [k] = order.splice(d.from, 1);
+  order.splice(d.idx, 0, k);
+  const parent = el.parentNode;
+  const anchor = d.secs[d.secs.length - 1].nextSibling;
+  const byKey = Object.fromEntries(d.secs.map((s) => [s.dataset.key, s]));
+  for (const key of order) parent.insertBefore(byKey[key], anchor);
+  // Verschiebungen ohne Animation entfernen – die anderen stehen schon an ihrem Platz
+  d.view.classList.remove('sec-reordering');
+  for (const s of d.secs) { s.style.transition = 'none'; s.style.transform = ''; }
+  // gezogenen Baustein von seiner aktuellen Position weich einrasten lassen (FLIP)
+  const after = el.getBoundingClientRect().top;
+  el.style.transform = `translate3d(0, ${before - after}px, 0) scale(1.02)`;
+  void el.offsetHeight;
+  el.style.transition = reduceMotion.matches ? 'none' : 'transform .32s var(--spring)';
+  el.style.transform = '';
+  setTimeout(() => {
+    el.classList.remove('sec-dragging');
+    for (const s of d.secs) s.style.transition = '';
+  }, 340);
+  DB.settings.statOrder = order;
+  save();
 }
 
 function setupStatsGestures(view) {
@@ -2496,8 +2551,11 @@ function setupStatsGestures(view) {
       return;
     }
     const sec = target.closest('.stat-section');
-    if (sec) liftSection(sec.dataset.key, y, target);
+    if (sec) sdStart(sec, y);
   };
+  const dragging = () => RO.drag || SD.d;
+  const moveDrag = (y) => { if (RO.drag) roMove(y); else if (SD.d) sdMove(y); };
+  const endDrag = () => { if (RO.drag) roEnd(); else if (SD.d) sdEnd(); };
   const pressable = (t) => !t.closest('.ri-handle') && (t.closest('.stat-section') || t.closest('.reorder-item'));
 
   // Griff ≡: sofort ziehen (Maus und Touch)
@@ -2518,20 +2576,20 @@ function setupStatsGestures(view) {
   });
   window.addEventListener('pointermove', (e) => {
     if (!press || press.kind === 'touch' || e.pointerId !== press.id) return;
-    if (RO.drag) { roMove(e.clientY); return; }
+    if (dragging()) { moveDrag(e.clientY); return; }
     if (Math.hypot(e.clientX - press.x, e.clientY - press.y) > 8) cancelPress();
   });
   const pointerEnd = (e) => {
     if (!press || press.kind === 'touch' || e.pointerId !== press.id) return;
     cancelPress();
-    roEnd();
+    endDrag();
   };
   window.addEventListener('pointerup', pointerEnd);
   window.addEventListener('pointercancel', pointerEnd);
 
   // Touch: langes Drücken, danach Scrollen unterbinden und ziehen
   view.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1 || RO.drag) return;
+    if (e.touches.length !== 1 || dragging()) return;
     const t = e.touches[0];
     if (!pressable(e.target)) return;
     const target = e.target;
@@ -2542,14 +2600,14 @@ function setupStatsGestures(view) {
     if (!press || press.kind !== 'touch') return;
     const t = [...e.changedTouches].find((x) => x.identifier === press.id);
     if (!t) return;
-    if (RO.drag) { e.preventDefault(); roMove(t.clientY); return; }
+    if (dragging()) { e.preventDefault(); moveDrag(t.clientY); return; }
     if (Math.hypot(t.clientX - press.x, t.clientY - press.y) > 10) cancelPress();
     else { press.x = t.clientX; press.y = t.clientY; }
   }, { passive: false });
   const touchEnd = () => {
     if (!press || press.kind !== 'touch') return;
     cancelPress();
-    roEnd();
+    endDrag();
   };
   view.addEventListener('touchend', touchEnd);
   view.addEventListener('touchcancel', touchEnd);
