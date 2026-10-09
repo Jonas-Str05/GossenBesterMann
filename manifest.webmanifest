@@ -1,0 +1,23 @@
+{
+  "name": "Karteikarten AP2",
+  "short_name": "AP2 Karten",
+  "description": "Karteikarten für die Abschlussprüfung – offline lernen mit Fächer-System.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "de",
+  "background_color": "#F2F2F7",
+  "theme_color": "#F2F2F7",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Neue Karte", "url": "./?action=new", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Schwächen lernen", "url": "./?action=weak", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

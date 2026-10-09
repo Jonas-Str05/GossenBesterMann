@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Karteikarten AP2</title>
+<meta name="description" content="Karteikarten für die Abschlussprüfung – offline lernen mit Fächer-System.">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="AP2 Karten">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <section class="view" id="view-learn" data-tab="learn"></section>
+  <section class="view" id="view-cards" data-tab="cards"></section>
+  <section class="view" id="view-categories" data-tab="categories"></section>
+  <section class="view" id="view-settings" data-tab="settings"></section>
+  <nav class="tabbar" id="tabbar" role="tablist"></nav>
+  <div class="select-bar" id="select-bar"></div>
+</div>
+<div id="overlays"></div>
+<div id="toast-host" aria-live="polite"></div>
+<input type="file" id="file-input" accept=".json,application/json" hidden>
+<script src="app.js"></script>
+</body>
+</html>
