@@ -191,6 +191,7 @@ function defaultDB() {
     // Antwort-Protokoll: [Zeit, Karten-ID, Kategorie-ID, richtig 1/0, Ebene vorher, Dauer ms]
     reviews: [],
     settings: {
+      theme: 'system', // 'system' | 'light' | 'dark'
       dailyGoal: 50,
       dailyMinutes: 20,
       haptics: true,
@@ -1133,6 +1134,7 @@ function setTab(t) {
 }
 
 function refresh() {
+  applyTheme();
   renderLearn();
   renderCardsList();
   renderCategories();
@@ -1140,6 +1142,24 @@ function refresh() {
   // Statistik ist rechenintensiver: nur zeichnen, wenn sichtbar
   if (UI.tab === 'stats') renderStats(); else UI.statsDirty = true;
 }
+
+// ---- Design: System / Hell / Dunkel ----------------------------------------
+const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(animate = false) {
+  const pref = DB.settings.theme || 'system';
+  const dark = pref === 'dark' || (pref === 'system' && darkMQ.matches);
+  const root = document.documentElement;
+  const next = dark ? 'dark' : 'light';
+  if (root.dataset.theme === next) return;
+  if (animate && !reduceMotion.matches) {
+    root.classList.add('theme-anim');
+    setTimeout(() => root.classList.remove('theme-anim'), 400);
+  }
+  root.dataset.theme = next;
+  const meta = $('meta[name="theme-color"]');
+  if (meta) meta.content = dark ? '#000000' : '#F2F2F7';
+}
+darkMQ.addEventListener('change', () => applyTheme(true));
 
 // Einstellungen als iOS-artige Push-Seite (von rechts), Zurück per Taste oder Android-Zurück
 function openSettings() {
@@ -1509,6 +1529,12 @@ function renderSettings() {
   v.innerHTML = navbar('Einstellungen', { left: `<button class="nav-btn back" data-action="settings-back">${ICON.chev}<span>Lernen</span></button>` }) + `
   <div class="content">
     <h1 class="large-title">Einstellungen</h1>
+
+    <div class="section-header" style="margin-top:8px">Design</div>
+    <div class="segmented" role="radiogroup" aria-label="Design">
+      ${[['system', 'System'], ['light', 'Hell'], ['dark', 'Dunkel']].map(([k, l]) => `<button role="radio" aria-checked="${(s.theme || 'system') === k}" class="${(s.theme || 'system') === k ? 'on' : ''}" data-action="set-theme" data-theme="${k}">${l}</button>`).join('')}
+    </div>
+    <p class="footnote">„System“ folgt automatisch der Einstellung deines Handys.</p>
 
     <div class="section-header">Backup</div>
     <div class="list icons">
@@ -3597,6 +3623,13 @@ const ACTIONS = {
     if (top && top.kind === 'sheet') closeOverlay(top);
     startSession({ type: 'retry', ids, label: 'Problemkarten' });
   },
+  'set-theme': (b) => {
+    DB.settings.theme = b.dataset.theme;
+    save();
+    applyTheme(true);
+    renderSettings();
+    haptic(5);
+  },
   'open-settings': () => openSettings(),
   'settings-back': () => { if (UI.settingsOv) closeOverlay(UI.settingsOv); },
   'start-pinned': () => startSession({ type: 'pinned', label: 'Gemerkte Karten' }),
@@ -3880,6 +3913,7 @@ function requestPersist() {
 
 function boot() {
   loadDB();
+  applyTheme();
   renderTabbar();
   initCardsView();
   refresh();

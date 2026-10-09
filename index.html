@@ -5,8 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>GossensBesterMann</title>
 <meta name="description" content="Karteikarten für die Abschlussprüfung – offline lernen mit Fächer-System.">
-<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F2F7">
+<script>
+  // Design vor dem ersten Zeichnen setzen (kein Aufblitzen)
+  (function () {
+    var t = 'system';
+    try { t = (JSON.parse(localStorage.getItem('karteikarten-ap2')) || {}).settings.theme || 'system'; } catch (e) {}
+    var dark = t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    document.querySelector('meta[name="theme-color"]').content = dark ? '#000000' : '#F2F2F7';
+  })();
+</script>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="GossensBesterMann">
