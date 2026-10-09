@@ -102,6 +102,9 @@ const ICON = {
   share: svg('<path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>', 2),
   bookmark: svg('<path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/>', 2),
   bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.6v12.8a1 1 0 0 0 1.5.86l10.4-6.4a1 1 0 0 0 0-1.72L9.5 4.74A1 1 0 0 0 8 5.6z"/></svg>',
+  arrowL: svg('<path d="M19 12H5M11 6l-6 6 6 6"/>', 2.4),
+  arrowR: svg('<path d="M5 12h14M13 6l6 6-6 6"/>', 2.4),
   stats: svg('<path d="M4.5 20v-6M9.5 20V9M14.5 20v-8M19.5 20V4"/>', 2.3),
   pencil: svg('<path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5z"/><path d="M13.5 7l3 3"/>', 2),
 };
@@ -1016,7 +1019,29 @@ function poolFor(spec) {
   if (spec.type === 'retry') return spec.ids.map(cardById).filter(Boolean);
   return DB.cards;
 }
+// „Jetzt lernen“: sinnvolle Auswahl ohne Wiederholungen in der Runde.
+// Gewichtung: schwache Ebenen deutlich öfter, lange nicht gesehene Karten öfter,
+// neue Karten in Maßen, heute schon gelernte Karten selten.
+function smartWeight(c, now) {
+  const seen = c.right + c.wrong > 0;
+  if (!seen) return 4;
+  const days = (now - (c.last || 0)) / 86400000;
+  const recency = days < 0.5 ? 0.25 : 1 + Math.min(days, 21) / 3;
+  return weightOf(c.level) * recency;
+}
+function smartQueue(n) {
+  const now = Date.now();
+  // gewichtete Stichprobe ohne Zurücklegen (Efraimidis-Spirakis)
+  return DB.cards
+    .map((c) => ({ id: c.id, key: Math.random() ** (1 / smartWeight(c, now)) }))
+    .sort((a, b) => b.key - a.key)
+    .slice(0, n)
+    .map((x) => x.id);
+}
+const smartSize = () => DB.settings.sessionSize || 30;
+
 function buildQueue(spec) {
+  if (spec.type === 'smart') return smartQueue(spec.count || smartSize());
   const pool = poolFor(spec);
   if (!pool.length) return [];
   const size = spec.count || 0;
@@ -1227,6 +1252,20 @@ function renderLearn() {
         <div class="row-main"><div class="row-title">App installieren</div><div class="row-sub">Für Offline-Nutzung auf den Startbildschirm.</div></div>
         <button class="btn-small" data-action="install">Installieren</button>
       </div>` : ''}
+    ${n ? (() => {
+      const goal = DB.settings.dailyGoal || 50;
+      const done = today.r + today.w;
+      const p = clamp(done / goal, 0, 1);
+      return `
+      <button class="hero-learn" data-action="start-smart">
+        <div class="hero-learn-text">
+          <b>${done ? 'Weiterlernen' : 'Jetzt lernen'}</b>
+          <span>${smartSize()} Karten · schwache & lange nicht gesehene zuerst</span>
+        </div>
+        <span class="hero-learn-play" aria-hidden="true">${ICON.play}</span>
+        <div class="hero-learn-goal"><div class="hero-learn-bar"><i style="width:${p * 100}%"></i></div><small>${done} / ${goal} heute${p >= 1 ? ' · Ziel erreicht' : ''}</small></div>
+      </button>`;
+    })() : ''}
     ${n === 0 ? `
       <div class="empty">
         <div class="empty-icon">${ICON.cards}</div>
@@ -3089,10 +3128,11 @@ function startSession(spec) {
           <button class="pill-btn primary" data-s="flip">${ICON.flip}<span>Umdrehen</span></button>
         </div>`;
     } else {
+      // Bewertet wird per Wischen – hier nur der Hinweis (antippen geht trotzdem)
       actions.innerHTML = `${tools}
-        <div class="act-row">
-          <button class="rate-btn no" data-s="no"><b>${ICON.x}Nicht gewusst</b><small>−1</small></button>
-          <button class="rate-btn yes" data-s="yes"><b>${ICON.check}Gewusst</b><small>+1</small></button>
+        <div class="act-row swipe-hints">
+          <button class="swipe-hint no" data-s="no" aria-label="Nicht gewusst (nach links wischen)">${ICON.arrowL}<span>Nicht gewusst</span></button>
+          <button class="swipe-hint yes" data-s="yes" aria-label="Gewusst (nach rechts wischen)"><span>Gewusst</span>${ICON.arrowR}</button>
         </div>`;
     }
   };
@@ -3118,7 +3158,7 @@ function startSession(spec) {
               <div class="face-q">${esc(card.front)}</div>
               ${backHTML(card)}
             </div></div>
-            <div class="face-foot">Wische nach rechts oder links – oder tippe unten</div>
+            <div class="face-foot">&nbsp;</div>
           </div>
         </div>
         <div class="tint yes"><span>${ICON.check}Gewusst</span></div>
@@ -3632,6 +3672,7 @@ const ACTIONS = {
   },
   'open-settings': () => openSettings(),
   'settings-back': () => { if (UI.settingsOv) closeOverlay(UI.settingsOv); },
+  'start-smart': () => startSession({ type: 'smart', label: 'Empfohlene Runde' }),
   'start-pinned': () => startSession({ type: 'pinned', label: 'Gemerkte Karten' }),
   'start-group': (b) => { const g = catById(b.dataset.id); if (g) startSession({ type: 'group', groupId: g.id, label: g.name }); },
   'pick-category': () => pickCategorySheet(),
