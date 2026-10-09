@@ -8,7 +8,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "lang": "de",
-  "background_color": "#F2F2F7",
+  "background_color": "#1A1A1D",
   "theme_color": "#F2F2F7",
   "categories": ["education", "productivity"],
   "icons": [

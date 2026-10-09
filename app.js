@@ -12,6 +12,7 @@ const MAX = 5;
 const LEVELS = Array.from({ length: MAX - MIN + 1 }, (_, i) => MIN + i);
 const COLORS = ['blue', 'indigo', 'purple', 'pink', 'red', 'orange', 'yellow', 'green', 'mint', 'teal', 'cyan', 'brown'];
 const SIZES = [10, 20, 50, 0]; // 0 = alle
+const MAX_REVIEWS = 25000; // ca. 1–1,5 MB im Speicher
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -101,6 +102,7 @@ const ICON = {
   share: svg('<path d="M12 15V3M8 7l4-4 4 4M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>', 2),
   bookmark: svg('<path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/>', 2),
   bookmarkFill: '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/></svg>',
+  stats: svg('<path d="M4.5 20v-6M9.5 20V9M14.5 20v-8M19.5 20V4"/>', 2.3),
   pencil: svg('<path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5z"/><path d="M13.5 7l3 3"/>', 2),
 };
 
@@ -186,7 +188,11 @@ function defaultDB() {
     categories: [{ id: 'inbox', name: 'Unsortiert', color: 'gray', icon: 'tray', keywords: [], created: Date.now() }],
     cards: [],
     log: {},
+    // Antwort-Protokoll: [Zeit, Karten-ID, Kategorie-ID, richtig 1/0, Ebene vorher, Dauer ms]
+    reviews: [],
     settings: {
+      dailyGoal: 50,
+      dailyMinutes: 20,
       haptics: true,
       voicePunct: true,
       voiceAutoNext: false,
@@ -216,6 +222,7 @@ function normalize(d) {
       if (c.kind === 'group' && c.id !== 'inbox') cat.kind = 'group';
       if (Number.isFinite(c.order)) cat.order = c.order;
       if (c.deck) cat.deck = true;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(c.examDate || '')) cat.examDate = c.examDate;
       // Symbol: gespeichert, sonst automatisch aus dem Namen geraten (bleibt änderbar)
       if (cat.id === 'inbox') cat.icon = 'tray';
       else if (CAT_ICONS[c.icon]) { cat.icon = c.icon; if (c.iconAuto) cat.iconAuto = true; }
@@ -261,11 +268,16 @@ function normalize(d) {
       if (/^\d{4}-\d{2}-\d{2}$/.test(k) && v) log[k] = { r: Math.max(0, +v.r || 0), w: Math.max(0, +v.w || 0) };
     }
   }
+  const reviews = (Array.isArray(d.reviews) ? d.reviews : [])
+    .filter((r) => Array.isArray(r) && r.length >= 4 && Number.isFinite(+r[0]))
+    .map((r) => [+r[0], String(r[1]), String(r[2]), r[3] ? 1 : 0, clampLevel(+r[4] || 0), Math.max(0, Math.min(+r[5] || 0, 90000))])
+    .slice(-MAX_REVIEWS);
   return {
     version: 1,
     categories,
     cards,
     log,
+    reviews,
     settings: { ...def.settings, ...(d.settings && typeof d.settings === 'object' ? d.settings : {}) },
     meta: { ...def.meta, ...(d.meta && typeof d.meta === 'object' ? d.meta : {}) },
   };
@@ -1028,20 +1040,24 @@ function buildQueue(spec) {
   return size && spec.type !== 'retry' ? ids.slice(0, size) : ids;
 }
 
-function rateCard(card, correct) {
+function rateCard(card, correct, durMs = 0) {
+  const t = Date.now();
   const rec = {
     id: card.id,
     correct,
     from: card.level,
     prev: { right: card.right, wrong: card.wrong, last: card.last },
     day: dayKey(),
+    t,
   };
   card.level = clampLevel(card.level + (correct ? 1 : -1));
   if (correct) card.right++; else card.wrong++;
-  card.last = Date.now();
+  card.last = t;
   rec.to = card.level;
   const lg = DB.log[rec.day] || (DB.log[rec.day] = { r: 0, w: 0 });
   if (correct) lg.r++; else lg.w++;
+  DB.reviews.push([t, card.id, card.categoryId, correct ? 1 : 0, rec.from, Math.round(Math.min(durMs, 90000))]);
+  if (DB.reviews.length > MAX_REVIEWS) DB.reviews.splice(0, DB.reviews.length - MAX_REVIEWS);
   save();
   return rec;
 }
@@ -1055,6 +1071,9 @@ function undoRating(rec) {
   }
   const lg = DB.log[rec.day];
   if (lg) { if (rec.correct) lg.r = Math.max(0, lg.r - 1); else lg.w = Math.max(0, lg.w - 1); }
+  for (let i = DB.reviews.length - 1; i >= 0; i--) {
+    if (DB.reviews[i][0] === rec.t && DB.reviews[i][1] === rec.id) { DB.reviews.splice(i, 1); break; }
+  }
   save();
 }
 
@@ -1075,7 +1094,7 @@ const TABS = [
   ['learn', 'Lernen', ICON.learn],
   ['cards', 'Karten', ICON.cards],
   ['categories', 'Kategorien', ICON.folder],
-  ['settings', 'Einstellungen', ICON.gear],
+  ['stats', 'Statistik', ICON.stats],
 ];
 
 function navbar(title, { left = '', right = '' } = {}) {
@@ -1094,6 +1113,9 @@ function renderTabbar() {
 }
 
 function setTab(t) {
+  // offene Einstellungen-Seite zuerst schließen
+  if (UI.settingsOv && stack.includes(UI.settingsOv)) closeOverlay(UI.settingsOv);
+  if (t === 'stats' && UI.statsDirty) renderStats();
   if (t === UI.tab) {
     const v = $(`.view[data-tab="${t}"]`);
     v.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
@@ -1115,6 +1137,45 @@ function refresh() {
   renderCardsList();
   renderCategories();
   renderSettings();
+  // Statistik ist rechenintensiver: nur zeichnen, wenn sichtbar
+  if (UI.tab === 'stats') renderStats(); else UI.statsDirty = true;
+}
+
+// Einstellungen als iOS-artige Push-Seite (von rechts), Zurück per Taste oder Android-Zurück
+function openSettings() {
+  const page = $('#view-settings');
+  const base = $(`.view[data-tab="${UI.tab}"]`);
+  renderSettings();
+  const W = window.innerWidth;
+  const sp = new Spring(W, { damping: 1, response: 0.42 }, (x) => {
+    page.style.transform = `translate3d(${x}px, 0, 0)`;
+    base.style.transform = `translate3d(${(x - W) * 0.3}px, 0, 0)`;
+  });
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    page.classList.remove('active', 'page');
+    page.style.transform = '';
+    base.style.transform = '';
+  };
+  const ov = {
+    kind: 'page',
+    show() {
+      page.classList.add('active', 'page');
+      page.scrollTop = 0;
+      page.classList.remove('scrolled');
+      sp.set(W);
+      requestAnimationFrame(() => sp.to(0));
+    },
+    hide() {
+      sp.to(W, { onRest: finish });
+      setTimeout(finish, 1200);
+    },
+    onBack() { closeOverlay(ov); },
+  };
+  UI.settingsOv = ov;
+  pushOverlay(ov);
 }
 
 // ---- Lernen ---------------------------------------------------------------
@@ -1134,7 +1195,10 @@ function renderLearn() {
   const catsWithCards = DB.categories.filter((c) => cardsIn(c.id).length).length;
   const showInstall = UI.installEvt && !isStandalone() && !DB.settings.installDismissed;
 
-  v.innerHTML = navbar('Lernen', { right: `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>` }) + `
+  v.innerHTML = navbar('Lernen', {
+    left: `<button class="icon-btn" data-action="open-settings" aria-label="Einstellungen">${ICON.gear}</button>`,
+    right: `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`,
+  }) + `
   <div class="content">
     <h1 class="large-title">Lernen</h1>
     ${showInstall ? `
@@ -1442,7 +1506,7 @@ function renderSettings() {
       <label class="switch"><input type="checkbox" data-setting="${key}" ${s[key] ? 'checked' : ''} aria-label="${esc(label)}"><span></span></label>
     </div>`;
 
-  v.innerHTML = navbar('Einstellungen') + `
+  v.innerHTML = navbar('Einstellungen', { left: `<button class="nav-btn back" data-action="settings-back">${ICON.chev}<span>Lernen</span></button>` }) + `
   <div class="content">
     <h1 class="large-title">Einstellungen</h1>
 
@@ -1544,6 +1608,707 @@ async function updatePersistStatus() {
     const p = navigator.storage && navigator.storage.persisted ? await navigator.storage.persisted() : null;
     elx.textContent = p == null ? 'Unbekannt' : p ? 'Aktiv' : 'Nicht aktiv';
   } catch (e) { elx.textContent = 'Unbekannt'; }
+}
+
+// ---------------------------------------------------------------------------
+// Statistik
+// ---------------------------------------------------------------------------
+
+const DAY_MS = 86400000;
+const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+const MON = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+const startOfDay = (d = new Date()) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const fmtDayLong = (d) => `${WD[d.getDay()]}, ${d.getDate()}. ${MON[d.getMonth()]}`;
+const pctOf = (a, b) => (b ? Math.round((a / b) * 100) : 0);
+const fmtNum = (n) => Math.round(n).toLocaleString('de-DE');
+function fmtDur(ms) {
+  const m = Math.round(ms / 60000);
+  if (m < 60) return `${m} Min.`;
+  return `${Math.floor(m / 60)} Std. ${m % 60 ? `${m % 60} Min.` : ''}`.trim();
+}
+function fmtDurShort(ms) {
+  const m = Math.round(ms / 60000);
+  return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`;
+}
+function niceMax(v) {
+  if (v <= 5) return 5;
+  const p = 10 ** Math.floor(Math.log10(v));
+  for (const m of [1, 2, 2.5, 5, 10]) if (v <= m * p) return m * p;
+  return 10 * p;
+}
+
+// Wissensstand-Stufen (Text-Label + Farbe, nie Farbe allein)
+const MASTERY = [
+  { key: 'weak', label: 'Schwach', hint: 'Ebene −5 bis −1', test: (l) => l < 0, color: 'var(--red)' },
+  { key: 'open', label: 'Offen', hint: 'Ebene 0', test: (l) => l === 0, color: 'var(--gray)' },
+  { key: 'good', label: 'Gelernt', hint: 'Ebene +1 bis +2', test: (l) => l >= 1 && l <= 2, color: 'color-mix(in srgb, var(--green) 55%, var(--bg2))' },
+  { key: 'sure', label: 'Sicher', hint: 'Ebene +3 bis +5', test: (l) => l >= 3, color: 'var(--green)' },
+];
+
+// Ein „Ausschnitt“ der Daten: alles, ein Bereich (Prüfung) oder eine Kategorie
+function makeScope(key) {
+  if (key === 'all') return { key, cards: DB.cards, reviews: DB.reviews, useLog: true };
+  const ids = key.startsWith('cat:') ? new Set([key.slice(4)]) : new Set(childrenOf(key).map((c) => c.id));
+  return {
+    key,
+    ids,
+    cards: DB.cards.filter((c) => ids.has(c.categoryId)),
+    reviews: DB.reviews.filter((r) => ids.has(r[2])),
+    useLog: false,
+  };
+}
+
+// Tageswerte: Tag → { r: richtig, w: falsch, ms: Lernzeit }
+function dayMap(sc) {
+  const m = new Map();
+  for (const r of sc.reviews) {
+    const k = dayKey(new Date(r[0]));
+    const e = m.get(k) || { r: 0, w: 0, ms: 0 };
+    if (r[3]) e.r++; else e.w++;
+    e.ms += r[5];
+    m.set(k, e);
+  }
+  // ältere Tage (vor dem Antwort-Protokoll) aus den Tagessummen ergänzen
+  if (sc.useLog) {
+    for (const [k, v] of Object.entries(DB.log)) {
+      const e = m.get(k);
+      if (!e) m.set(k, { r: v.r, w: v.w, ms: 0 });
+      else if (v.r + v.w > e.r + e.w) { e.r = v.r; e.w = v.w; }
+    }
+  }
+  return m;
+}
+
+function bestStreak() {
+  const days = Object.keys(DB.log).filter((k) => DB.log[k].r + DB.log[k].w > 0).sort();
+  let best = 0;
+  let cur = 0;
+  let prev = null;
+  for (const k of days) {
+    const d = new Date(`${k}T12:00:00`);
+    cur = prev && Math.round((d - prev) / DAY_MS) === 1 ? cur + 1 : 1;
+    best = Math.max(best, cur);
+    prev = d;
+  }
+  return best;
+}
+
+function masteryCounts(cards) {
+  const m = Object.fromEntries(MASTERY.map((s) => [s.key, 0]));
+  for (const c of cards) m[MASTERY.find((s) => s.test(c.level)).key]++;
+  return m;
+}
+
+// ---- Diagramm-Bausteine (SVG) ----------------------------------------------
+
+const CHARTS = new Map();
+let chartSeq = 0;
+const chartW = (inset = 64) => Math.max(240, Math.min(document.documentElement.clientWidth, 720) - inset);
+
+// Gestapelte Balken; items: [{ label, segs: [{ v, c }], detail }]
+function svgBars(items, { w = chartW(), h = 150, labelEvery = 1, unit = '' } = {}) {
+  const total = (it) => it.segs.reduce((a, s) => a + s.v, 0);
+  const nice = niceMax(Math.max(1, ...items.map(total)));
+  const padR = 30;
+  const padB = 20;
+  const padT = 8;
+  const iw = w - padR;
+  const ih = h - padB - padT;
+  const slot = iw / items.length;
+  const bw = Math.max(3, Math.min(slot * 0.64, 28));
+  const r = Math.min(4, bw / 2);
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">`;
+  for (const f of [0.5, 1]) {
+    const y = padT + ih - ih * f;
+    s += `<line class="grid" x1="0" x2="${iw}" y1="${y}" y2="${y}"/><text class="axis" x="${w}" y="${y + 4}" text-anchor="end">${fmtNum(nice * f)}${unit}</text>`;
+  }
+  s += `<line class="base" x1="0" x2="${iw}" y1="${padT + ih}" y2="${padT + ih}"/>`;
+  items.forEach((it, i) => {
+    const x = i * slot + (slot - bw) / 2;
+    let y = padT + ih;
+    s += `<g class="mark" data-i="${i}">`;
+    it.segs.filter((sg) => sg.v > 0).forEach((sg, j) => {
+      const hh = (sg.v / nice) * ih;
+      y -= hh;
+      const gap = j > 0 ? 2 : 0; // 2px Fuge zwischen gestapelten Segmenten
+      s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(1, hh - gap).toFixed(1)}" rx="${r}" fill="${sg.c}"/>`;
+    });
+    s += '</g>';
+    if (it.label && (i % labelEvery === 0)) s += `<text class="axis" x="${(x + bw / 2).toFixed(1)}" y="${h - 5}" text-anchor="middle">${esc(it.label)}</text>`;
+  });
+  return `${s}</svg>`;
+}
+
+// Linie 0–100 %; points: [{ v (0–100 oder null), label, detail }]
+function svgLine(points, { w = chartW(), h = 130, labelEvery = 7 } = {}) {
+  const padR = 34;
+  const padB = 20;
+  const padT = 10;
+  const iw = w - padR;
+  const ih = h - padB - padT;
+  const step = iw / Math.max(1, points.length - 1);
+  const X = (i) => i * step;
+  const Y = (v) => padT + ih - (v / 100) * ih;
+  let s = `<svg class="chart" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" aria-hidden="true">`;
+  for (const v of [50, 100]) s += `<line class="grid" x1="0" x2="${iw}" y1="${Y(v)}" y2="${Y(v)}"/><text class="axis" x="${w}" y="${Y(v) + 4}" text-anchor="end">${v} %</text>`;
+  s += `<line class="base" x1="0" x2="${iw}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  const pts = points.map((p, i) => (p.v == null ? null : [X(i), Y(p.v)])).filter(Boolean);
+  if (pts.length) {
+    const d = pts.map((p, i) => `${i ? 'L' : 'M'}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join('');
+    s += `<path class="area" d="${d}L${pts[pts.length - 1][0].toFixed(1)},${Y(0)}L${pts[0][0].toFixed(1)},${Y(0)}Z"/>`;
+    s += `<path class="line" d="${d}"/>`;
+    if (pts.length <= 40) for (const p of pts) s += `<circle class="dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3"/>`;
+  }
+  points.forEach((p, i) => {
+    if (p.label) s += `<text class="axis" x="${X(i).toFixed(1)}" y="${h - 5}" text-anchor="${i === 0 ? 'start' : i === points.length - 1 ? 'end' : 'middle'}">${esc(p.label)}</text>`;
+  });
+  s += `<line class="cursor" x1="0" x2="0" y1="${padT}" y2="${Y(0)}" style="display:none"/>`;
+  return `${s}</svg>`;
+}
+
+// Diagramm mit Kopfzeile; Antippen/Ziehen zeigt den genauen Wert (wie in Apple Health)
+function chartBlock(svgStr, items, headHTML, kind = 'bars') {
+  const id = `ch${++chartSeq}`;
+  CHARTS.set(id, { items, head: headHTML, kind });
+  return `<div class="chart-wrap" data-chart="${id}"><div class="chart-head">${headHTML}</div><div class="chart-plot">${svgStr}</div></div>`;
+}
+
+function bindCharts(root) {
+  for (const wrap of $$('.chart-wrap', root)) {
+    const cfg = CHARTS.get(wrap.dataset.chart);
+    if (!cfg || wrap._bound) continue;
+    wrap._bound = true;
+    const plot = $('.chart-plot', wrap);
+    const head = $('.chart-head', wrap);
+    const svgEl = $('svg', plot);
+    let timer = 0;
+    const pick = (e) => {
+      const rect = svgEl.getBoundingClientRect();
+      const w = rect.width * (1 - 30 / svgEl.viewBox.baseVal.width);
+      const x = clamp(e.clientX - rect.left, 0, w);
+      const n = cfg.items.length;
+      const i = cfg.kind === 'line' ? Math.round((x / w) * (n - 1)) : clamp(Math.floor((x / w) * n), 0, n - 1);
+      const it = cfg.items[i];
+      if (!it) return;
+      head.innerHTML = it.detail;
+      wrap.classList.add('scrub');
+      if (cfg.kind === 'line') {
+        const cur = $('.cursor', svgEl);
+        const cx = (i * (svgEl.viewBox.baseVal.width - 34)) / Math.max(1, n - 1);
+        cur.setAttribute('x1', cx); cur.setAttribute('x2', cx); cur.style.display = '';
+      } else {
+        for (const m of $$('.mark', svgEl)) m.classList.toggle('dim', +m.dataset.i !== i);
+      }
+    };
+    const reset = () => {
+      head.innerHTML = cfg.head;
+      wrap.classList.remove('scrub');
+      for (const m of $$('.mark', svgEl)) m.classList.remove('dim');
+      const cur = $('.cursor', svgEl);
+      if (cur) cur.style.display = 'none';
+    };
+    plot.addEventListener('pointerdown', (e) => { clearTimeout(timer); pick(e); });
+    plot.addEventListener('pointermove', (e) => { if (e.buttons || e.pointerType === 'mouse') pick(e); });
+    plot.addEventListener('pointerleave', () => { clearTimeout(timer); timer = setTimeout(reset, 300); });
+    plot.addEventListener('pointerup', () => { clearTimeout(timer); timer = setTimeout(reset, 2500); });
+    plot.addEventListener('pointercancel', () => { clearTimeout(timer); timer = setTimeout(reset, 300); });
+  }
+}
+
+// Aktivitätsringe (Apple-Watch-Stil)
+function svgRings(rings, size = 132) {
+  const sw = 13;
+  let s = `<svg class="rings" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" aria-hidden="true">`;
+  rings.forEach((rg, i) => {
+    const r = size / 2 - sw / 2 - i * (sw + 3);
+    const C = 2 * Math.PI * r;
+    const p = clamp(rg.p, 0, 1);
+    s += `<circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${rg.c}" stroke-opacity=".2" stroke-width="${sw}"/>`;
+    if (p > 0) s += `<circle class="ring-val" cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="${rg.c}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}" transform="rotate(-90 ${size / 2} ${size / 2})"/>`;
+  });
+  return `${s}</svg>`;
+}
+
+// ---- Abschnitte -------------------------------------------------------------
+
+function masteryBlock(sc, title = 'Wissensstand') {
+  const n = sc.cards.length;
+  const m = masteryCounts(sc.cards);
+  const learned = m.good + m.sure;
+  const seen = sc.cards.filter((c) => c.right + c.wrong > 0).length;
+  const segs = MASTERY.filter((s) => m[s.key]).map((s) => `<span style="flex:${m[s.key]};background:${s.color}" title="${s.label}: ${m[s.key]}"></span>`).join('');
+  return `
+    <div class="block stat-block">
+      <div class="stat-kicker">${esc(title)}</div>
+      <div class="hero"><b>${pctOf(learned, n)}<small>%</small></b><span>gelernt · ${fmtNum(learned)} von ${fmtNum(n)} Karten</span></div>
+      <div class="stack-bar" role="img" aria-label="Verteilung der Karten nach Wissensstand">${segs || '<span style="flex:1;background:var(--fill)"></span>'}</div>
+      <div class="legend">
+        ${MASTERY.map((s) => `<div class="legend-item"><i style="background:${s.color}"></i><div><b>${fmtNum(m[s.key])}</b> ${s.label}<small>${s.hint}</small></div></div>`).join('')}
+      </div>
+      <div class="stat-note">${fmtNum(seen)} von ${fmtNum(n)} Karten mindestens einmal gelernt (${pctOf(seen, n)} %)</div>
+    </div>`;
+}
+
+function facherBlock(sc) {
+  const counts = levelCounts(sc.cards);
+  const items = LEVELS.map((l) => ({
+    label: fmtLevel(l),
+    segs: [{ v: counts[l], c: levelColor(l) }],
+    detail: `<b>${fmtNum(counts[l])}</b><span>Karten in Ebene ${fmtLevel(l)}</span>`,
+  }));
+  return `<div class="block stat-block"><div class="stat-kicker">Fächer</div>${chartBlock(svgBars(items, { h: 130 }), items, `<b>${fmtNum(sc.cards.length)}</b><span>Karten · tippe auf ein Fach</span>`)}</div>`;
+}
+
+function activityBlock(sc, range) {
+  const dm = dayMap(sc);
+  const today = startOfDay();
+  let items = [];
+  if (range === 91) {
+    // 13 Wochen, wochenweise
+    const monday = addDays(today, -((today.getDay() + 6) % 7));
+    for (let wk = 12; wk >= 0; wk--) {
+      const start = addDays(monday, -7 * wk);
+      let r = 0; let w = 0;
+      for (let d = 0; d < 7; d++) { const e = dm.get(dayKey(addDays(start, d))); if (e) { r += e.r; w += e.w; } }
+      items.push({
+        label: wk % 4 === 0 ? `${start.getDate()}.${start.getMonth() + 1}.` : '',
+        segs: [{ v: r, c: 'var(--green)' }, { v: w, c: 'var(--red)' }],
+        detail: `<b>${fmtNum(r + w)}</b><span>Woche ab ${start.getDate()}. ${MON[start.getMonth()]} · ${fmtNum(r)} gewusst, ${fmtNum(w)} nicht</span>`,
+        n: r + w,
+      });
+    }
+  } else {
+    for (let i = range - 1; i >= 0; i--) {
+      const d = addDays(today, -i);
+      const e = dm.get(dayKey(d)) || { r: 0, w: 0 };
+      items.push({
+        label: range === 7 ? WD[d.getDay()] : (i % 7 === 0 ? `${d.getDate()}.` : ''),
+        segs: [{ v: e.r, c: 'var(--green)' }, { v: e.w, c: 'var(--red)' }],
+        detail: `<b>${fmtNum(e.r + e.w)}</b><span>${fmtDayLong(d)} · ${fmtNum(e.r)} gewusst, ${fmtNum(e.w)} nicht</span>`,
+        n: e.r + e.w,
+      });
+    }
+  }
+  const total = items.reduce((a, it) => a + it.n, 0);
+  const days = range === 91 ? 91 : range;
+  const head = `<b>${fmtNum(total / days * (range === 91 ? 7 : 1))}</b><span>Ø Antworten pro ${range === 91 ? 'Woche' : 'Tag'} · ${fmtNum(total)} insgesamt</span>`;
+  return `
+    <div class="block stat-block">
+      <div class="stat-row-head">
+        <div class="stat-kicker">Aktivität</div>
+        <div class="seg-mini" role="radiogroup" aria-label="Zeitraum">
+          ${[[7, '7 T'], [30, '30 T'], [91, '3 M']].map(([v, l]) => `<button role="radio" aria-checked="${range === v}" class="${range === v ? 'on' : ''}" data-stat-range="${v}">${l}</button>`).join('')}
+        </div>
+      </div>
+      ${chartBlock(svgBars(items, { h: 150, labelEvery: 1 }), items, head)}
+      <div class="legend inline"><div class="legend-item"><i style="background:var(--green)"></i>gewusst</div><div class="legend-item"><i style="background:var(--red)"></i>nicht gewusst</div></div>
+    </div>`;
+}
+
+function accuracyBlock(sc) {
+  const dm = dayMap(sc);
+  const today = startOfDay();
+  const pts = [];
+  let sumR = 0; let sumN = 0; let prevR = 0; let prevN = 0;
+  for (let i = 29; i >= 0; i--) {
+    const d = addDays(today, -i);
+    const e = dm.get(dayKey(d));
+    const n = e ? e.r + e.w : 0;
+    if (e) { sumR += e.r; sumN += n; }
+    pts.push({
+      v: n ? (e.r / n) * 100 : null,
+      label: i % 7 === 0 ? `${d.getDate()}.${d.getMonth() + 1}.` : '',
+      detail: n ? `<b>${pctOf(e.r, n)} %</b><span>${fmtDayLong(d)} · ${fmtNum(e.r)} von ${fmtNum(n)} gewusst</span>` : `<b>–</b><span>${fmtDayLong(d)} · nicht gelernt</span>`,
+    });
+  }
+  for (let i = 59; i >= 30; i--) { const e = dm.get(dayKey(addDays(today, -i))); if (e) { prevR += e.r; prevN += e.r + e.w; } }
+  const cur = sumN ? (sumR / sumN) * 100 : null;
+  const prev = prevN ? (prevR / prevN) * 100 : null;
+  const trend = cur != null && prev != null ? Math.round(cur - prev) : null;
+  const trendHTML = trend == null ? '' : `<em class="${trend >= 0 ? 'up' : 'down'}">${trend >= 0 ? '▲' : '▼'} ${Math.abs(trend)} Pkt. ggü. Vormonat</em>`;
+  const head = `<b>${cur == null ? '–' : `${Math.round(cur)} %`}</b><span>Trefferquote, letzte 30 Tage ${trendHTML}</span>`;
+  return `<div class="block stat-block"><div class="stat-kicker">Trefferquote</div>${chartBlock(svgLine(pts, { h: 130, labelEvery: 7 }), pts, head, 'line')}</div>`;
+}
+
+function timeBlock(sc) {
+  const dm = dayMap(sc);
+  const today = startOfDay();
+  const items = [];
+  let week = 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = addDays(today, -i);
+    const e = dm.get(dayKey(d)) || { ms: 0 };
+    week += e.ms;
+    items.push({
+      label: WD[d.getDay()],
+      segs: [{ v: e.ms / 60000, c: 'var(--cyan)' }],
+      detail: `<b>${fmtDur(e.ms)}</b><span>${fmtDayLong(d)}</span>`,
+    });
+  }
+  const timed = sc.reviews.filter((r) => r[5] > 0);
+  const total = timed.reduce((a, r) => a + r[5], 0);
+  const avgSec = timed.length ? total / timed.length / 1000 : 0;
+  const head = `<b>${fmtDur(week)}</b><span>diese Woche · Ø ${fmtDur(week / 7)} pro Tag</span>`;
+  return `
+    <div class="block stat-block">
+      <div class="stat-kicker">Lernzeit</div>
+      ${chartBlock(svgBars(items, { h: 120 }), items, head)}
+      <div class="mini-stats">
+        <div><b>${fmtDurShort(total)}</b><span>gesamt</span></div>
+        <div><b>${avgSec ? `${avgSec.toLocaleString('de-DE', { maximumFractionDigits: 1 })} s` : '–'}</b><span>Ø pro Karte</span></div>
+        <div><b>${fmtNum(timed.length)}</b><span>gemessene Antworten</span></div>
+      </div>
+    </div>`;
+}
+
+function heatmapBlock(sc) {
+  const dm = dayMap(sc);
+  const w = chartW(64);
+  const weeks = w < 330 ? 16 : 20;
+  const gap = 3;
+  const labelW = 20;
+  const cell = Math.floor((w - labelW - gap * (weeks - 1)) / weeks);
+  const today = startOfDay();
+  const monday = addDays(today, -((today.getDay() + 6) % 7));
+  const start = addDays(monday, -7 * (weeks - 1));
+  let max = 1;
+  for (let i = 0; i < weeks * 7; i++) { const e = dm.get(dayKey(addDays(start, i))); if (e) max = Math.max(max, e.r + e.w); }
+  const level = (n) => (n <= 0 ? 0 : Math.min(4, Math.ceil((n / max) * 4)));
+  const fills = ['var(--fill)', 'color-mix(in srgb, var(--green) 30%, var(--bg2))', 'color-mix(in srgb, var(--green) 55%, var(--bg2))', 'color-mix(in srgb, var(--green) 78%, var(--bg2))', 'var(--green)'];
+  const H = 16 + 7 * (cell + gap);
+  let s = `<svg class="chart heat" viewBox="0 0 ${labelW + weeks * (cell + gap)} ${H}" width="${labelW + weeks * (cell + gap)}" height="${H}" aria-hidden="true">`;
+  ['Mo', '', 'Mi', '', 'Fr', '', ''].forEach((l, r) => { if (l) s += `<text class="axis" x="0" y="${16 + r * (cell + gap) + cell - 2}">${l}</text>`; });
+  let lastMonth = -1;
+  for (let wk = 0; wk < weeks; wk++) {
+    const first = addDays(start, wk * 7);
+    if (first.getMonth() !== lastMonth) {
+      lastMonth = first.getMonth();
+      if (wk < weeks - 1) s += `<text class="axis" x="${labelW + wk * (cell + gap)}" y="10">${MON[lastMonth]}</text>`;
+    }
+    for (let d = 0; d < 7; d++) {
+      const day = addDays(first, d);
+      if (day > today) continue;
+      const e = dm.get(dayKey(day));
+      const n = e ? e.r + e.w : 0;
+      s += `<rect class="cell" data-d="${dayKey(day)}" data-n="${n}" x="${labelW + wk * (cell + gap)}" y="${16 + d * (cell + gap)}" width="${cell}" height="${cell}" rx="3" fill="${fills[level(n)]}"/>`;
+    }
+  }
+  s += '</svg>';
+  const active = [...dm.values()].filter((e) => e.r + e.w > 0).length;
+  return `
+    <div class="block stat-block">
+      <div class="stat-kicker">Lernkalender</div>
+      <div class="chart-head heat-head"><b>${fmtNum(active)}</b><span>Lerntage insgesamt · tippe auf einen Tag</span></div>
+      <div class="heat-wrap">${s}</div>
+      <div class="legend inline heat-legend"><span>weniger</span>${fills.map((f) => `<i style="background:${f}"></i>`).join('')}<span>mehr</span></div>
+    </div>`;
+}
+
+function hoursBlock(sc) {
+  const buckets = Array.from({ length: 12 }, () => ({ r: 0, w: 0 }));
+  for (const r of sc.reviews) {
+    const b = buckets[Math.floor(new Date(r[0]).getHours() / 2)];
+    if (r[3]) b.r++; else b.w++;
+  }
+  const items = buckets.map((b, i) => ({
+    label: i % 3 === 0 ? `${i * 2}` : '',
+    segs: [{ v: b.r + b.w, c: 'var(--indigo)' }],
+    detail: `<b>${fmtNum(b.r + b.w)}</b><span>${i * 2}–${i * 2 + 2} Uhr · ${b.r + b.w ? `${pctOf(b.r, b.r + b.w)} % gewusst` : 'keine Antworten'}</span>`,
+  }));
+  const ranked = buckets.map((b, i) => ({ i, n: b.r + b.w, acc: b.r + b.w ? b.r / (b.r + b.w) : 0 })).filter((b) => b.n >= 10).sort((a, b) => b.acc - a.acc);
+  const best = ranked[0];
+  const head = best
+    ? `<b>${best.i * 2}–${best.i * 2 + 2} Uhr</b><span>deine beste Zeit · ${Math.round(best.acc * 100)} % gewusst</span>`
+    : '<b>–</b><span>Wird angezeigt, sobald genug Antworten da sind</span>';
+  return `<div class="block stat-block"><div class="stat-kicker">Tageszeit</div>${chartBlock(svgBars(items, { h: 110 }), items, head)}<div class="stat-note">Antworten nach Uhrzeit (2-Stunden-Blöcke)</div></div>`;
+}
+
+function problemCards(sc, limit = 10) {
+  return sc.cards
+    .filter((c) => c.wrong >= 2 && c.wrong / (c.right + c.wrong) >= 0.4)
+    .sort((a, b) => b.wrong / (b.right + b.wrong) - a.wrong / (a.right + a.wrong) || b.wrong - a.wrong)
+    .slice(0, limit);
+}
+
+function problemBlock(sc) {
+  const list = problemCards(sc);
+  return `
+    <div class="section-header">Problemkarten</div>
+    ${list.length ? `
+    <div class="list">
+      ${list.map((c) => {
+        const n = c.right + c.wrong;
+        return `<button class="row" data-action="edit-card" data-id="${esc(c.id)}">
+          <span class="lvl" style="--c:${levelColor(c.level)}">${fmtLevel(c.level)}</span>
+          <div class="row-main"><div class="row-title clamp1">${esc(c.front)}</div><div class="row-sub">${c.wrong}× nicht gewusst von ${n} · ${pctOf(c.right, n)} % Quote</div></div>${chev}
+        </button>`;
+      }).join('')}
+    </div>
+    <div class="btn-stack"><button class="btn-tinted" data-action="learn-problems" data-scope="${esc(sc.key)}">${ICON.flame}<span>Problemkarten lernen</span></button></div>`
+    : '<p class="footnote" style="margin-top:0">Noch keine Problemkarten – hier landen Karten, die du mindestens zweimal und überwiegend nicht gewusst hast.</p>'}`;
+}
+
+function recordsBlock(sc) {
+  const dm = dayMap(sc);
+  let bestDay = null;
+  for (const [k, e] of dm) if (!bestDay || e.r + e.w > bestDay.n) bestDay = { k, n: e.r + e.w };
+  const answers = sc.cards.reduce((a, c) => a + c.right + c.wrong, 0);
+  const right = sc.cards.reduce((a, c) => a + c.right, 0);
+  const activeDays = [...dm.values()].filter((e) => e.r + e.w > 0).length;
+  const tiles = [
+    [fmtNum(answers), 'Antworten gesamt'],
+    [answers ? `${pctOf(right, answers)} %` : '–', 'Trefferquote gesamt'],
+    [bestDay ? fmtNum(bestDay.n) : '–', bestDay ? `Rekordtag (${fmtDayLong(new Date(`${bestDay.k}T12:00:00`))})` : 'Rekordtag'],
+    [activeDays ? fmtNum(answers / activeDays) : '–', 'Ø pro Lerntag'],
+  ];
+  if (sc.key === 'all') tiles.push([`${bestStreak()}`, 'längste Serie (Tage)'], [fmtNum(DB.cards.filter((c) => c.level === MAX).length), 'Karten auf +5']);
+  return `
+    <div class="section-header">Rekorde & Kennzahlen</div>
+    <div class="tile-grid">${tiles.map(([v, l]) => `<div class="stat"><div class="stat-value">${v}</div><div class="stat-label">${l}</div></div>`).join('')}</div>`;
+}
+
+function categoriesBlock(sc) {
+  const cats = sc.key === 'all' ? sortedCats() : childrenOf(sc.key);
+  const rows = cats.map((c) => {
+    const cs = cardsIn(c.id);
+    if (!cs.length) return null;
+    const m = masteryCounts(cs);
+    const ans = cs.reduce((a, x) => a + x.right + x.wrong, 0);
+    const right = cs.reduce((a, x) => a + x.right, 0);
+    const avg = cs.reduce((a, x) => a + x.level, 0) / cs.length;
+    return { c, cs, m, ans, right, avg, learned: pctOf(m.good + m.sure, cs.length) };
+  }).filter(Boolean).sort((a, b) => a.avg - b.avg || a.learned - b.learned);
+  if (!rows.length) return '';
+  return `
+    <div class="section-header">Kategorien <span class="sh-note">schwächste zuerst</span></div>
+    <div class="list icons" style="--inset:66px">
+      ${rows.map((r) => `
+        <button class="row" data-action="cat-stats" data-id="${esc(r.c.id)}">
+          ${rowIcon(catIcon(r.c), r.c.color, true)}
+          <div class="row-main">
+            <div class="row-title clamp1">${esc(r.c.name)}</div>
+            <div class="stack-bar thin">${MASTERY.filter((s) => r.m[s.key]).map((s) => `<span style="flex:${r.m[s.key]};background:${s.color}"></span>`).join('')}</div>
+            <div class="row-sub">${r.learned} % gelernt · ${r.ans ? `${pctOf(r.right, r.ans)} % Quote` : 'noch nicht gelernt'}</div>
+          </div>${chev}
+        </button>`).join('')}
+    </div>`;
+}
+
+// Prüfungs-Countdown mit Prognose
+function examBlock(gs) {
+  if (!gs.length) return '';
+  const today = startOfDay();
+  const cards = gs.map((g) => {
+    const cs = cardsInGroup(g.id);
+    const learned = cs.filter((c) => c.level >= 1).length;
+    const remaining = cs.length - learned;
+    const ids = new Set(childrenOf(g.id).map((c) => c.id));
+    // Tempo: Karten, die in den letzten 7 Tagen von 0 auf +1 gestiegen sind
+    const since = today.getTime() - 6 * DAY_MS;
+    const gained = DB.reviews.filter((r) => r[0] >= since && r[3] && r[4] === 0 && ids.has(r[2])).length;
+    const pace = gained / 7;
+    let status = '';
+    let days = null;
+    if (g.examDate) {
+      days = Math.round((new Date(`${g.examDate}T00:00:00`) - today) / DAY_MS);
+      if (days < 0) status = '<span class="status muted">Prüfung vorbei</span>';
+      else if (!remaining) status = `<span class="status good">${ICON.check}Alle Karten gelernt</span>`;
+      else {
+        const need = Math.ceil(remaining / Math.max(1, days));
+        status = pace >= need
+          ? `<span class="status good">${ICON.check}Im Plan · Ø ${pace.toLocaleString('de-DE', { maximumFractionDigits: 1 })} neue/Tag, nötig ${need}</span>`
+          : `<span class="status warn">${ICON.flame}Tempo erhöhen · ${need} neue Karten/Tag nötig${pace ? `, bisher Ø ${pace.toLocaleString('de-DE', { maximumFractionDigits: 1 })}` : ''}</span>`;
+      }
+    }
+    const p = pctOf(learned, cs.length);
+    return `
+      <button class="exam-card" data-action="exam-dates" style="--c:var(--${g.color})">
+        <div class="exam-top">
+          <span class="exam-name">${esc(groupShort(g))}</span>
+          <span class="exam-days">${days == null ? '<em>Datum festlegen</em>' : days < 0 ? '' : days === 0 ? '<b>Heute!</b>' : `<b>${days}</b> ${days === 1 ? 'Tag' : 'Tage'}`}</span>
+        </div>
+        <div class="exam-sub">${esc(g.name.split(':').slice(1).join(':').trim() || g.name)}${g.examDate ? ` · ${new Date(`${g.examDate}T00:00:00`).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}` : ''}</div>
+        <div class="gbar" style="--c:var(--${g.color})"><span style="width:${p}%"></span></div>
+        <div class="exam-meta"><span>${p} % gelernt</span><span>${fmtNum(remaining)} offen</span></div>
+        ${status}
+      </button>`;
+  }).join('');
+  return `<div class="section-header">Prüfungen</div><div class="exam-list">${cards}</div>`;
+}
+
+function todayBlock() {
+  const sc = makeScope('all');
+  const dm = dayMap(sc);
+  const e = dm.get(dayKey()) || { r: 0, w: 0, ms: 0 };
+  const n = e.r + e.w;
+  const goal = DB.settings.dailyGoal || 50;
+  const minGoal = DB.settings.dailyMinutes || 20;
+  const mins = Math.round(e.ms / 60000);
+  const acc = n ? e.r / n : 0;
+  // Wochenstreifen Mo–So
+  const today = startOfDay();
+  const monday = addDays(today, -((today.getDay() + 6) % 7));
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(monday, i);
+    const x = dm.get(dayKey(d));
+    const cnt = x ? x.r + x.w : 0;
+    const p = clamp(cnt / goal, 0, 1);
+    const future = d > today;
+    const C = 2 * Math.PI * 13;
+    return `<div class="wday ${future ? 'future' : ''} ${dayKey(d) === dayKey() ? 'today' : ''}" title="${fmtDayLong(d)}: ${cnt} Karten">
+      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="var(--pink)" stroke-opacity=".18" stroke-width="5"/>${p > 0 ? `<circle cx="16" cy="16" r="13" fill="none" stroke="var(--pink)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}" transform="rotate(-90 16 16)"/>` : ''}${p >= 1 ? `<path d="M11 16.5l3.3 3.3 6.7-7" fill="none" stroke="var(--pink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>` : ''}</svg>
+      <span>${WD[d.getDay()]}</span></div>`;
+  }).join('');
+  return `
+    <div class="block today-card">
+      <div class="today-main" data-action="edit-goals" role="button" tabindex="0" aria-label="Tagesziele ändern">
+        ${svgRings([{ p: n / goal, c: 'var(--pink)' }, { p: mins / minGoal, c: 'var(--green)' }, { p: acc, c: 'var(--cyan)' }])}
+        <div class="ring-legend">
+          <div style="--c:var(--pink)"><span>Karten</span><b>${n}<small>/${goal}</small></b></div>
+          <div style="--c:var(--green)"><span>Lernzeit</span><b>${mins}<small>/${minGoal} Min.</small></b></div>
+          <div style="--c:var(--cyan)"><span>Gewusst</span><b>${n ? Math.round(acc * 100) : '–'}<small>${n ? ' %' : ''}</small></b></div>
+        </div>
+      </div>
+      <div class="week-strip">${week}</div>
+      <div class="streak-line">${ICON.flame}<span><b>${streak()} ${streak() === 1 ? 'Tag' : 'Tage'}</b> in Folge gelernt · Rekord ${bestStreak()}</span><button class="link-btn" data-action="edit-goals">Ziele</button></div>
+    </div>`;
+}
+
+function renderStats() {
+  UI.statsDirty = false;
+  const v = $('#view-stats');
+  if (!v) return;
+  const st = v.scrollTop;
+  CHARTS.clear();
+  if (UI.statScope !== 'all' && !isGroup(catById(UI.statScope))) UI.statScope = 'all';
+  const scopeKey = UI.statScope || 'all';
+  const sc = makeScope(scopeKey);
+  const range = UI.statRange || 7;
+  const gs = groups();
+  const chip = (key, label, color) => `<button class="chip ${scopeKey === key ? 'on' : ''}" ${color ? `style="--c:var(--${color})"` : ''} data-stat-scope="${esc(key)}">${color ? '<span class="dot"></span>' : ''}${esc(label)}</button>`;
+
+  v.innerHTML = navbar('Statistik') + `
+    <div class="content">
+      <h1 class="large-title">Statistik</h1>
+      ${DB.cards.length ? `
+      <div class="section-header" style="margin-top:0">Heute</div>
+      ${todayBlock()}
+      ${examBlock(scopeKey === 'all' ? gs : gs.filter((g) => g.id === scopeKey))}
+      <div class="chips stat-chips">${chip('all', 'Alle Karten')}${gs.map((g) => chip(g.id, groupShort(g), g.color)).join('')}</div>
+      ${masteryBlock(sc, scopeKey === 'all' ? 'Wissensstand' : `Wissensstand · ${groupShort(catById(scopeKey))}`)}
+      ${facherBlock(sc)}
+      ${activityBlock(sc, range)}
+      ${accuracyBlock(sc)}
+      ${heatmapBlock(sc)}
+      ${timeBlock(sc)}
+      ${hoursBlock(sc)}
+      ${categoriesBlock(sc)}
+      ${problemBlock(sc)}
+      ${recordsBlock(sc)}
+      <p class="footnote">Lernzeit, Tageszeit und Kategorie-Verläufe werden seit diesem Update erfasst. Tippe auf ein Diagramm, um genaue Werte zu sehen.</p>
+      ` : `
+      <div class="empty"><div class="empty-icon">${ICON.stats}</div><h2>Noch keine Daten</h2><p>Lege Karten an und lerne eine Runde – dann wird es hier spannend.</p></div>`}
+    </div>`;
+  bindCharts(v);
+  v.scrollTop = st;
+}
+
+// Kategorie im Detail
+function openCategoryStats(cat) {
+  const sc = makeScope(`cat:${cat.id}`);
+  CHARTS.clear();
+  const ans = sc.cards.reduce((a, c) => a + c.right + c.wrong, 0);
+  const right = sc.cards.reduce((a, c) => a + c.right, 0);
+  const ms = sc.reviews.reduce((a, r) => a + r[5], 0);
+  const sheet = openSheet({
+    title: cat.name,
+    left: { label: 'Fertig' },
+    body: `
+      <div class="cat-stats-head">${rowIcon(catIcon(cat), cat.color, true)}<div><b>${esc(cat.name)}</b><span>${cat.parentId ? esc(catById(cat.parentId).name) : 'Ohne Bereich'}</span></div></div>
+      <div class="tile-grid" style="margin-top:4px">
+        <div class="stat"><div class="stat-value">${fmtNum(sc.cards.length)}</div><div class="stat-label">Karten</div></div>
+        <div class="stat"><div class="stat-value">${ans ? `${pctOf(right, ans)} %` : '–'}</div><div class="stat-label">Trefferquote</div></div>
+        <div class="stat"><div class="stat-value">${fmtNum(ans)}</div><div class="stat-label">Antworten</div></div>
+        <div class="stat"><div class="stat-value">${ms ? fmtDur(ms) : '–'}</div><div class="stat-label">Lernzeit</div></div>
+      </div>
+      <div style="height:12px"></div>
+      ${masteryBlock(sc)}
+      ${facherBlock(sc)}
+      ${activityBlock(sc, 30)}
+      ${problemBlock(sc)}
+      <div class="btn-stack">
+        <button class="btn-primary" data-cs="learn">${ICON.learn}<span>Kategorie lernen</span></button>
+        <button class="btn-plain" data-cs="show">Karten anzeigen</button>
+      </div>`,
+    onMount: (sh) => bindCharts(sh.body),
+  });
+  sheet.body.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-cs]');
+    if (!b) return;
+    sheet.close();
+    if (b.dataset.cs === 'learn') startSession({ type: 'category', categoryId: cat.id, label: catPath(cat) });
+    else { UI.cardsFilter = cat.id; setTab('cards'); renderCardsList(); }
+  });
+}
+
+// Prüfungstermine festlegen
+function openExamDates() {
+  const gs = groups();
+  const sheet = openSheet({
+    title: 'Prüfungstermine',
+    compact: true,
+    left: { label: 'Fertig' },
+    body: `
+      <div class="list">
+        ${gs.map((g) => `
+          <div class="row">
+            ${rowIcon(ICON.learn, g.color)}
+            <div class="row-main"><div class="row-title">${esc(groupShort(g))}</div><div class="row-sub clamp1">${esc(g.name.split(':').slice(1).join(':').trim())}</div></div>
+            <input class="date-input" type="date" value="${esc(g.examDate || '')}" data-exam="${esc(g.id)}" aria-label="Prüfungstermin ${esc(groupShort(g))}">
+          </div>`).join('')}
+      </div>
+      <p class="footnote">Mit Termin siehst du einen Countdown und ob dein Lerntempo reicht.</p>`,
+    onClose: () => { if (UI.tab === 'stats') renderStats(); },
+  });
+  sheet.body.addEventListener('change', (e) => {
+    const inp = e.target.closest('[data-exam]');
+    if (!inp) return;
+    const g = catById(inp.dataset.exam);
+    if (inp.value) g.examDate = inp.value; else delete g.examDate;
+    save();
+    haptic(5);
+  });
+}
+
+// Tagesziele
+function openGoals() {
+  const CARD_GOALS = [20, 30, 50, 75, 100, 150];
+  const MIN_GOALS = [10, 15, 20, 30, 45, 60];
+  const render = (sh) => {
+    const s = DB.settings;
+    sh.body.innerHTML = `
+      <div class="form-label">Karten pro Tag</div>
+      <div class="segmented">${CARD_GOALS.map((v) => `<button class="${s.dailyGoal === v ? 'on' : ''}" data-goal="${v}">${v}</button>`).join('')}</div>
+      <div class="form-label">Lernzeit pro Tag (Minuten)</div>
+      <div class="segmented">${MIN_GOALS.map((v) => `<button class="${s.dailyMinutes === v ? 'on' : ''}" data-mins="${v}">${v}</button>`).join('')}</div>
+      <p class="footnote">Die Ringe füllen sich, wenn du dein Tagesziel erreichst. Der dritte Ring zeigt deine Trefferquote von heute.</p>`;
+  };
+  const sheet = openSheet({
+    title: 'Tagesziele',
+    compact: true,
+    left: { label: 'Fertig' },
+    body: '',
+    onMount: render,
+    onClose: () => { refresh(); },
+  });
+  sheet.body.addEventListener('click', (e) => {
+    const g = e.target.closest('[data-goal]');
+    const m = e.target.closest('[data-mins]');
+    if (g) DB.settings.dailyGoal = +g.dataset.goal;
+    if (m) DB.settings.dailyMinutes = +m.dataset.mins;
+    if (g || m) { save(); haptic(4); render(sheet); }
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -2257,11 +3022,11 @@ function startSession(spec) {
   let H = window.innerHeight;
   const slide = new Spring(H, { damping: 1, response: 0.42 }, (y) => { sessionEl.style.transform = `translate3d(0, ${y}px, 0)`; });
 
-  const title = {
+  const title = spec.label || {
     weighted: 'Schwächen zuerst',
     equal: 'Alle zufällig',
     retry: 'Wiederholung',
-  }[spec.type] || spec.label || '';
+  }[spec.type] || '';
   $('.session-title', root).textContent = title;
 
   const updateTop = () => {
@@ -2407,9 +3172,9 @@ function startSession(spec) {
         drag.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
         if (drag.axis === 'x') { try { node.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
       }
-      if (drag.axis !== 'x') return;
-      const raw = drag.sx + dx;
-      xs.set(S.revealed ? raw : rubber(raw, W(), 0.25));
+      // Wischen ist erst nach dem Aufdecken möglich – vorher bleibt die Karte ruhig liegen
+      if (drag.axis !== 'x' || !S.revealed) return;
+      xs.set(drag.sx + dx);
     });
     const end = (e, cancelled) => {
       if (!drag || e.pointerId !== drag.id) return;
@@ -2419,7 +3184,7 @@ function startSession(spec) {
         if (!cancelled && performance.now() - d.t0 < 600) onTap();
         return;
       }
-      if (d.axis !== 'x') return;
+      if (d.axis !== 'x' || !S.revealed) return;
       const v = d.vt.get().x;
       const proj = st.x + project(v, 0.99);
       if (!cancelled && S.revealed && Math.abs(proj) > W() * 0.38 && Math.sign(proj) === Math.sign(st.x || proj)) {
@@ -2456,6 +3221,7 @@ function startSession(spec) {
   }
 
   function mount(opts = {}) {
+    S.shownAt = performance.now();
     S.revealed = !!opts.revealed;
     S.hintShown = false;
     const view = CardView(currentCard(), opts);
@@ -2469,7 +3235,7 @@ function startSession(spec) {
   function rate(correct, velocity) {
     if (!S.revealed || S.done || !S.view) return;
     const card = currentCard();
-    const rec = rateCard(card, correct);
+    const rec = rateCard(card, correct, performance.now() - S.shownAt);
     S.results.push(rec);
     haptic(correct ? 12 : [14, 50, 14]);
     S.view.leave(correct ? 1 : -1, velocity);
@@ -2605,16 +3371,25 @@ function startSession(spec) {
       mount();
       requestAnimationFrame(() => slide.to(0));
       document.addEventListener('keydown', onKey);
+      document.addEventListener('visibilitychange', onVis);
     },
     hide() {
       root.style.pointerEvents = 'none';
       document.removeEventListener('keydown', onKey);
+      document.removeEventListener('visibilitychange', onVis);
       slide.to(H, { response: 0.4, onRest: () => root.remove() });
       setTimeout(() => root.remove(), 1500);
       refresh();
     },
     onBack() { closeOverlay(ov); },
   };
+
+  // Zeit im Hintergrund zählt nicht als Lernzeit
+  let hiddenAt = 0;
+  function onVis() {
+    if (document.hidden) hiddenAt = performance.now();
+    else if (hiddenAt) { S.shownAt += performance.now() - hiddenAt; hiddenAt = 0; }
+  }
 
   function onKey(e) {
     if (topOverlay() !== ov) return;
@@ -2811,6 +3586,19 @@ const ACTIONS = {
   'start-weighted': () => startSession({ type: 'weighted' }),
   'start-equal': () => startSession({ type: 'equal' }),
   'start-level': (b) => { const l = +b.dataset.level; startSession({ type: 'level', level: l, label: `Ebene ${fmtLevel(l)}` }); },
+  'cat-stats': (b) => { const c = catById(b.dataset.id); if (c) openCategoryStats(c); },
+  'exam-dates': () => openExamDates(),
+  'edit-goals': () => openGoals(),
+  'learn-problems': (b) => {
+    const ids = problemCards(makeScope(b.dataset.scope || 'all'), 50).map((c) => c.id);
+    if (!ids.length) return;
+    // aus einem Sheet heraus: erst schließen
+    const top = topOverlay();
+    if (top && top.kind === 'sheet') closeOverlay(top);
+    startSession({ type: 'retry', ids, label: 'Problemkarten' });
+  },
+  'open-settings': () => openSettings(),
+  'settings-back': () => { if (UI.settingsOv) closeOverlay(UI.settingsOv); },
   'start-pinned': () => startSession({ type: 'pinned', label: 'Gemerkte Karten' }),
   'start-group': (b) => { const g = catById(b.dataset.id); if (g) startSession({ type: 'group', groupId: g.id, label: g.name }); },
   'pick-category': () => pickCategorySheet(),
@@ -2932,6 +3720,23 @@ document.addEventListener('click', (e) => {
   if (!b || b.disabled) return;
   const fn = ACTIONS[b.dataset.action];
   if (fn) fn(b, e);
+});
+
+// Statistik: Bereich, Zeitraum, Kalendertage
+document.addEventListener('click', (e) => {
+  const scope = e.target.closest('[data-stat-scope]');
+  if (scope) { UI.statScope = scope.dataset.statScope; renderStats(); haptic(4); return; }
+  const range = e.target.closest('[data-stat-range]');
+  if (range) { UI.statRange = +range.dataset.statRange; renderStats(); haptic(4); return; }
+  const cell = e.target.closest('.heat .cell');
+  if (cell) {
+    const head = cell.closest('.stat-block').querySelector('.heat-head');
+    const d = new Date(`${cell.dataset.d}T12:00:00`);
+    const n = +cell.dataset.n;
+    head.innerHTML = `<b>${fmtNum(n)}</b><span>${fmtDayLong(d)} · ${n === 1 ? 'Antwort' : 'Antworten'}</span>`;
+    for (const c of $$('.heat .cell.sel')) c.classList.remove('sel');
+    cell.classList.add('sel');
+  }
 });
 
 document.addEventListener('change', (e) => {
@@ -3097,6 +3902,18 @@ function boot() {
     UI.installEvt = null;
     toast('App installiert');
     refresh();
+  });
+
+  // Diagramme an neue Breite anpassen (Drehen, Fenstergröße)
+  let resizeT = 0;
+  let lastW = window.innerWidth;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => {
+      if (Math.abs(window.innerWidth - lastW) < 2) return;
+      lastW = window.innerWidth;
+      if (UI.tab === 'stats') renderStats(); else UI.statsDirty = true;
+    }, 200);
   });
 
   // Daten aus einem anderen Tab übernehmen
