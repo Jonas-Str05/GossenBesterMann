@@ -581,6 +581,7 @@ function openSheet({ title, body, left, right, compact, onMount, beforeClose, on
   const isBase = !stack.some((o) => o.kind === 'sheet' || o.kind === 'session');
   let H = 800;
   const spring = new Spring(H, { damping: 1, response: 0.38, precision: 0.5 }, (y) => {
+    if (finished) return; // nach dem Entfernen nie wieder die App verschieben
     sheetEl.style.transform = `translate3d(0, ${y}px, 0)`;
     const p = clamp(1 - y / H, 0, 1);
     scrim.style.opacity = String(p);
@@ -606,7 +607,8 @@ function openSheet({ title, body, left, right, compact, onMount, beforeClose, on
       $('#overlays').appendChild(root);
       H = sheetEl.offsetHeight || window.innerHeight;
       spring.set(H);
-      requestAnimationFrame(() => spring.to(0, { damping: 1, response: 0.4 }));
+      // nicht mehr öffnen, falls das Sheet schon vor dem ersten Frame geschlossen wurde
+      requestAnimationFrame(() => { if (!closing) spring.to(0, { damping: 1, response: 0.4 }); });
       // nach dem Return von openSheet, aber noch vor dem ersten Frame
       if (onMount) queueMicrotask(() => onMount(sheet));
     },
@@ -1184,6 +1186,7 @@ function navbar(title, { left = '', right = '' } = {}) {
   </div></header>`;
 }
 const chev = `<span class="chev">${ICON.chev}</span>`;
+const gearBtn = () => `<button class="icon-btn" data-action="open-settings" aria-label="Einstellungen">${ICON.gear}</button>`;
 const rowIcon = (icon, color, lg) => `<span class="row-icon ${lg ? 'lg' : ''}" style="--c:var(--${color})">${icon}</span>`;
 
 function renderTabbar() {
@@ -1245,14 +1248,17 @@ function openSettings() {
   const base = $(`.view[data-tab="${UI.tab}"]`);
   renderSettings();
   const W = window.innerWidth;
+  let done = false;
+  let hiding = false;
   const sp = new Spring(W, { damping: 1, response: 0.42 }, (x) => {
+    if (done) return;
     page.style.transform = `translate3d(${x}px, 0, 0)`;
     base.style.transform = `translate3d(${(x - W) * 0.3}px, 0, 0)`;
   });
-  let done = false;
   const finish = () => {
     if (done) return;
     done = true;
+    sp.stop();
     page.classList.remove('active', 'page');
     page.style.transform = '';
     base.style.transform = '';
@@ -1264,9 +1270,10 @@ function openSettings() {
       page.scrollTop = 0;
       page.classList.remove('scrolled');
       sp.set(W);
-      requestAnimationFrame(() => sp.to(0));
+      requestAnimationFrame(() => { if (!hiding) sp.to(0); });
     },
     hide() {
+      hiding = true;
       sp.to(W, { onRest: finish });
       setTimeout(finish, 1200);
     },
@@ -1294,7 +1301,7 @@ function renderLearn() {
   const showInstall = UI.installEvt && !isStandalone() && !DB.settings.installDismissed;
 
   v.innerHTML = navbar('Lernen', {
-    left: `<button class="icon-btn" data-action="open-settings" aria-label="Einstellungen">${ICON.gear}</button>`,
+    left: gearBtn(),
     right: `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`,
   }) + `
   <div class="content">
@@ -1402,7 +1409,7 @@ function renderLearn() {
 function initCardsView() {
   const v = $('#view-cards');
   v.innerHTML = `${navbar('Karten', {
-    left: '<button class="nav-btn" data-action="toggle-select" id="select-btn">Auswählen</button>',
+    left: '<span id="cards-nav-left"></span>',
     right: `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`,
   })}
   <div class="content">
@@ -1413,6 +1420,42 @@ function initCardsView() {
     <div id="cards-list"></div>
   </div>`;
   $('#card-search').addEventListener('input', (e) => { UI.search = e.target.value; renderCardsList(); });
+  renderCardsNavLeft();
+  bindLongPress($('#cards-list'));
+}
+
+// Langes Drücken auf eine Karte: Auswahlmodus starten und diese Karte auswählen
+function bindLongPress(list) {
+  let timer = 0;
+  let start = null;
+  let row = null;
+  const cancel = () => {
+    clearTimeout(timer);
+    timer = 0;
+    if (row) row.classList.remove('pressing');
+    row = null;
+  };
+  list.addEventListener('pointerdown', (e) => {
+    const r = e.target.closest('.card-row');
+    if (!r || e.button !== 0 || UI.select) return;
+    row = r;
+    start = { x: e.clientX, y: e.clientY };
+    row.classList.add('pressing');
+    timer = setTimeout(() => {
+      const id = row.dataset.id;
+      cancel();
+      UI.suppressClick = true; // der folgende Klick soll nicht den Editor öffnen
+      setTimeout(() => { UI.suppressClick = false; }, 600);
+      haptic(15);
+      setSelectMode(true, id);
+    }, 480);
+  });
+  list.addEventListener('pointermove', (e) => {
+    if (timer && start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) cancel();
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) list.addEventListener(ev, cancel);
+  // Kontextmenü / Textauswahl des Browsers beim langen Drücken unterdrücken
+  list.addEventListener('contextmenu', (e) => { if (e.target.closest('.card-row')) e.preventDefault(); });
 }
 
 const SORTS = {
@@ -1509,7 +1552,7 @@ function renderCardsList() {
       <div class="list">
         ${list.map((c) => {
           const cat = catById(c.categoryId);
-          return `<button class="row" data-action="${sel ? 'toggle-card' : 'edit-card'}" data-id="${esc(c.id)}">
+          return `<button class="row card-row" data-action="${sel ? 'toggle-card' : 'edit-card'}" data-id="${esc(c.id)}">
             ${sel ? `<span class="check ${UI.selected.has(c.id) ? 'on' : ''}">${ICON.check}</span>` : ''}
             <span class="lvl" style="--c:${levelColor(c.level)}">${fmtLevel(c.level)}</span>
             <div class="row-main">
@@ -1524,12 +1567,17 @@ function renderCardsList() {
   renderSelectBar();
 }
 
-function setSelectMode(on) {
+function renderCardsNavLeft() {
+  const slot = $('#cards-nav-left');
+  if (slot) slot.innerHTML = UI.select ? '<button class="nav-btn bold" data-action="toggle-select">Fertig</button>' : gearBtn();
+}
+
+function setSelectMode(on, firstId = null) {
   UI.select = on;
   UI.selected.clear();
+  if (on && firstId) UI.selected.add(firstId);
   $('#app').classList.toggle('select-mode', on);
-  const b = $('#select-btn');
-  if (b) { b.textContent = on ? 'Fertig' : 'Auswählen'; b.classList.toggle('bold', on); }
+  renderCardsNavLeft();
   renderCardsList();
 }
 
@@ -1560,7 +1608,7 @@ function renderCategories() {
     </button>`;
   };
   const gs = groups();
-  v.innerHTML = navbar('Kategorien', { right: `<button class="icon-btn" data-action="new-category" aria-label="Neue Kategorie">${ICON.plus}</button>` }) + `
+  v.innerHTML = navbar('Kategorien', { left: gearBtn(), right: `<button class="icon-btn" data-action="new-category" aria-label="Neue Kategorie">${ICON.plus}</button>` }) + `
   <div class="content">
     <h1 class="large-title">Kategorien</h1>
     ${gs.map((g) => {
@@ -1618,7 +1666,7 @@ function renderSettings() {
       <label class="switch"><input type="checkbox" data-setting="${key}" ${s[key] ? 'checked' : ''} aria-label="${esc(label)}"><span></span></label>
     </div>`;
 
-  v.innerHTML = navbar('Einstellungen', { left: `<button class="nav-btn back" data-action="settings-back">${ICON.chev}<span>Lernen</span></button>` }) + `
+  v.innerHTML = navbar('Einstellungen', { left: `<button class="nav-btn back" data-action="settings-back">${ICON.chev}<span>${esc((TABS.find((t) => t[0] === UI.tab) || TABS[0])[1])}</span></button>` }) + `
   <div class="content">
     <h1 class="large-title">Einstellungen</h1>
 
@@ -2315,7 +2363,7 @@ function renderStats() {
   const gs = groups();
   const chip = (key, label, color) => `<button class="chip ${scopeKey === key ? 'on' : ''}" ${color ? `style="--c:var(--${color})"` : ''} data-stat-scope="${esc(key)}">${color ? '<span class="dot"></span>' : ''}${esc(label)}</button>`;
 
-  v.innerHTML = navbar('Statistik') + `
+  v.innerHTML = navbar('Statistik', { left: gearBtn() }) + `
     <div class="content">
       <h1 class="large-title">Statistik</h1>
       ${DB.cards.length ? `
@@ -3932,6 +3980,8 @@ const ACTIONS = {
 document.addEventListener('click', (e) => {
   const b = e.target.closest('[data-action]');
   if (!b || b.disabled) return;
+  // Klick direkt nach langem Drücken ignorieren
+  if (UI.suppressClick && b.classList.contains('card-row')) { UI.suppressClick = false; return; }
   const fn = ACTIONS[b.dataset.action];
   if (fn) fn(b, e);
 });

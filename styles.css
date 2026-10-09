@@ -1144,6 +1144,10 @@ button.bold { font-weight: 600; }
 .tool-btn.on { background: color-mix(in srgb, var(--orange) 18%, var(--bg2)); color: color-mix(in srgb, var(--orange) 85%, var(--label)); }
 .tool-btn.destructive { color: var(--red); }
 
+/* Langes Drücken: kein Browser-Menü, sanftes „Eindrücken“ als Rückmeldung */
+.card-row { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+.card-row.pressing { background: var(--fill2); transform: scale(.985); transition: transform .45s ease, background-color .2s ease; }
+
 .restore-btn {
   flex: none;
   width: 40px;
