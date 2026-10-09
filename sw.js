@@ -1,5 +1,5 @@
 /* Service Worker: hält die App komplett offline verfügbar. */
-const CACHE = 'karteikarten-ap2-v8';
+const CACHE = 'karteikarten-ap2-v9';
 const ASSETS = [
   './',
   './index.html',

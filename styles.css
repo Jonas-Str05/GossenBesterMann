@@ -1144,6 +1144,20 @@ button.bold { font-weight: 600; }
 .tool-btn.on { background: color-mix(in srgb, var(--orange) 18%, var(--bg2)); color: color-mix(in srgb, var(--orange) 85%, var(--label)); }
 .tool-btn.destructive { color: var(--red); }
 
+.restore-btn {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 13%, transparent);
+  transition: transform .12s ease;
+}
+.restore-btn svg { width: 20px; height: 20px; }
+.restore-btn:active { transform: scale(.9); }
+
 .swipe-hints { justify-content: space-between; }
 .swipe-hint {
   display: inline-flex;

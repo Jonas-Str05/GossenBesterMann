@@ -13,6 +13,8 @@ const LEVELS = Array.from({ length: MAX - MIN + 1 }, (_, i) => MIN + i);
 const COLORS = ['blue', 'indigo', 'purple', 'pink', 'red', 'orange', 'yellow', 'green', 'mint', 'teal', 'cyan', 'brown'];
 const SIZES = [10, 20, 50, 0]; // 0 = alle
 const MAX_REVIEWS = 25000; // ca. 1–1,5 MB im Speicher
+const TRASH_DAYS = 30; // so lange bleiben gelöschte Karten im Papierkorb
+const MAX_TRASH = 1500;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -193,6 +195,8 @@ function defaultDB() {
     log: {},
     // Antwort-Protokoll: [Zeit, Karten-ID, Kategorie-ID, richtig 1/0, Ebene vorher, Dauer ms]
     reviews: [],
+    // Papierkorb: { at: gelöscht am, cat: Kategoriepfad zum Anzeigen, card: vollständige Karte }
+    trash: [],
     settings: {
       theme: 'system', // 'system' | 'light' | 'dark'
       dailyGoal: 50,
@@ -276,12 +280,18 @@ function normalize(d) {
     .filter((r) => Array.isArray(r) && r.length >= 4 && Number.isFinite(+r[0]))
     .map((r) => [+r[0], String(r[1]), String(r[2]), r[3] ? 1 : 0, clampLevel(+r[4] || 0), Math.max(0, Math.min(+r[5] || 0, 90000))])
     .slice(-MAX_REVIEWS);
+  const trashLimit = Date.now() - TRASH_DAYS * 86400000;
+  const trash = (Array.isArray(d.trash) ? d.trash : [])
+    .filter((t) => t && t.card && (t.card.front || t.card.back) && +t.at >= trashLimit)
+    .map((t) => ({ at: +t.at, cat: String(t.cat || ''), card: t.card }))
+    .slice(-MAX_TRASH);
   return {
     version: 1,
     categories,
     cards,
     log,
     reviews,
+    trash,
     settings: { ...def.settings, ...(d.settings && typeof d.settings === 'object' ? d.settings : {}) },
     meta: { ...def.meta, ...(d.meta && typeof d.meta === 'object' ? d.meta : {}) },
   };
@@ -349,7 +359,50 @@ function createCategory(name, extra = {}) {
   DB.categories.push(cat);
   return cat;
 }
-const findCatByName = (name) => DB.categories.find((c) => !isGroup(c) && c.name.toLowerCase() === name.trim().toLowerCase());
+// ---- Papierkorb -------------------------------------------------------------
+// Karten werden nie sofort endgültig gelöscht, sondern 30 Tage aufbewahrt.
+function trashCards(cards) {
+  const list = cards.filter(Boolean);
+  if (!list.length) return 0;
+  const now = Date.now();
+  for (const c of list) {
+    const cat = catById(c.categoryId);
+    DB.trash.push({ at: now, cat: cat ? catPath(cat) : 'Unsortiert', card: { ...c } });
+  }
+  const ids = new Set(list.map((c) => c.id));
+  DB.cards = DB.cards.filter((c) => !ids.has(c.id));
+  if (DB.trash.length > MAX_TRASH) DB.trash.splice(0, DB.trash.length - MAX_TRASH);
+  return list.length;
+}
+function restoreFromTrash(entries) {
+  let n = 0;
+  for (const e of entries) {
+    const i = DB.trash.indexOf(e);
+    if (i >= 0) DB.trash.splice(i, 1);
+    const c = e.card;
+    if (cardById(c.id)) continue; // existiert schon wieder (z. B. per Backup)
+    const cat = catById(c.categoryId);
+    DB.cards.push({
+      id: String(c.id || uid()),
+      front: String(c.front || ''),
+      back: String(c.back || ''),
+      hint: String(c.hint || ''),
+      categoryId: cat && !isGroup(cat) ? cat.id : 'inbox', // Kategorie inzwischen gelöscht → Unsortiert
+      level: clampLevel(Math.round(+c.level || 0)),
+      created: +c.created || Date.now(),
+      updated: Date.now(),
+      right: +c.right || 0,
+      wrong: +c.wrong || 0,
+      last: +c.last || 0,
+      ...(c.deck ? { deck: true } : {}),
+      ...(c.pinned ? { pinned: true } : {}),
+    });
+    n++;
+  }
+  return n;
+}
+
+const findCatByName =(name) => DB.categories.find((c) => !isGroup(c) && c.name.toLowerCase() === name.trim().toLowerCase());
 function streak() {
   let n = 0;
   const d = new Date();
@@ -1592,6 +1645,15 @@ function renderSettings() {
     </div>
     <p class="footnote">Deine Karten liegen nur auf diesem Gerät. Exportiere regelmäßig ein Backup – z. B. in Google Drive.</p>
 
+    <div class="section-header">Papierkorb</div>
+    <div class="list icons">
+      <button class="row" data-action="open-trash">
+        ${rowIcon(ICON.trash, 'gray')}
+        <div class="row-main"><div class="row-title">Zuletzt gelöscht</div><div class="row-sub">Karten ${TRASH_DAYS} Tage lang wiederherstellen</div></div>
+        <span class="row-value">${DB.trash.length || ''}</span>${chev}
+      </button>
+    </div>
+
     ${DB.meta.deckTotal ? `
     <div class="section-header">Prüfungskarten AP2</div>
     <div class="list icons">
@@ -2585,13 +2647,13 @@ function openCardEditor(card = null, opts = {}) {
       level = clampLevel(level + (act === 'lvl-up' ? 1 : -1));
       renderLevel();
     } else if (act === 'delete') {
-      const ok = await confirmDialog({ title: 'Karte löschen?', message: 'Das kann nicht rückgängig gemacht werden.', confirm: 'Löschen', destructive: true });
+      const ok = await confirmDialog({ title: 'Karte löschen?', message: `Sie bleibt ${TRASH_DAYS} Tage im Papierkorb (Einstellungen) und lässt sich wiederherstellen.`, confirm: 'Löschen', destructive: true });
       if (ok) {
-        DB.cards = DB.cards.filter((c) => c !== card);
+        trashCards([card]);
         save();
         refresh();
         sheet.close();
-        toast('Karte gelöscht');
+        toast('In den Papierkorb verschoben');
         if (opts.onDeleted) opts.onDeleted();
       }
     } else if (act === 'save-next') {
@@ -2761,7 +2823,7 @@ function openCategoryEditor(cat = null, opts = {}) {
       if (n) {
         choice = await actionSheet({
           title: `„${cat.name}“ löschen?`,
-          message: `Die Kategorie enthält ${plural(n, 'Karte', 'Karten')}.`,
+          message: `Die Kategorie enthält ${plural(n, 'Karte', 'Karten')}. Gelöschte Karten bleiben ${TRASH_DAYS} Tage im Papierkorb.`,
           actions: [
             { label: 'Karten nach „Unsortiert“ verschieben', value: 'move' },
             { label: `Kategorie und ${plural(n, 'Karte', 'Karten')} löschen`, value: 'all', style: 'destructive' },
@@ -2771,7 +2833,7 @@ function openCategoryEditor(cat = null, opts = {}) {
         choice = null;
       }
       if (!choice) return;
-      if (choice === 'all') DB.cards = DB.cards.filter((c) => c.categoryId !== cat.id);
+      if (choice === 'all') trashCards(cardsIn(cat.id));
       else for (const c of DB.cards) if (c.categoryId === cat.id) c.categoryId = 'inbox';
       DB.categories = DB.categories.filter((c) => c !== cat);
       if (DB.settings.lastCategory === cat.id) DB.settings.lastCategory = 'inbox';
@@ -3360,7 +3422,7 @@ function startSession(spec) {
   function removeCurrent(alreadyDeleted) {
     const id = queue[S.i];
     if (!alreadyDeleted) {
-      DB.cards = DB.cards.filter((c) => c.id !== id);
+      trashCards([cardById(id)]);
       save();
     }
     if (S.view) { S.view.sink(); S.view = null; }
@@ -3384,11 +3446,11 @@ function startSession(spec) {
 
   async function deleteCurrent() {
     if (!S.revealed || !S.view) return;
-    const ok = await confirmDialog({ title: 'Karte löschen?', message: 'Die Karte wird endgültig gelöscht.', confirm: 'Löschen', destructive: true });
+    const ok = await confirmDialog({ title: 'Karte löschen?', message: `Sie bleibt ${TRASH_DAYS} Tage im Papierkorb (Einstellungen) und lässt sich wiederherstellen.`, confirm: 'Löschen', destructive: true });
     if (!ok) return;
     removeCurrent(false);
     haptic([10, 40, 10]);
-    toast('Karte gelöscht');
+    toast('In den Papierkorb verschoben');
   }
 
   function showSummary() {
@@ -3488,6 +3550,83 @@ function startSession(spec) {
   });
 
   pushOverlay(ov);
+}
+
+// ---------------------------------------------------------------------------
+// Papierkorb („Zuletzt gelöscht“, wie in der Fotos-App)
+// ---------------------------------------------------------------------------
+
+function trashAge(at) {
+  const days = Math.floor((Date.now() - at) / 86400000);
+  const left = Math.max(0, TRASH_DAYS - days);
+  const when = days === 0 ? 'heute gelöscht' : days === 1 ? 'gestern gelöscht' : `vor ${days} Tagen gelöscht`;
+  return `${when} · noch ${left} ${left === 1 ? 'Tag' : 'Tage'}`;
+}
+
+function openTrash() {
+  const render = (sh) => {
+    const list = [...DB.trash].sort((a, b) => b.at - a.at);
+    sh.body.innerHTML = list.length ? `
+      <div class="list-meta"><span>${plural(list.length, 'Karte', 'Karten')}</span></div>
+      <div class="list">
+        ${list.map((e) => `
+          <div class="row trash-row">
+            <span class="lvl" style="--c:${levelColor(+e.card.level || 0)}">${fmtLevel(+e.card.level || 0)}</span>
+            <div class="row-main">
+              <div class="row-title clamp2">${esc(e.card.front)}</div>
+              <div class="row-sub clamp1">${esc(e.cat)} · ${trashAge(e.at)}</div>
+            </div>
+            <button class="restore-btn" data-restore="${DB.trash.indexOf(e)}" aria-label="Wiederherstellen">${ICON.undo}</button>
+          </div>`).join('')}
+      </div>
+      <div class="btn-stack">
+        <button class="btn-tinted" data-trash="restore-all">${ICON.undo}<span>Alle wiederherstellen</span></button>
+        <button class="btn-plain destructive" data-trash="empty">Papierkorb leeren</button>
+      </div>
+      <p class="footnote">Karten werden nach ${TRASH_DAYS} Tagen automatisch endgültig gelöscht. Lernstand und Statistik der Karte bleiben beim Wiederherstellen erhalten.</p>`
+      : `<div class="empty"><div class="empty-icon" style="background:var(--fill);color:var(--label2)">${ICON.trash}</div><h2>Papierkorb ist leer</h2><p>Gelöschte Karten landen hier und können ${TRASH_DAYS} Tage lang wiederhergestellt werden.</p></div>`;
+  };
+  const sheet = openSheet({
+    title: 'Zuletzt gelöscht',
+    left: { label: 'Fertig' },
+    body: '',
+    onMount: render,
+    onClose: () => renderSettings(),
+  });
+  sheet.body.addEventListener('click', async (e) => {
+    const r = e.target.closest('[data-restore]');
+    if (r) {
+      const entry = DB.trash[+r.dataset.restore];
+      if (!entry) return;
+      const row = r.closest('.row');
+      restoreFromTrash([entry]);
+      save();
+      refresh();
+      haptic(8);
+      toast(`„${entry.card.front.slice(0, 40)}“ wiederhergestellt`);
+      // Zeile sanft ausblenden, dann neu zeichnen
+      if (row && !reduceMotion.matches) {
+        row.style.transition = 'opacity .2s ease, transform .25s var(--spring)';
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(30px)';
+        setTimeout(() => render(sheet), 220);
+      } else render(sheet);
+      return;
+    }
+    const b = e.target.closest('[data-trash]');
+    if (!b) return;
+    if (b.dataset.trash === 'restore-all') {
+      const n = restoreFromTrash([...DB.trash]);
+      save(); refresh(); render(sheet);
+      toast(`${plural(n, 'Karte', 'Karten')} wiederhergestellt`);
+    } else if (b.dataset.trash === 'empty') {
+      const ok = await confirmDialog({ title: 'Papierkorb leeren?', message: `${plural(DB.trash.length, 'Karte wird', 'Karten werden')} endgültig gelöscht. Das kann nicht rückgängig gemacht werden.`, confirm: 'Endgültig löschen', destructive: true });
+      if (!ok) return;
+      DB.trash = [];
+      save(); render(sheet);
+      toast('Papierkorb geleert');
+    }
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -3670,6 +3809,7 @@ const ACTIONS = {
     renderSettings();
     haptic(5);
   },
+  'open-trash': () => openTrash(),
   'open-settings': () => openSettings(),
   'settings-back': () => { if (UI.settingsOv) closeOverlay(UI.settingsOv); },
   'start-smart': () => startSession({ type: 'smart', label: 'Empfohlene Runde' }),
@@ -3732,11 +3872,11 @@ const ACTIONS = {
   },
   'bulk-delete': async () => {
     const n = UI.selected.size;
-    const ok = await confirmDialog({ title: `${plural(n, 'Karte', 'Karten')} löschen?`, message: 'Das kann nicht rückgängig gemacht werden.', confirm: 'Löschen', destructive: true });
+    const ok = await confirmDialog({ title: `${plural(n, 'Karte', 'Karten')} löschen?`, message: `Sie bleiben ${TRASH_DAYS} Tage im Papierkorb (Einstellungen) und lassen sich wiederherstellen.`, confirm: 'Löschen', destructive: true });
     if (!ok) return;
-    DB.cards = DB.cards.filter((c) => !UI.selected.has(c.id));
+    trashCards(DB.cards.filter((c) => UI.selected.has(c.id)));
     save();
-    toast(`${plural(n, 'Karte', 'Karten')} gelöscht`);
+    toast(`${plural(n, 'Karte', 'Karten')} im Papierkorb`);
     setSelectMode(false);
     refresh();
   },
