@@ -12,6 +12,22 @@ Offline-Karteikarten-App für die Abschlussprüfung, im Apple-Design, für dein 
 - **Kategorien:** anlegen, Farbe, Stichwörter, löschen, manuell und automatisch verteilen
 - **Backup:** JSON exportieren/importieren, Text-Import (`Vorderseite ; Rückseite ; Hinweis ; Kategorie`)
 
+## Prüfungskarten (deck/ap2.txt)
+
+Der mitgelieferte Kartensatz wird beim App-Start automatisch übernommen: neue Karten kommen dazu, Lernstand und eigene Änderungen bleiben erhalten, gelöschte Karten kommen nicht wieder (außer über Einstellungen → „Fehlende wiederherstellen“).
+
+Format:
+
+```
+# k1 | Klausur 1: IT-Systemlösung | blue      ← Bereich (ID, Name, Farbe)
+## k1-net | Netzwerke & Kommunikation        ← Kategorie (ID, Name)
+### Netzwerkdienste                           ← Unterthema, wird als Hinweis gezeigt
+DNS | Domain Name System | Übersetzt Domainnamen in IP-Adressen.
+Router | Verbindet Netze …                    ← ohne Abkürzung: nur Erklärung
+```
+
+Die Karten-ID ergibt sich aus Kategorie-ID + Vorderseite. Wer die Vorderseite ändert, erzeugt also eine neue Karte.
+
 ## Aufs Handy bringen
 
 Die App muss einmal über **HTTPS** geöffnet werden; danach ist sie installiert und läuft komplett offline.

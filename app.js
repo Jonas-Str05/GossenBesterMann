@@ -131,17 +131,30 @@ function normalize(d) {
   d = d && typeof d === 'object' ? d : {};
   const cats = (Array.isArray(d.categories) ? d.categories : [])
     .filter((c) => c && c.id != null && typeof c.name === 'string')
-    .map((c) => ({
-      id: String(c.id),
-      name: c.name.trim() || 'Ohne Namen',
-      color: c.id === 'inbox' ? 'gray' : (COLORS.includes(c.color) ? c.color : 'blue'),
-      keywords: Array.isArray(c.keywords) ? c.keywords.map((k) => String(k).trim()).filter(Boolean) : [],
-      created: +c.created || Date.now(),
-    }));
+    .map((c) => {
+      const cat = {
+        id: String(c.id),
+        name: c.name.trim() || 'Ohne Namen',
+        color: c.id === 'inbox' ? 'gray' : (COLORS.includes(c.color) ? c.color : 'blue'),
+        keywords: Array.isArray(c.keywords) ? c.keywords.map((k) => String(k).trim()).filter(Boolean) : [],
+        created: +c.created || Date.now(),
+        parentId: c.parentId ? String(c.parentId) : null,
+      };
+      if (c.kind === 'group' && c.id !== 'inbox') cat.kind = 'group';
+      if (Number.isFinite(c.order)) cat.order = c.order;
+      if (c.deck) cat.deck = true;
+      return cat;
+    });
   const seen = new Set();
   const categories = cats.filter((c) => (seen.has(c.id) ? false : seen.add(c.id)));
   if (!categories.some((c) => c.id === 'inbox')) categories.unshift(def.categories[0]);
-  const ids = new Set(categories.map((c) => c.id));
+  // Bereiche (Gruppen) sind nie verschachtelt; Kategorien verweisen nur auf existierende Bereiche
+  const groupIds = new Set(categories.filter((c) => c.kind === 'group').map((c) => c.id));
+  for (const c of categories) {
+    if (c.kind === 'group' || c.id === 'inbox' || !groupIds.has(c.parentId)) c.parentId = null;
+  }
+  // Karten liegen immer in einer Kategorie, nie direkt in einem Bereich
+  const ids = new Set(categories.filter((c) => c.kind !== 'group').map((c) => c.id));
   const cardIds = new Set();
   const cards = (Array.isArray(d.cards) ? d.cards : [])
     .filter((c) => c && (c.front || c.back))
@@ -161,6 +174,7 @@ function normalize(d) {
         right: Math.max(0, +c.right || 0),
         wrong: Math.max(0, +c.wrong || 0),
         last: +c.last || 0,
+        ...(c.deck ? { deck: true } : {}),
       };
     });
   const log = {};
@@ -205,12 +219,27 @@ function save() {
 const catById = (id) => DB.categories.find((c) => c.id === id);
 const cardById = (id) => DB.cards.find((c) => c.id === id);
 const cardsIn = (catId) => DB.cards.filter((c) => c.categoryId === catId);
+const isGroup = (c) => !!c && c.kind === 'group';
+const byOrder = (a, b) => (a.order ?? 1e9) - (b.order ?? 1e9) || a.name.localeCompare(b.name, 'de', { sensitivity: 'base' });
+const groups = () => DB.categories.filter(isGroup).sort(byOrder);
+const childrenOf = (gid) => DB.categories.filter((c) => !isGroup(c) && c.parentId === gid && c.id !== 'inbox').sort(byOrder);
+const ungrouped = () => [
+  ...DB.categories.filter((c) => !isGroup(c) && !c.parentId && c.id !== 'inbox').sort(byOrder),
+  catById('inbox'),
+];
+const cardsInGroup = (gid) => {
+  const ids = new Set(childrenOf(gid).map((c) => c.id));
+  return DB.cards.filter((c) => ids.has(c.categoryId));
+};
+// Kurzname eines Bereichs: „Klausur 1: IT-Systemlösung“ → „Klausur 1“
+const groupShort = (g) => g.name.split(':')[0].trim();
+const catPath = (c) => {
+  const g = c.parentId && catById(c.parentId);
+  return g ? `${groupShort(g)} › ${c.name}` : c.name;
+};
+// Alle Kategorien (ohne Bereiche) in Anzeige-Reihenfolge: nach Bereich, dann ohne Bereich, „Unsortiert“ zuletzt
 function sortedCats() {
-  return [...DB.categories].sort((a, b) => {
-    if (a.id === 'inbox') return 1;
-    if (b.id === 'inbox') return -1;
-    return a.name.localeCompare(b.name, 'de', { sensitivity: 'base' });
-  });
+  return [...groups().flatMap((g) => childrenOf(g.id)), ...ungrouped()];
 }
 function levelCounts(cards = DB.cards) {
   const m = Object.fromEntries(LEVELS.map((l) => [l, 0]));
@@ -222,10 +251,11 @@ function nextColor() {
   return COLORS.find((c) => !used.includes(c)) || COLORS[DB.categories.length % COLORS.length];
 }
 function createCategory(name, extra = {}) {
-  const cat = { id: uid(), name: name.trim(), color: nextColor(), keywords: [], created: Date.now(), ...extra };
+  const cat = { id: uid(), name: name.trim(), color: nextColor(), keywords: [], created: Date.now(), parentId: null, ...extra };
   DB.categories.push(cat);
   return cat;
 }
+const findCatByName = (name) => DB.categories.find((c) => !isGroup(c) && c.name.toLowerCase() === name.trim().toLowerCase());
 function streak() {
   let n = 0;
   const d = new Date();
@@ -410,6 +440,14 @@ function openSheet({ title, body, left, right, compact, onMount, beforeClose, on
     if (isBase && !(closing && stack.some((o) => o.kind === 'sheet'))) pushBack(p);
   });
   let closing = false;
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    spring.stop();
+    root.remove();
+    if (isBase && !stack.some((o) => o.kind === 'sheet')) pushBack(0);
+  };
 
   const sheet = {
     kind: 'sheet',
@@ -434,8 +472,10 @@ function openSheet({ title, body, left, right, compact, onMount, beforeClose, on
         damping: 1,
         response: 0.36,
         velocity: opts.velocity,
-        onRest: () => { root.remove(); if (isBase && !stack.some((o) => o.kind === 'sheet')) pushBack(0); },
+        onRest: finish,
       });
+      // Fallback, falls keine Animationsframes laufen (z. B. App im Hintergrund)
+      setTimeout(finish, 1500);
       if (onClose) onClose();
     },
     close(opts) { closeOverlay(sheet, opts); },
@@ -542,6 +582,7 @@ function alertDialog({ title, message, buttons, input }) {
         root.style.pointerEvents = 'none';
         if (inp) inp.blur();
         anim.to(0, { response: 0.22, onRest: () => root.remove() });
+        setTimeout(() => root.remove(), 1500);
       },
       onBack() { finish(buttons.findIndex((b) => b.cancel)); },
     };
@@ -614,7 +655,7 @@ function actionSheet({ title, message, actions }) {
         sp.set(H);
         requestAnimationFrame(() => sp.to(0));
       },
-      hide() { root.style.pointerEvents = 'none'; sp.to(H, { onRest: () => root.remove() }); },
+      hide() { root.style.pointerEvents = 'none'; sp.to(H, { onRest: () => root.remove() }); setTimeout(() => root.remove(), 1500); },
       onBack() { finish(-1); },
     };
     root.addEventListener('click', (e) => {
@@ -813,7 +854,7 @@ function containsTerm(low, term) {
 function buildModel() {
   const m = new Map();
   for (const c of DB.categories) {
-    if (c.id === 'inbox') continue;
+    if (c.id === 'inbox' || isGroup(c)) continue;
     m.set(c.id, {
       tf: new Map(),
       n: 0,
@@ -877,6 +918,7 @@ const weightOf = (level) => 2 ** ((MAX - level) / 2);
 
 function poolFor(spec) {
   if (spec.type === 'category') return DB.cards.filter((c) => c.categoryId === spec.categoryId);
+  if (spec.type === 'group') return cardsInGroup(spec.groupId);
   if (spec.type === 'level') return DB.cards.filter((c) => c.level === spec.level);
   if (spec.type === 'retry') return spec.ids.map(cardById).filter(Boolean);
   return DB.cards;
@@ -1051,6 +1093,24 @@ function renderLearn() {
         ${SIZES.map((s) => `<button role="radio" aria-checked="${size === s}" class="${size === s ? 'on' : ''}" data-action="set-size" data-size="${s}">${s || 'Alle'}</button>`).join('')}
       </div>
 
+      ${groups().some((g) => cardsInGroup(g.id).length) ? `
+      <div class="section-header">Prüfungen</div>
+      <div class="list icons" style="--inset:66px">
+        ${groups().map((g) => {
+          const cs = cardsInGroup(g.id);
+          const known = cs.filter((c) => c.level > 0).length;
+          const pct = cs.length ? Math.round((known / cs.length) * 100) : 0;
+          return `<button class="row" data-action="start-group" data-id="${esc(g.id)}" ${cs.length ? '' : 'disabled'}>
+            ${rowIcon(ICON.learn, g.color, true)}
+            <div class="row-main">
+              <div class="row-title clamp1">${esc(g.name)}</div>
+              <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')} · ${pct} % gewusst</div>
+              <div class="gbar" style="--c:var(--${g.color})"><span style="width:${pct}%"></span></div>
+            </div>${chev}
+          </button>`;
+        }).join('')}
+      </div>` : ''}
+
       <div class="section-header">Lernen starten</div>
       <div class="list icons">
         <button class="row" data-action="start-weighted">
@@ -1087,6 +1147,7 @@ function initCardsView() {
     <h1 class="large-title" id="cards-title">Karten</h1>
     <label class="search">${ICON.search}<input id="card-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen"></label>
     <div class="chips" id="card-chips"></div>
+    <div class="chips sub" id="card-subchips" hidden></div>
     <div id="cards-list"></div>
   </div>`;
   $('#card-search').addEventListener('input', (e) => { UI.search = e.target.value; renderCardsList(); });
@@ -1099,21 +1160,69 @@ const SORTS = {
   alpha: ['Alphabetisch', (a, b) => a.front.localeCompare(b.front, 'de', { sensitivity: 'base' })],
 };
 
+// Filter: 'all' | 'g:<Bereich-ID>' | 'g:none' (ohne Bereich) | <Kategorie-ID>
+const ungroupedCardCats = () => new Set(ungrouped().map((c) => c.id));
+function filterGroup() {
+  const f = UI.cardsFilter;
+  if (f === 'all') return null;
+  if (f.startsWith('g:')) return f.slice(2);
+  const c = catById(f);
+  return c ? (c.parentId || 'none') : null;
+}
+
 function filteredCards() {
   const q = UI.search.trim().toLowerCase();
+  const f = UI.cardsFilter;
   let list = DB.cards;
-  if (UI.cardsFilter !== 'all') list = list.filter((c) => c.categoryId === UI.cardsFilter);
+  if (f === 'g:none') { const ids = ungroupedCardCats(); list = list.filter((c) => ids.has(c.categoryId)); }
+  else if (f.startsWith('g:')) list = cardsInGroup(f.slice(2));
+  else if (f !== 'all') list = list.filter((c) => c.categoryId === f);
   if (q) list = list.filter((c) => `${c.front}\n${c.back}\n${c.hint}`.toLowerCase().includes(q));
   const sort = SORTS[DB.settings.cardSort] || SORTS.new;
   return [...list].sort(sort[1]);
 }
 
 function renderCardsList() {
-  if (UI.cardsFilter !== 'all' && !catById(UI.cardsFilter)) UI.cardsFilter = 'all';
+  const f = UI.cardsFilter;
+  const valid = f === 'all' || f === 'g:none' || (f.startsWith('g:') ? isGroup(catById(f.slice(2))) : catById(f) && !isGroup(catById(f)));
+  if (!valid) UI.cardsFilter = 'all';
   const chips = $('#card-chips');
-  const cats = sortedCats();
-  chips.innerHTML = `<button class="chip ${UI.cardsFilter === 'all' ? 'on' : ''}" data-action="filter" data-cat="all">Alle <span class="n">${DB.cards.length}</span></button>` +
-    cats.map((c) => `<button class="chip ${UI.cardsFilter === c.id ? 'on' : ''}" style="--c:var(--${c.color})" data-action="filter" data-cat="${esc(c.id)}"><span class="dot"></span>${esc(c.name)} <span class="n">${cardsIn(c.id).length}</span></button>`).join('');
+  const gs = groups();
+  const ug = ungrouped();
+  const ugCount = DB.cards.filter((c) => ug.some((x) => x.id === c.categoryId)).length;
+  const active = filterGroup();
+  const chip = (key, label, n, color, on) =>
+    `<button class="chip ${on ? 'on' : ''}" ${color ? `style="--c:var(--${color})"` : ''} data-action="filter" data-cat="${esc(key)}">${color ? '<span class="dot"></span>' : ''}${esc(label)} <span class="n">${n}</span></button>`;
+
+  if (!gs.length) {
+    // ohne Bereiche: eine Zeile mit allen Kategorien
+    chips.innerHTML = chip('all', 'Alle', DB.cards.length, null, UI.cardsFilter === 'all') +
+      sortedCats().map((c) => chip(c.id, c.name, cardsIn(c.id).length, c.color, UI.cardsFilter === c.id)).join('');
+    $('#card-subchips').hidden = true;
+  } else {
+    chips.innerHTML = chip('all', 'Alle', DB.cards.length, null, UI.cardsFilter === 'all') +
+      gs.map((g) => chip(`g:${g.id}`, groupShort(g), cardsInGroup(g.id).length, g.color, active === g.id)).join('') +
+      (ugCount || ug.length > 1 ? chip('g:none', 'Weitere', ugCount, 'gray', active === 'none') : '');
+    const sub = $('#card-subchips');
+    if (active) {
+      const kids = active === 'none' ? ug : childrenOf(active);
+      const total = active === 'none' ? ugCount : cardsInGroup(active).length;
+      sub.innerHTML = chip(`g:${active}`, 'Alle', total, null, UI.cardsFilter === `g:${active}`) +
+        kids.map((c) => chip(c.id, c.name, cardsIn(c.id).length, c.color, UI.cardsFilter === c.id)).join('');
+      sub.hidden = false;
+    } else {
+      sub.hidden = true;
+    }
+  }
+  // aktiven Chip in den sichtbaren Bereich der horizontalen Leiste holen
+  for (const row of [chips, $('#card-subchips')]) {
+    const on = $('.chip.on', row);
+    if (!on || row.hidden) continue;
+    const l = on.offsetLeft - 16;
+    const r = on.offsetLeft + on.offsetWidth + 16 - row.clientWidth;
+    if (row.scrollLeft > l) row.scrollLeft = l;
+    else if (row.scrollLeft < r) row.scrollLeft = r;
+  }
 
   const list = filteredCards();
   const box = $('#cards-list');
@@ -1171,28 +1280,42 @@ function renderSelectBar() {
 
 function renderCategories() {
   const v = $('#view-categories');
-  const cats = sortedCats();
   const inboxN = cardsIn('inbox').length;
+  const catRow = (c) => {
+    const cs = cardsIn(c.id);
+    const avg = cs.length ? cs.reduce((a, x) => a + x.level, 0) / cs.length : null;
+    return `<button class="row" data-action="edit-category" data-id="${esc(c.id)}">
+      ${rowIcon(c.id === 'inbox' ? ICON.cards : ICON.folder, c.color, true)}
+      <div class="row-main">
+        <div class="row-title clamp1">${esc(c.name)}</div>
+        <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')}${avg != null ? ` · Ø Ebene ${avg > 0 ? '+' : avg < 0 ? '−' : ''}${Math.abs(avg).toLocaleString('de-DE', { maximumFractionDigits: 1 })}` : ''}</div>
+      </div>${chev}
+    </button>`;
+  };
+  const gs = groups();
   v.innerHTML = navbar('Kategorien', { right: `<button class="icon-btn" data-action="new-category" aria-label="Neue Kategorie">${ICON.plus}</button>` }) + `
   <div class="content">
     <h1 class="large-title">Kategorien</h1>
+    ${gs.map((g) => {
+      const kids = childrenOf(g.id);
+      return `
+      <div class="section-header"><span class="clamp1">${esc(g.name)}</span><button data-action="edit-category" data-id="${esc(g.id)}">Bearbeiten</button></div>
+      <div class="list icons" style="--inset:66px">
+        ${kids.length ? kids.map(catRow).join('') : `<div class="row"><div class="row-main"><div class="row-sub">Noch keine Kategorien in diesem Bereich</div></div></div>`}
+      </div>`;
+    }).join('')}
+    <div class="section-header">${gs.length ? 'Weitere' : ''}</div>
     <div class="list icons" style="--inset:66px">
-      ${cats.map((c) => {
-        const cs = cardsIn(c.id);
-        const avg = cs.length ? cs.reduce((a, x) => a + x.level, 0) / cs.length : null;
-        return `<button class="row" data-action="edit-category" data-id="${esc(c.id)}">
-          ${rowIcon(c.id === 'inbox' ? ICON.cards : ICON.folder, c.color, true)}
-          <div class="row-main">
-            <div class="row-title clamp1">${esc(c.name)}</div>
-            <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')}${avg != null ? ` · Ø Ebene ${avg > 0 ? '+' : avg < 0 ? '−' : ''}${Math.abs(avg).toLocaleString('de-DE', { maximumFractionDigits: 1 })}` : ''}</div>
-          </div>${chev}
-        </button>`;
-      }).join('')}
+      ${ungrouped().map(catRow).join('')}
     </div>
-    <div class="list" style="margin-top:12px">
+    <div class="list icons" style="margin-top:12px;--inset:66px">
       <button class="row accent" data-action="new-category">
         <span class="row-icon lg" style="--c:transparent;color:var(--blue)">${ICON.plus}</span>
         <div class="row-main"><div class="row-title">Neue Kategorie</div></div>
+      </button>
+      <button class="row accent" data-action="new-group">
+        <span class="row-icon lg" style="--c:transparent;color:var(--blue)">${ICON.layers}</span>
+        <div class="row-main"><div class="row-title">Neuer Bereich</div><div class="row-sub">z. B. eine Prüfung, die Kategorien bündelt</div></div>
       </button>
     </div>
 
@@ -1248,6 +1371,21 @@ function renderSettings() {
       </button>
     </div>
     <p class="footnote">Deine Karten liegen nur auf diesem Gerät. Exportiere regelmäßig ein Backup – z. B. in Google Drive.</p>
+
+    ${DB.meta.deckTotal ? `
+    <div class="section-header">Prüfungskarten AP2</div>
+    <div class="list icons">
+      <div class="row">
+        ${rowIcon(ICON.learn, 'indigo')}
+        <div class="row-main"><div class="row-title">Mitgelieferte Karten</div><div class="row-sub">Werden bei App-Updates automatisch ergänzt</div></div>
+        <span class="row-value">${(() => { const s = new Set(DB.meta.deckIds || []); return DB.cards.filter((c) => s.has(c.id)).length; })()} / ${DB.meta.deckTotal}</span>
+      </div>
+      <button class="row" data-action="restore-deck">
+        ${rowIcon(ICON.reset, 'teal')}
+        <div class="row-main"><div class="row-title">Fehlende wiederherstellen</div><div class="row-sub">Gelöschte Prüfungskarten und -kategorien zurückholen</div></div>${chev}
+      </button>
+    </div>
+    <p class="footnote">Dein Lernstand und eigene Änderungen an Karten bleiben dabei erhalten.</p>` : ''}
 
     <div class="section-header">Spracheingabe</div>
     <div class="list icons">
@@ -1321,6 +1459,15 @@ async function updatePersistStatus() {
 // Karte anlegen / bearbeiten
 // ---------------------------------------------------------------------------
 
+// Kategorie-Chips, gruppiert nach Bereich. attr = Attribut, das die Kategorie-ID trägt.
+function catChipsHTML(selectedId, attr, extra = '') {
+  const chip = (c) => `<button type="button" class="chip ${c.id === selectedId ? 'on' : ''}" style="--c:var(--${c.color})" ${attr}="${esc(c.id)}"><span class="dot"></span>${esc(c.name)}</button>`;
+  const gs = groups().filter((g) => childrenOf(g.id).length);
+  if (!gs.length) return `<div class="chip-wrap">${sortedCats().map(chip).join('')}${extra}</div>`;
+  return gs.map((g) => `<div class="chip-group">${esc(g.name)}</div><div class="chip-wrap">${childrenOf(g.id).map(chip).join('')}</div>`).join('') +
+    `<div class="chip-group">Weitere</div><div class="chip-wrap">${ungrouped().map(chip).join('')}${extra}</div>`;
+}
+
 function fieldHTML(key, label, placeholder, value, optional) {
   return `
     <div class="form-group" data-group="${key}">
@@ -1375,9 +1522,7 @@ function openCardEditor(card = null, opts = {}) {
   const dirty = () => val('front') !== initial.front || val('back') !== initial.back || val('hint') !== initial.hint || catId !== initial.cat || level !== initial.level;
 
   const renderPicker = () => {
-    $('#cat-picker', sheet.body).innerHTML = sortedCats().map((c) =>
-      `<button type="button" class="chip ${c.id === catId ? 'on' : ''}" style="--c:var(--${c.color})" data-ed="cat" data-id="${esc(c.id)}"><span class="dot"></span>${esc(c.name)}</button>`).join('') +
-      `<button type="button" class="chip dashed" data-ed="new-cat">${ICON.plus}Neu</button>`;
+    $('#cat-picker', sheet.body).innerHTML = catChipsHTML(catId, 'data-ed="cat" data-id', `<button type="button" class="chip dashed" data-ed="new-cat">${ICON.plus}Neu</button>`);
   };
   const renderLevel = () => {
     const l = $('#ed-lvl', sheet.body);
@@ -1418,7 +1563,9 @@ function openCardEditor(card = null, opts = {}) {
     if (isNew) {
       DB.cards.push({ id: uid(), ...data, level: 0, created: Date.now(), updated: Date.now(), right: 0, wrong: 0, last: 0 });
     } else {
+      const textChanged = data.front !== card.front || data.back !== card.back || data.hint !== card.hint;
       Object.assign(card, data, { level, updated: Date.now() });
+      if (textChanged) delete card.deck; // eigene Änderung: Kartensatz-Updates überschreiben sie nicht mehr
     }
     if (manualCat) DB.settings.lastCategory = catId;
     save();
@@ -1493,7 +1640,7 @@ function openCardEditor(card = null, opts = {}) {
     } else if (act === 'new-cat') {
       const name = await promptDialog({ title: 'Neue Kategorie', message: 'Wie soll die Kategorie heißen?', placeholder: 'z. B. Netzwerktechnik', confirm: 'Anlegen' });
       if (name) {
-        const existing = DB.categories.find((c) => c.name.toLowerCase() === name.toLowerCase());
+        const existing = findCatByName(name);
         const cat = existing || createCategory(name);
         save();
         catId = cat.id;
@@ -1546,10 +1693,12 @@ function openCardEditor(card = null, opts = {}) {
 // Kategorie anlegen / bearbeiten
 // ---------------------------------------------------------------------------
 
-function openCategoryEditor(cat = null) {
+function openCategoryEditor(cat = null, opts = {}) {
+  if (isGroup(cat)) { openGroupEditor(cat); return; }
   const isNew = !cat;
   const isInbox = cat && cat.id === 'inbox';
-  let color = cat ? cat.color : nextColor();
+  let parentId = cat ? cat.parentId : (opts.parentId || null);
+  let color = cat ? cat.color : (parentId ? catById(parentId).color : nextColor());
   const cs = cat ? cardsIn(cat.id) : [];
   const counts = levelCounts(cs);
   const maxC = Math.max(1, ...Object.values(counts));
@@ -1560,6 +1709,9 @@ function openCategoryEditor(cat = null) {
         <div class="form-label">Name</div>
         <div class="field"><input type="text" data-c="name" value="${esc(cat ? cat.name : '')}" placeholder="z. B. Netzwerktechnik" autocomplete="off" enterkeyhint="done"></div>
       </div>
+      ${!isInbox && groups().length ? `
+      <div class="form-label">Bereich</div>
+      <div class="cat-picker"><div class="chip-wrap" id="grp-picker"></div></div>` : ''}
       ${isInbox ? '' : `
       <div class="form-label">Farbe</div>
       <div class="colors" id="colors"></div>
@@ -1589,8 +1741,14 @@ function openCategoryEditor(cat = null) {
     if (!box) return;
     box.innerHTML = COLORS.map((c) => `<button type="button" class="swatch ${c === color ? 'on' : ''}" style="--c:var(--${c})" data-color="${c}" aria-label="Farbe ${c}"></button>`).join('');
   };
+  const renderGroups = () => {
+    const box = $('#grp-picker', sheet.body);
+    if (!box) return;
+    box.innerHTML = groups().map((g) => `<button type="button" class="chip ${parentId === g.id ? 'on' : ''}" style="--c:var(--${g.color})" data-grp="${esc(g.id)}"><span class="dot"></span>${esc(groupShort(g))}</button>`).join('') +
+      `<button type="button" class="chip ${!parentId ? 'on' : ''}" style="--c:var(--gray)" data-grp=""><span class="dot"></span>Kein Bereich</button>`;
+  };
   const initialKw = cat ? cat.keywords.join('|') : '';
-  const dirty = () => (cat ? nameVal() !== cat.name || color !== cat.color || kwVal().join('|') !== initialKw : !!nameVal());
+  const dirty = () => (cat ? nameVal() !== cat.name || color !== cat.color || kwVal().join('|') !== initialKw || (parentId || null) !== (cat.parentId || null) : !!nameVal());
 
   sheet = openSheet({
     title: isNew ? 'Neue Kategorie' : 'Kategorie',
@@ -1602,10 +1760,13 @@ function openCategoryEditor(cat = null) {
       action: (sh) => {
         const name = nameVal();
         if (!name) return;
-        const dupe = DB.categories.find((c) => c !== cat && c.name.toLowerCase() === name.toLowerCase());
+        const dupe = DB.categories.find((c) => c !== cat && !isGroup(c) && c.name.toLowerCase() === name.toLowerCase());
         if (dupe) { toast('Diese Kategorie gibt es schon', 'error'); return; }
-        if (isNew) createCategory(name, { color, keywords: kwVal() });
-        else Object.assign(cat, { name, color: isInbox ? 'gray' : color, keywords: isInbox ? [] : kwVal() });
+        if (isNew) createCategory(name, { color, keywords: kwVal(), parentId });
+        else {
+          Object.assign(cat, { name, color: isInbox ? 'gray' : color, keywords: isInbox ? [] : kwVal(), parentId: isInbox ? null : parentId });
+          delete cat.deck;
+        }
         save();
         refresh();
         toast(isNew ? 'Kategorie angelegt' : 'Kategorie gesichert');
@@ -1615,6 +1776,7 @@ function openCategoryEditor(cat = null) {
     beforeClose: async () => (!dirty() ? true : confirmDialog({ title: 'Änderungen verwerfen?', confirm: 'Verwerfen', destructive: true })),
     onMount: (sh) => {
       renderColors();
+      renderGroups();
       for (const t of $$('textarea', sh.body)) autoGrow(t);
       sh.setRight(null, !nameVal());
     },
@@ -1627,6 +1789,14 @@ function openCategoryEditor(cat = null) {
   sheet.body.addEventListener('click', async (e) => {
     const sw = e.target.closest('[data-color]');
     if (sw) { color = sw.dataset.color; renderColors(); haptic(5); return; }
+    const gp = e.target.closest('[data-grp]');
+    if (gp) {
+      parentId = gp.dataset.grp || null;
+      if (isNew && parentId) { color = catById(parentId).color; renderColors(); }
+      renderGroups();
+      haptic(5);
+      return;
+    }
     const b = e.target.closest('[data-ce]');
     if (!b) return;
     const act = b.dataset.ce;
@@ -1662,11 +1832,97 @@ function openCategoryEditor(cat = null) {
 }
 
 // ---------------------------------------------------------------------------
+// Bereich (z. B. eine Prüfung) anlegen / bearbeiten
+// ---------------------------------------------------------------------------
+
+function openGroupEditor(group = null) {
+  const isNew = !group;
+  let color = group ? group.color : nextColor();
+  const kids = group ? childrenOf(group.id) : [];
+  const cs = group ? cardsInGroup(group.id) : [];
+
+  const body = `
+    <div class="form">
+      <div class="form-group">
+        <div class="form-label">Name des Bereichs</div>
+        <div class="field"><input type="text" data-g="name" value="${esc(group ? group.name : '')}" placeholder="z. B. Klausur 1: IT-Systemlösung" autocomplete="off" enterkeyhint="done"></div>
+      </div>
+      <p class="footnote">Tipp: Mit „Klausur 1: …“ wird „Klausur 1“ als Kurzname in Filtern angezeigt.</p>
+      <div class="form-label">Farbe</div>
+      <div class="colors" id="g-colors"></div>
+      ${group ? `
+        <div class="form-label">${plural(kids.length, 'Kategorie', 'Kategorien')} · ${plural(cs.length, 'Karte', 'Karten')}</div>
+        <div class="btn-stack" style="margin-top:0">
+          ${cs.length ? `<button class="btn-primary" type="button" data-ge="learn">${ICON.learn}<span>Ganzen Bereich lernen</span></button>` : ''}
+          <button class="btn-plain" type="button" data-ge="add">Kategorie hinzufügen</button>
+          <button class="btn-plain destructive" type="button" data-ge="delete">Bereich auflösen</button>
+        </div>
+        <p class="footnote">Beim Auflösen bleiben alle Kategorien und Karten erhalten – sie landen unter „Weitere“.</p>` : ''}
+    </div>`;
+
+  let sheet;
+  const nameVal = () => $('[data-g="name"]', sheet.body).value.trim();
+  const renderColors = () => {
+    $('#g-colors', sheet.body).innerHTML = COLORS.map((c) => `<button type="button" class="swatch ${c === color ? 'on' : ''}" style="--c:var(--${c})" data-color="${c}" aria-label="Farbe ${c}"></button>`).join('');
+  };
+  const dirty = () => (group ? nameVal() !== group.name || color !== group.color : !!nameVal());
+
+  sheet = openSheet({
+    title: isNew ? 'Neuer Bereich' : 'Bereich',
+    body,
+    left: { label: 'Abbrechen' },
+    right: {
+      label: isNew ? 'Anlegen' : 'Sichern',
+      bold: true,
+      action: (sh) => {
+        const name = nameVal();
+        if (!name) return;
+        if (isNew) {
+          createCategory(name, { kind: 'group', color });
+        } else {
+          // Farbe an Kategorien weitergeben, die noch die alte Bereichsfarbe tragen
+          for (const k of childrenOf(group.id)) if (k.color === group.color) k.color = color;
+          Object.assign(group, { name, color });
+          delete group.deck;
+        }
+        save();
+        refresh();
+        toast(isNew ? 'Bereich angelegt' : 'Bereich gesichert');
+        sh.close();
+      },
+    },
+    beforeClose: async () => (!dirty() ? true : confirmDialog({ title: 'Änderungen verwerfen?', confirm: 'Verwerfen', destructive: true })),
+    onMount: (sh) => { renderColors(); sh.setRight(null, !nameVal()); },
+  });
+
+  sheet.body.addEventListener('input', () => sheet.setRight(null, !nameVal()));
+  sheet.body.addEventListener('click', async (e) => {
+    const sw = e.target.closest('[data-color]');
+    if (sw) { color = sw.dataset.color; renderColors(); haptic(5); return; }
+    const b = e.target.closest('[data-ge]');
+    if (!b) return;
+    const act = b.dataset.ge;
+    if (act === 'learn') { sheet.close(); startSession({ type: 'group', groupId: group.id, label: group.name }); }
+    if (act === 'add') { sheet.close(); openCategoryEditor(null, { parentId: group.id }); }
+    if (act === 'delete') {
+      const ok = await confirmDialog({ title: `„${group.name}“ auflösen?`, message: 'Kategorien und Karten bleiben erhalten.', confirm: 'Auflösen', destructive: true });
+      if (!ok) return;
+      for (const k of childrenOf(group.id)) k.parentId = null;
+      DB.categories = DB.categories.filter((c) => c !== group);
+      save();
+      refresh();
+      sheet.close();
+      toast('Bereich aufgelöst');
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Automatisch verteilen
 // ---------------------------------------------------------------------------
 
 function openAutoDistribute() {
-  const realCats = DB.categories.filter((c) => c.id !== 'inbox');
+  const realCats = DB.categories.filter((c) => c.id !== 'inbox' && !isGroup(c));
   if (!realCats.length) {
     alertDialog({
       title: 'Noch keine Kategorien',
@@ -1762,29 +2018,45 @@ function openAutoDistribute() {
 // ---------------------------------------------------------------------------
 
 function pickCategorySheet() {
-  const cats = sortedCats();
+  const row = (c) => {
+    const cs = cardsIn(c.id);
+    const weak = cs.filter((x) => x.level < 0).length;
+    return `<button class="row" data-cat="${esc(c.id)}" ${cs.length ? '' : 'disabled'}>
+      ${rowIcon(c.id === 'inbox' ? ICON.cards : ICON.folder, c.color, true)}
+      <div class="row-main"><div class="row-title clamp1">${esc(c.name)}</div><div class="row-sub">${plural(cs.length, 'Karte', 'Karten')}${weak ? ` · ${weak} schwach` : ''}</div></div>${chev}
+    </button>`;
+  };
+  const section = (title, rows) => (rows ? `${title ? `<div class="section-header">${esc(title)}</div>` : ''}<div class="list icons" style="--inset:66px">${rows}</div>` : '');
+  const gs = groups();
+  const body = gs.length
+    ? gs.map((g) => {
+      const n = cardsInGroup(g.id).length;
+      return section(g.name, `
+        <button class="row" data-group="${esc(g.id)}" ${n ? '' : 'disabled'}>
+          ${rowIcon(ICON.learn, g.color, true)}
+          <div class="row-main"><div class="row-title">Ganze ${esc(groupShort(g))}</div><div class="row-sub">${plural(n, 'Karte', 'Karten')} aus allen Themen</div></div>${chev}
+        </button>${childrenOf(g.id).map(row).join('')}`);
+    }).join('') + section('Weitere', ungrouped().map(row).join(''))
+    : section('', sortedCats().map(row).join(''));
   const sheet = openSheet({
     title: 'Kategorie lernen',
     compact: true,
     left: { label: 'Abbrechen' },
-    body: `
-      <div class="list icons" style="--inset:66px">
-        ${cats.map((c) => {
-          const cs = cardsIn(c.id);
-          const weak = cs.filter((x) => x.level < 0).length;
-          return `<button class="row" data-cat="${esc(c.id)}" ${cs.length ? '' : 'disabled'}>
-            ${rowIcon(c.id === 'inbox' ? ICON.cards : ICON.folder, c.color, true)}
-            <div class="row-main"><div class="row-title clamp1">${esc(c.name)}</div><div class="row-sub">${plural(cs.length, 'Karte', 'Karten')}${weak ? ` · ${weak} schwach` : ''}</div></div>${chev}
-          </button>`;
-        }).join('')}
-      </div>`,
+    body,
   });
   sheet.body.addEventListener('click', (e) => {
+    const g = e.target.closest('[data-group]');
+    if (g) {
+      const grp = catById(g.dataset.group);
+      sheet.close();
+      startSession({ type: 'group', groupId: grp.id, label: grp.name });
+      return;
+    }
     const b = e.target.closest('[data-cat]');
     if (!b) return;
     const cat = catById(b.dataset.cat);
     sheet.close();
-    startSession({ type: 'category', categoryId: cat.id, label: cat.name });
+    startSession({ type: 'category', categoryId: cat.id, label: catPath(cat) });
   });
 }
 
@@ -1824,6 +2096,17 @@ function sizeClass(t) {
   if (n > 160 || lines > 4) return 's';
   if (n > 60 || lines > 2) return 'm';
   return '';
+}
+
+// Prüfungskarten: „Ausgeschriebener Name\nErklärung“ → Name als Überschrift, Erklärung darunter
+function backHTML(card) {
+  const i = card.back.indexOf('\n');
+  if (card.id.startsWith('d-') && i > 0 && i <= 90) {
+    const title = card.back.slice(0, i).trim();
+    const rest = card.back.slice(i + 1).trim();
+    return `<div class="face-text ${title.length > 40 ? 'm' : ''}">${esc(title)}</div><div class="face-expl">${esc(rest)}</div>`;
+  }
+  return `<div class="face-text ${sizeClass(card.back)}">${esc(card.back)}</div>`;
 }
 
 function startSession(spec) {
@@ -1910,7 +2193,7 @@ function startSession(spec) {
             <div class="face-top"><span class="face-label">Antwort</span><span class="lvl" style="--c:${levelColor(card.level)}">${fmtLevel(card.level)}</span></div>
             <div class="face-scroll"><div class="face-content">
               <div class="face-q">${esc(card.front)}</div>
-              <div class="face-text ${sizeClass(card.back)}">${esc(card.back)}</div>
+              ${backHTML(card)}
             </div></div>
             <div class="face-foot">Wische nach rechts oder links – oder tippe unten</div>
           </div>
@@ -2129,6 +2412,7 @@ function startSession(spec) {
       root.style.pointerEvents = 'none';
       document.removeEventListener('keydown', onKey);
       slide.to(H, { response: 0.4, onRest: () => root.remove() });
+      setTimeout(() => root.remove(), 1500);
       refresh();
     },
     onBack() { closeOverlay(ov); },
@@ -2177,7 +2461,7 @@ async function exportBackup() {
   if (canShare) {
     how = await actionSheet({
       title: 'Backup exportieren',
-      message: `${plural(DB.cards.length, 'Karte', 'Karten')} · ${plural(DB.categories.length, 'Kategorie', 'Kategorien')}`,
+      message: `${plural(DB.cards.length, 'Karte', 'Karten')} · ${plural(sortedCats().length, 'Kategorie', 'Kategorien')}`,
       actions: [
         { label: 'Teilen (z. B. Google Drive)', value: 'share' },
         { label: 'In „Downloads“ speichern', value: 'download' },
@@ -2277,8 +2561,7 @@ function openTextImport() {
     onMount: (sh) => renderCats(sh),
   });
   function renderCats(sh) {
-    $('#ti-cats', sh.body).innerHTML = sortedCats().map((c) =>
-      `<button type="button" class="chip ${c.id === catId ? 'on' : ''}" style="--c:var(--${c.color})" data-ti-cat="${esc(c.id)}"><span class="dot"></span>${esc(c.name)}</button>`).join('');
+    $('#ti-cats', sh.body).innerHTML = catChipsHTML(catId, 'data-ti-cat');
   }
   const ta = $('[data-ti]', sheet.body);
   const btn = $('[data-ti-go]', sheet.body);
@@ -2297,7 +2580,7 @@ function openTextImport() {
       for (const r of rows) {
         let cid = catId;
         if (r.cat) {
-          const ex = DB.categories.find((x) => x.name.toLowerCase() === r.cat.toLowerCase());
+          const ex = findCatByName(r.cat);
           cid = (ex || createCategory(r.cat)).id;
         }
         DB.cards.push({ id: uid(), front: r.front, back: r.back, hint: r.hint, categoryId: cid, level: 0, created: Date.now(), updated: Date.now(), right: 0, wrong: 0, last: 0 });
@@ -2318,14 +2601,16 @@ function openTextImport() {
 
 const ACTIONS = {
   tab: (b) => setTab(b.dataset.tab),
-  'new-card': () => openCardEditor(null, UI.tab === 'cards' && UI.cardsFilter !== 'all' ? { categoryId: UI.cardsFilter } : {}),
+  'new-card': () => openCardEditor(null, UI.tab === 'cards' && catById(UI.cardsFilter) && !isGroup(catById(UI.cardsFilter)) ? { categoryId: UI.cardsFilter } : {}),
   'edit-card': (b) => { const c = cardById(b.dataset.id); if (c) openCardEditor(c); },
   'new-category': () => openCategoryEditor(null),
+  'new-group': () => openGroupEditor(null),
   'edit-category': (b) => { const c = catById(b.dataset.id); if (c) openCategoryEditor(c); },
   'set-size': (b) => { DB.settings.sessionSize = +b.dataset.size; save(); renderLearn(); haptic(4); },
   'start-weighted': () => startSession({ type: 'weighted' }),
   'start-equal': () => startSession({ type: 'equal' }),
   'start-level': (b) => { const l = +b.dataset.level; startSession({ type: 'level', level: l, label: `Ebene ${fmtLevel(l)}` }); },
+  'start-group': (b) => { const g = catById(b.dataset.id); if (g) startSession({ type: 'group', groupId: g.id, label: g.name }); },
   'pick-category': () => pickCategorySheet(),
   'pick-level': () => pickLevelSheet(),
   filter: (b) => { UI.cardsFilter = b.dataset.cat; renderCardsList(); },
@@ -2352,14 +2637,14 @@ const ACTIONS = {
     const n = UI.selected.size;
     const v = await actionSheet({
       title: `${plural(n, 'Karte', 'Karten')} verschieben nach …`,
-      actions: [...sortedCats().map((c) => ({ label: c.name, value: c.id })), { label: '+ Neue Kategorie', value: '__new' }],
+      actions: [...sortedCats().map((c) => ({ label: catPath(c), value: c.id })), { label: '+ Neue Kategorie', value: '__new' }],
     });
     if (!v) return;
     let target = v;
     if (v === '__new') {
       const name = await promptDialog({ title: 'Neue Kategorie', placeholder: 'Name', confirm: 'Anlegen' });
       if (!name) return;
-      const ex = DB.categories.find((c) => c.name.toLowerCase() === name.toLowerCase());
+      const ex = findCatByName(name);
       target = (ex || createCategory(name)).id;
     }
     for (const id of UI.selected) { const c = cardById(id); if (c) { c.categoryId = target; c.updated = Date.now(); } }
@@ -2390,6 +2675,11 @@ const ACTIONS = {
     toast(`${plural(n, 'Karte', 'Karten')} gelöscht`);
     setSelectMode(false);
     refresh();
+  },
+  'restore-deck': async () => {
+    const r = await loadDeck({ restore: true });
+    if (!r) toast('Kartensatz konnte nicht geladen werden', 'error');
+    else if (!r.added) toast('Es fehlen keine Prüfungskarten');
   },
   'auto-distribute': () => openAutoDistribute(),
   'manual-distribute': () => { UI.cardsFilter = cardsIn('inbox').length ? 'inbox' : 'all'; setTab('cards'); setSelectMode(true); },
@@ -2462,6 +2752,116 @@ document.addEventListener('keydown', (e) => {
 // Start
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Mitgelieferter Kartensatz (deck/ap2.txt) – wird automatisch übernommen
+// ---------------------------------------------------------------------------
+
+const DECK_URL = 'deck/ap2.txt';
+
+function fnv(str) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36);
+}
+
+function parseDeck(txt) {
+  const deck = { groups: [], cats: [], cards: [] };
+  let group = null;
+  let cat = null;
+  let topic = '';
+  for (const raw of txt.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line || line.startsWith('//') || line.startsWith('@')) continue;
+    if (line.startsWith('###')) { topic = line.slice(3).trim(); continue; }
+    if (line.startsWith('##')) {
+      const [id, name] = line.slice(2).split('|').map((s) => s.trim());
+      cat = { id: `deck-${id}`, name, parentId: group && group.id, color: group ? group.color : 'blue', order: deck.cats.length };
+      deck.cats.push(cat);
+      topic = '';
+      continue;
+    }
+    if (line.startsWith('#')) {
+      const [id, name, color] = line.slice(1).split('|').map((s) => s.trim());
+      group = { id: `deck-${id}`, name, color: COLORS.includes(color) ? color : 'blue', order: deck.groups.length };
+      deck.groups.push(group);
+      cat = null;
+      continue;
+    }
+    if (!cat) continue;
+    const parts = line.split(' | ').map((s) => s.trim());
+    if (parts.length < 2) continue;
+    const front = parts[0];
+    const back = parts.length >= 3 ? `${parts[1]}\n${parts.slice(2).join(' | ')}` : parts[1];
+    deck.cards.push({ id: `d-${fnv(`${cat.id}|${front}`)}`, front, back, hint: topic ? `Thema: ${topic}` : '', categoryId: cat.id });
+  }
+  return deck;
+}
+
+// Fügt neue Karten/Kategorien hinzu, aktualisiert unveränderte Kartensatz-Karten.
+// Lernstand, eigene Karten und eigene Änderungen bleiben unangetastet; gelöschte Karten kommen nicht wieder.
+function mergeDeck(deck, { restore = false } = {}) {
+  const seenCards = new Set(restore ? [] : DB.meta.deckIds || []);
+  const seenCats = new Set(DB.meta.deckCats || []);
+  const now = Date.now();
+  let added = 0;
+  let updated = 0;
+
+  for (const d of [...deck.groups.map((g) => ({ ...g, kind: 'group' })), ...deck.cats]) {
+    const ex = catById(d.id);
+    if (!ex && (!seenCats.has(d.id) || restore)) {
+      const cat = { id: d.id, name: d.name, color: d.color, keywords: [], created: now, parentId: d.parentId || null, order: d.order, deck: true };
+      if (d.kind === 'group') cat.kind = 'group';
+      DB.categories.push(cat);
+    } else if (ex && ex.deck) {
+      Object.assign(ex, { name: d.name, order: d.order });
+      if (!isGroup(ex) && d.parentId && catById(d.parentId)) ex.parentId = d.parentId;
+    }
+    seenCats.add(d.id);
+  }
+
+  for (const c of deck.cards) {
+    const ex = cardById(c.id);
+    if (!seenCards.has(c.id) && !ex) {
+      const target = catById(c.categoryId);
+      DB.cards.push({ ...c, categoryId: target && !isGroup(target) ? c.categoryId : 'inbox', level: 0, created: now, updated: now, right: 0, wrong: 0, last: 0, deck: true });
+      added++;
+    } else if (ex && ex.deck && (ex.front !== c.front || ex.back !== c.back || ex.hint !== c.hint)) {
+      Object.assign(ex, { front: c.front, back: c.back, hint: c.hint });
+      updated++;
+    }
+    seenCards.add(c.id);
+  }
+
+  DB.meta.deckIds = [...new Set([...(DB.meta.deckIds || []), ...seenCards])];
+  DB.meta.deckCats = [...seenCats];
+  return { added, updated };
+}
+
+async function loadDeck(opts = {}) {
+  let txt;
+  try {
+    const res = await fetch(DECK_URL, { cache: 'no-cache' });
+    if (!res.ok) return null;
+    txt = await res.text();
+  } catch (e) {
+    return null; // offline und noch nicht im Cache – beim nächsten Start erneut
+  }
+  const hash = fnv(txt);
+  if (!opts.restore && DB.meta.deckHash === hash) return { added: 0, updated: 0, total: parseDeck(txt).cards.length };
+  const deck = parseDeck(txt);
+  const r = mergeDeck(deck, opts);
+  DB.meta.deckHash = hash;
+  DB.meta.deckTotal = deck.cards.length;
+  save();
+  if (!stack.length) refresh();
+  if (r.added) toast(`${plural(r.added, 'neue Prüfungskarte', 'neue Prüfungskarten')} geladen`);
+  else if (r.updated) toast(`${plural(r.updated, 'Prüfungskarte', 'Prüfungskarten')} aktualisiert`);
+  return { ...r, total: deck.cards.length };
+}
+
 let persistAsked = false;
 function requestPersist() {
   if (persistAsked || !navigator.storage || !navigator.storage.persist) return;
@@ -2481,6 +2881,7 @@ function boot() {
   if (DB.cards.length) requestPersist();
 
   Voice.checkLocal().then(() => renderSettings());
+  loadDeck().then((r) => { if (r && r.added) requestPersist(); });
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();

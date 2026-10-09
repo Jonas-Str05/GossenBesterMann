@@ -702,7 +702,26 @@ button.row:active, .row.tappable:active { background: var(--fill2); transition: 
   50% { box-shadow: 0 0 0 7px color-mix(in srgb, var(--red) 0%, transparent); }
 }
 
-.cat-picker { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px; }
+.cat-picker { padding: 0 16px; }
+.chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip-group {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--label2);
+  margin: 14px 4px 7px;
+}
+.chip-group:first-child { margin-top: 2px; }
+.chips.sub { padding-top: 8px; }
+.chips.sub .chip { height: 30px; font-size: 14px; padding: 0 12px; }
+
+.gbar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--fill);
+  margin-top: 7px;
+  overflow: hidden;
+}
+.gbar span { display: block; height: 100%; border-radius: 2px; background: var(--c); transition: width .6s var(--spring); }
 .suggest-note {
   display: flex;
   align-items: center;
@@ -836,6 +855,7 @@ button.bold { font-weight: 600; }
   border-radius: 14px;
   overflow: hidden;
 }
+.asheet-group:first-child { max-height: calc(100vh - var(--safe-top) - var(--safe-bottom) - 120px); overflow-y: auto; overscroll-behavior: contain; }
 .asheet-head { padding: 14px 18px; text-align: center; font-size: 13px; color: var(--label2); line-height: 1.35; }
 .asheet-head b { display: block; font-size: 13px; font-weight: 600; margin-bottom: 2px; }
 .asheet-group button {
@@ -985,6 +1005,17 @@ button.bold { font-weight: 600; }
   padding-bottom: 14px;
   margin-bottom: 16px;
   border-bottom: .5px solid var(--sep);
+}
+.face-expl {
+  margin-top: 14px;
+  font-size: 18px;
+  line-height: 1.4;
+  color: var(--label2);
+  text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 .face-foot { text-align: center; font-size: 13px; color: var(--label3); padding: 0 20px 18px; }
 

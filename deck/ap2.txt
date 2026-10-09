@@ -1,0 +1,907 @@
+@version 1
+// Aufbau: "# id | Bereich | Farbe", "## id | Kategorie", "### Unterthema (wird Hinweis)"
+// Karte: "Vorderseite | Ausgeschriebener Name | Kurze Erklärung" oder "Vorderseite | Kurze Erklärung"
+
+# k1 | Klausur 1: IT-Systemlösung | blue
+
+## k1-sec | IT-Sicherheit & Datenschutz
+### Schutzziele
+Vertraulichkeit | Nur Berechtigte können die Daten einsehen.
+Integrität | Daten sind vollständig und unverändert – keine unbemerkte Manipulation.
+Verfügbarkeit | Systeme und Daten sind nutzbar, wenn sie gebraucht werden.
+Authentizität | Echtheit von Daten und Kommunikationspartnern ist überprüfbar.
+### Schadenspotenziale
+Imageschaden | Ruf- und Vertrauensverlust bei Kunden und Öffentlichkeit.
+Wirtschaftlicher Schaden | Finanzielle Verluste, z. B. durch Ausfall, Bußgelder oder Lösegeld.
+Datenverlust | Daten sind zerstört oder nicht mehr verfügbar.
+### Bedrohungsszenarien
+Datendiebstahl | Unbefugtes Kopieren oder Abgreifen vertraulicher Daten.
+Ransomware | Erpressungssoftware | Verschlüsselt Daten und fordert Lösegeld für die Freigabe.
+Phishing | Gefälschte Mails oder Webseiten, um Zugangsdaten zu stehlen (Identitätsdiebstahl).
+Man-in-the-Middle | Angreifer klinkt sich unbemerkt zwischen zwei Kommunikationspartner und liest oder manipuliert mit.
+SQL-Injection | Einschleusen von SQL-Befehlen über Eingabefelder, um die Datenbank zu manipulieren.
+DDoS | Distributed Denial of Service | Viele Systeme überlasten gleichzeitig einen Dienst, bis er ausfällt.
+### IT-Sicherheitskonzepte & Vorgaben
+Security by Design | Sicherheit wird von Anfang an in die Entwicklung eingeplant, nicht nachträglich.
+IT-Grundschutz | BSI-Methode mit Bausteinen und Standardmaßnahmen für ein angemessenes Sicherheitsniveau.
+BSI | Bundesamt für Sicherheit in der Informationstechnik | Deutsche Behörde für IT-Sicherheit – gibt Standards und Warnungen heraus.
+Funktionale Anforderungen | Beschreiben, WAS ein System können soll.
+Qualitätsanforderungen | Nicht-funktionale Anforderungen: WIE gut ein System sein soll (z. B. Performance, Sicherheit).
+TOM | Technische und organisatorische Maßnahmen | Maßnahmen zum Schutz personenbezogener Daten (Art. 32 DSGVO).
+IT-Sicherheitskriterien | Richtschnur für Entwickler, objektive Bewertung von Systemen und Hilfe bei der Produktauswahl.
+### Analyse und Überprüfung
+Risikoanalyse | Bewertet Bedrohungen nach Eintrittswahrscheinlichkeit × Schadenshöhe.
+Penetrationstest | Simulierter Angriff, um Sicherheitslücken aufzudecken.
+Device Security Check | Prüft Endgeräte auf ihren Sicherheitsstand (Updates, Virenschutz, Konfiguration).
+IAM | Identity & Access Management | Verwaltet Identitäten und deren Zugriffsrechte zentral.
+Schwachstellenanalyse | Systematische Suche nach bekannten Sicherheitslücken.
+TOM-Wirksamkeitsprüfung | Regelmäßige Kontrolle, ob die Schutzmaßnahmen wirken und effizient sind.
+### Kundenberatung zur IT-Sicherheit
+Zielgruppen der IT-Sicherheitsberatung | Private Haushalte, Unternehmen (intern/extern), öffentliche Hand.
+Rahmenbedingungen der IT-Sicherheit | Technologisch, organisatorisch, rechtlich und ethisch.
+### Kontrollmechanismen
+Zutrittskontrolle | Kein physischer Zutritt Unbefugter zu Räumen – z. B. Alarmanlage, Video, Besucherausweise.
+Zugangskontrolle | Keine Nutzung von Systemen durch Unbefugte – z. B. Passwort-Sperre, Biometrie, Chipkarte.
+Zugriffskontrolle | Nur Zugriff auf berechtigte Daten – z. B. Rollenkonzept, Verschlüsselung, sicheres Löschen.
+### Monitoring & Rechtliches
+Log Management | Sammeln, Speichern und Auswerten von Protokolldaten (Logs).
+Compliance Report | Bericht, ob Gesetze und interne Regeln eingehalten werden.
+Kundendaten | Dürfen nur zweckgebunden und mit Rechtsgrundlage gespeichert und verwertet werden.
+BDSG | Bundesdatenschutzgesetz | Ergänzt die DSGVO in Deutschland (z. B. Beschäftigtendatenschutz).
+DSGVO | Datenschutz-Grundverordnung | EU-Verordnung zum Schutz personenbezogener Daten.
+GoBD | Grundsätze ordnungsmäßiger Buchführung in elektronischer Form | Regeln für digitale Buchführung und Archivierung.
+
+## k1-pm | Projektmanagement
+### Projektplanung und -steuerung
+Machbarkeitsanalyse | Prüft, ob ein Projekt technisch, wirtschaftlich und organisatorisch umsetzbar ist.
+Terminplanung | Legt Dauer, Reihenfolge und Termine der Vorgänge fest.
+Ressourcenplanung | Plant Personal, Material und Budget für das Projekt.
+Kapazität | Verfügbare Leistung von Personal und Betriebsmitteln in einem Zeitraum.
+### Methoden und Modelle
+DevOps | Development & Operations | Enge Zusammenarbeit von Entwicklung und Betrieb mit viel Automatisierung.
+Kanban | Aufgaben-Board (To do, Doing, Done), begrenzt gleichzeitig laufende Arbeit (WIP-Limit).
+Agiles Projektmanagement | Iteratives Vorgehen in kurzen Zyklen mit viel Kundenfeedback.
+Scrum | Agiles Framework mit Sprints, Product Owner, Scrum Master und Entwicklungsteam.
+Wasserfallmodell | Klassisch: Phasen laufen streng nacheinander ab.
+### Werkzeuge und Dokumentation
+PM-Tools | Software zur Projektplanung und -steuerung, z. B. MS Project, Jira.
+Arbeitsplan | Legt Arbeitsschritte, Reihenfolge, Zuständigkeiten und Zeiten fest.
+Arbeitsprotokoll | Dokumentiert durchgeführte Arbeiten, Zeiten und Ergebnisse.
+### Netzplan
+FAZ | Frühester Anfangszeitpunkt | Frühester Start = größter FEZ aller Vorgänger.
+FEZ | Frühester Endzeitpunkt | FEZ = FAZ + Dauer.
+SAZ | Spätester Anfangszeitpunkt | SAZ = SEZ − Dauer.
+SEZ | Spätester Endzeitpunkt | Spätestes Ende = kleinster SAZ aller Nachfolger.
+GP | Gesamtpuffer | GP = SAZ − FAZ. So weit darf sich ein Vorgang verschieben, ohne das Projektende zu gefährden.
+FP | Freier Puffer | FP = FAZ (Nachfolger) − FEZ. Verschiebung ohne Auswirkung auf den Nachfolger.
+Kritischer Weg | Kette aller Vorgänge mit Puffer 0 – jede Verzögerung verschiebt das Projektende.
+### Abstimmungsprozesse
+Kooperation | Zusammenarbeit, bei der jeder eigene Teilaufgaben erledigt.
+Kollaboration | Gemeinsames Arbeiten am selben Ergebnis, z. B. gleichzeitig an einem Dokument.
+Transparenz | Alle Beteiligten haben Einblick in Stand, Entscheidungen und Probleme.
+Servicemanagement | Planung, Steuerung und Verbesserung von IT-Services.
+ITIL | IT Infrastructure Library | Best-Practice-Sammlung für IT-Servicemanagement.
+
+## k1-req | Anforderungsanalyse & Geschäftsprozesse
+### Anforderungsanalyse
+Lastenheft | Vom Auftraggeber: beschreibt WAS und WOFÜR – die Anforderungen.
+Pflichtenheft | Vom Auftragnehmer: beschreibt WIE und WOMIT die Anforderungen umgesetzt werden.
+Anforderungsdefinition | Festlegen und Dokumentieren der Anforderungen an ein System.
+Ist-Analyse | Erfasst den aktuellen Zustand – per Interview, Fragebogen, Beobachtung oder Dokumentenanalyse.
+Soll-Konzept | Beschreibt den angestrebten Zielzustand.
+Zielbezogene Anforderungsanalyse | Leitet Anforderungen direkt aus den Unternehmenszielen ab.
+KPI | Key Performance Indicator | Kennzahl, um Ziele oder Lösungsvarianten messbar zu vergleichen.
+### Geschäftsprozesse darstellen
+Geschäftsprozess | Folge von Tätigkeiten, die einen Wert für den Kunden erzeugt.
+Wertschöpfung | Mehrwert, der durch die Leistungserstellung entsteht.
+BPMN | Business Process Model and Notation | Standard-Notation für Prozesse: Tasks, Events, Gateways, Pools und Lanes.
+Gateway | Verzweigung in BPMN: XOR = genau ein Weg, OR = ein oder mehrere, AND = alle parallel.
+Pool und Lane | BPMN: Pool = Organisation/Teilnehmer, Lane = Rolle oder Abteilung darin.
+EPK | Ereignisgesteuerte Prozesskette | Prozessmodell aus Ereignissen, Funktionen und Konnektoren (UND/ODER/XOR).
+Organisatorische Schnittstelle | Übergabepunkt zwischen Abteilungen oder Personen in einem Prozess.
+### Digitalisierung
+Digitalisierung | Umwandlung analoger Informationen und Prozesse in digitale.
+Digitale Transformation | Grundlegender Wandel von Geschäftsmodellen und Prozessen durch digitale Technik.
+Digitale Disruption | Neue digitale Lösungen verdrängen bestehende Produkte oder Märkte.
+Unternehmensziele | Ökonomische (Gewinn), ökologische (Nachhaltigkeit) und soziale Ziele.
+### IT-Systeme bewerten
+Arten von IT-Systemen | z. B. Client, Server, Embedded System, mobile Geräte, Cloudsysteme.
+Auswahlkriterien | z. B. Leistung, Kosten, Kompatibilität, Support, Normen und Zertifikate.
+Zertifikate und Kennzeichnungen | z. B. CE, Energy Star, Blauer Engel, TCO Certified.
+Integriertes Managementsystem | Fasst Qualitäts-, Sicherheits- und Umweltmanagement in einem System zusammen.
+Green IT | Umwelt- und ressourcenschonender Einsatz von IT über den gesamten Lebenszyklus.
+### Datenanalyse
+Datenanalyse | Auswerten von Daten, um Muster und Entscheidungsgrundlagen zu gewinnen.
+Datenanalyse-Tools | z. B. Excel, Power BI, Tableau, Python.
+KI | Künstliche Intelligenz | Systeme, die aus Daten lernen und z. B. erkennen oder vorhersagen.
+
+## k1-sys | Systemarchitektur & Komponenten
+### Bewertungskriterien von IT-Systemen
+Leistungsfähigkeit | Wie schnell und belastbar ein System ist (z. B. CPU, RAM, Durchsatz).
+Funktionalität | Welche Funktionen ein System bietet und ob sie die Anforderungen erfüllen.
+Wirtschaftlichkeit | Verhältnis von Nutzen bzw. Ertrag zu den Kosten.
+Erweiterbarkeit | Möglichkeit, ein System später aufzurüsten oder zu skalieren.
+### Softwarearchitekturen
+Integrierte Unternehmenssoftware | Eine Software deckt viele Bereiche mit gemeinsamer Datenbasis ab, z. B. ERP.
+Digitales Ökosystem | Netzwerk aus Unternehmen, Kunden und Diensten rund um eine Plattform.
+Digitale Plattform | Online-Vermittler zwischen Anbietern und Nutzern, z. B. App Store.
+### Hardware-Komponenten
+Client | Endgerät, das Dienste eines Servers nutzt.
+Server | Rechner, der Dienste für andere Rechner (Clients) bereitstellt.
+Peripheriegerät | Externes Gerät am Computer, z. B. Drucker, Maus, Monitor.
+Zubehör | Ergänzende Teile wie Kabel, Dockingstation oder Tasche.
+### Netzwerk-Komponenten
+Switch | Verbindet Geräte im LAN, leitet anhand der MAC-Adresse weiter (Layer 2).
+Router | Verbindet Netze, leitet anhand der IP-Adresse weiter (Layer 3).
+Firewall | Filtert den Netzwerkverkehr nach festgelegten Regeln.
+Stateful Inspection Firewall | Prüft Pakete im Zusammenhang mit dem Verbindungszustand.
+NGFW | Next Generation Firewall | Firewall mit Anwendungserkennung, Intrusion Prevention und Inhaltsfilter.
+Access Point | Verbindet WLAN-Geräte mit dem kabelgebundenen Netz.
+### Organisationsstrukturen
+Aufbauorganisation | Legt Stellen, Abteilungen und Hierarchien fest (Organigramm).
+Ablauforganisation | Legt fest, wie Arbeitsprozesse zeitlich und räumlich ablaufen.
+Wertschöpfungskette | Kette aus Primär- und Unterstützungsaktivitäten, die Wert schaffen (nach Porter).
+
+## k1-net | Netzwerke & Kommunikation
+### Netzwerkinfrastruktur
+Kabelgebundenes Netz | Verbindung über Kupfer (Twisted Pair) oder Glasfaser – stabil und schnell.
+WLAN | Wireless Local Area Network | Kabelloses lokales Netz nach IEEE 802.11.
+### Netzwerkkomponenten und -dienste
+Passive Netzwerkkomponenten | Ohne eigene Signalverarbeitung, z. B. Kabel, Patchfeld, Netzwerkdose.
+Aktive Netzwerkkomponenten | Mit Strom und Signalverarbeitung, z. B. Switch, Router, Access Point.
+DNS | Domain Name System | Übersetzt Domainnamen in IP-Adressen.
+DHCP | Dynamic Host Configuration Protocol | Vergibt automatisch IP-Adressen und Netzwerkeinstellungen.
+NTP | Network Time Protocol | Synchronisiert die Uhrzeit von Geräten im Netz.
+VPN | Virtual Private Network | Verschlüsselter Tunnel durch ein öffentliches Netz.
+WAN | Wide Area Network | Weitverkehrsnetz, verbindet Standorte – z. B. das Internet.
+DSL | Digital Subscriber Line | Internetzugang über die Telefonleitung.
+### Speichersysteme und Ausfallsicherheit
+RAID | Redundant Array of Independent Disks | Verbund mehrerer Festplatten für Leistung und/oder Ausfallsicherheit.
+RAID 0 | Striping: Daten verteilt, schnell – aber keine Ausfallsicherheit.
+RAID 1 | Mirroring: Daten gespiegelt, 1 Platte darf ausfallen, 50 % Nutzkapazität.
+RAID 5 | Striping mit Parität (mind. 3 Platten) – 1 Platte darf ausfallen.
+RAID 6 | Doppelte Parität (mind. 4 Platten) – 2 Platten dürfen ausfallen.
+RAID 10 | Spiegelung + Striping (mind. 4 Platten) – schnell und ausfallsicher.
+NAS | Network Attached Storage | Speichergerät, das per Netzwerk Dateifreigaben bereitstellt.
+SAN | Storage Area Network | Eigenes schnelles Netz für Speicher auf Blockebene.
+### Protokolle und Modelle
+OSI-Modell | Referenzmodell mit 7 Schichten für die Netzwerkkommunikation.
+OSI-Layer 2 | Sicherungsschicht (Data Link): MAC-Adressen, Switch, Frames.
+OSI-Layer 3 | Vermittlungsschicht (Network): IP-Adressen, Router, Pakete.
+NAT | Network Address Translation | Übersetzt private in öffentliche IP-Adressen.
+PAT | Port Address Translation | NAT mit Ports: viele Geräte teilen sich eine öffentliche IP.
+IPv4 | Internet Protocol Version 4 | 32-Bit-Adressen, dezimal in 4 Oktetten (z. B. 192.168.0.1).
+IPv6 | Internet Protocol Version 6 | 128-Bit-Adressen, hexadezimal in 8 Blöcken.
+LAN | Local Area Network | Lokales Netz, z. B. in einem Gebäude.
+Subnetzmaske | Trennt Netz- und Hostanteil einer IP-Adresse (z. B. /24 = 255.255.255.0).
+MAC-Adresse | Media Access Control | Eindeutige 48-Bit-Hardwareadresse einer Netzwerkkarte.
+### Netzwerkplanung
+Netzwerkplan | Grafische Darstellung von Geräten, Verbindungen und Adressen eines Netzes.
+Nutzer- und Zugriffsrechte | Legen fest, wer welche Ressourcen wie nutzen darf (z. B. lesen, schreiben).
+Monitoring | Laufende Überwachung von Systemen und Netzwerk, z. B. Auslastung und Ausfälle.
+### Datenmengen und Präfixe
+KiB | Kibibyte | 2¹⁰ = 1.024 Byte (Binärpräfix).
+MiB | Mebibyte | 2²⁰ Byte = 1.024 KiB.
+GiB | Gibibyte | 2³⁰ Byte = 1.024 MiB.
+TiB | Tebibyte | 2⁴⁰ Byte = 1.024 GiB.
+kB | Kilobyte | 10³ = 1.000 Byte (Dezimalpräfix).
+MB | Megabyte | 10⁶ = 1.000.000 Byte.
+GB | Gigabyte | 10⁹ Byte.
+TB | Terabyte | 10¹² Byte.
+Binär- vs. Dezimalpräfix | Datenmengen mit Binärpräfixen (Basis 2), physikalische Größen wie Übertragungsraten dezimal (Basis 10).
+
+## k1-cloud | Cloud & Betriebskonzepte
+### Cloud und Online-Dienste
+Cloud Computing | Bereitstellung von IT-Ressourcen über das Internet nach Bedarf.
+Public Cloud | Öffentliche Cloud eines Anbieters, von vielen Kunden geteilt.
+Private Cloud | Cloud exklusiv für ein einzelnes Unternehmen.
+Hybrid Cloud | Kombination aus Public und Private Cloud.
+IaaS | Infrastructure as a Service | Miete von Infrastruktur: Server, Speicher, Netz.
+PaaS | Platform as a Service | Miete einer Plattform zum Entwickeln und Betreiben von Anwendungen.
+SaaS | Software as a Service | Nutzung fertiger Software über den Browser, z. B. Microsoft 365.
+Onlinedienste | Über das Internet angebotene Dienste, z. B. E-Mail, Cloud-Speicher, Banking.
+B2B-Plattformdienste | Online-Plattformen für Geschäfte zwischen Unternehmen.
+IT-Service | Dienstleistung der IT, z. B. Support, Hosting oder Wartung.
+### Digitale Konzepte und Automation
+Digitale Lösungsvarianten | Alternative digitale Lösungen für dasselbe Problem, z. B. Cloud vs. On-Premises.
+Wertschöpfungsnetzwerk | Mehrere Unternehmen arbeiten digital vernetzt an der Wertschöpfung.
+Digitaler Zwilling | Virtuelles Abbild eines realen Objekts oder Prozesses mit Echtzeitdaten.
+Automation | Abläufe laufen ohne menschliches Eingreifen ab.
+Neue Arbeitsformen | z. B. Homeoffice, mobiles Arbeiten, Coworking, agile Teams.
+Digitale Assistenzsysteme | Unterstützen Menschen bei Aufgaben, z. B. Sprachassistent, AR-Brille.
+Predictive Maintenance | Prädiktive Instandhaltung | Wartung, bevor ein Defekt eintritt – vorhergesagt aus Sensordaten.
+### Betriebliche Informationssysteme
+RAMI 4.0 | Referenzarchitekturmodell Industrie 4.0 | 3D-Modell zur Einordnung von Industrie-4.0-Komponenten.
+ERP | Enterprise Resource Planning | Software, die alle Ressourcen steuert: Einkauf, Lager, Finanzen, Personal.
+PLM | Product Lifecycle Management | Verwaltet Produktdaten über den gesamten Lebenszyklus.
+APS | Advanced Planning and Scheduling | Software für detaillierte Produktions- und Kapazitätsplanung.
+SCM | Supply Chain Management | Steuerung der gesamten Lieferkette.
+SRM | Supplier Relationship Management | Management der Lieferantenbeziehungen.
+EDI | Electronic Data Interchange | Automatischer elektronischer Austausch von Geschäftsdokumenten zwischen Firmen.
+### Digitale Beschaffungs- und Betriebsprozesse
+E-Procurement | Elektronische Beschaffung über digitale Systeme und Kataloge.
+E-Kanban | Digitales Kanban: Nachschub wird automatisch elektronisch ausgelöst.
+eSourcing | Elektronische Lieferantensuche und -auswahl, z. B. per Online-Ausschreibung.
+Purchase-to-Pay | Prozess von der Bestellung bis zur Bezahlung der Rechnung.
+Source-to-Pay | Gesamtprozess von der Lieferantensuche bis zur Bezahlung.
+VMI | Vendor Managed Inventory | Lieferant überwacht und füllt das Lager des Kunden selbst auf.
+SMI | Supplier Managed Inventory | Wie VMI: Lieferant verantwortet die Bestände beim Kunden.
+Smart Contract | Digitaler Vertrag, der sich bei erfüllten Bedingungen automatisch ausführt.
+
+## k1-lic | Lizenzmodelle
+### Lizenzarten
+EULA | End User License Agreement | Lizenzvertrag zwischen Hersteller und Endnutzer.
+OEM-Lizenz | Original Equipment Manufacturer | Günstige Lizenz, an die mitgelieferte Hardware gebunden.
+GNU GPL | GNU General Public License | Open-Source-Lizenz: frei nutzbar, Änderungen müssen ebenfalls unter GPL stehen (Copyleft).
+Open Source | Quellcode ist offen einsehbar, änderbar und weitergebbar.
+Proprietäre Software | Hersteller behält alle Rechte, der Quellcode ist geschlossen.
+Pay-per-Use | Bezahlt wird nur die tatsächliche Nutzung.
+Subscription | Software-Abo | Regelmäßige Gebühr für das Nutzungsrecht, inklusive Updates.
+### Lizenzierung
+Lizenzierung | Einräumen von Nutzungsrechten an Software, z. B. pro Gerät, Nutzer oder CPU-Kern.
+Urheberrecht | Schützt geistige Werke wie Software – Nutzung nur mit Erlaubnis bzw. Lizenz.
+
+## k1-dev | Softwareentwicklung
+### Fehler erkennen und beheben
+Debugging | Systematisches Finden und Beheben von Fehlern im Code.
+Breakpoint | Haltepunkt, an dem das Programm beim Debuggen anhält.
+Ablaufverfolgung | Trace: schrittweises Nachverfolgen des Programmablaufs.
+Versionsverwaltung | Verwaltet Änderungen am Quellcode, z. B. mit Git.
+### Softwaretest
+Statischer Test | Prüfung ohne Ausführung des Codes, z. B. Review oder Code-Analyse.
+Dynamischer Test | Prüfung durch Ausführen des Programms.
+Black-Box-Test | Test ohne Kenntnis des Codes – nur Eingaben und Ausgaben.
+White-Box-Test | Test mit Kenntnis des Codes, z. B. alle Zweige abdecken.
+Review | Manuelle Prüfung von Code oder Dokumenten durch andere Personen.
+Extremwertetest | Test mit Grenz- und Extremwerten, z. B. 0, Maximum, negative Werte.
+Komponententest | Unit-Test: testet einzelne Module isoliert.
+Integrationstest | Testet das Zusammenspiel mehrerer Komponenten.
+Systemtest | Testet das Gesamtsystem gegen die Anforderungen.
+Abnahmetest | Test durch den Kunden vor der Abnahme.
+Lasttest | Prüft das Verhalten unter hoher, erwarteter Last.
+Performancetest | Misst Antwortzeiten und Durchsatz.
+Testdaten | Daten zum Testen – Testdatengeneratoren erzeugen sie automatisch.
+### Algorithmen
+Algorithmus | Eindeutige, endliche Folge von Schritten zur Lösung eines Problems.
+Pseudocode | Sprachunabhängige, halbformale Beschreibung eines Algorithmus.
+### UML
+UML | Unified Modeling Language | Standardisierte grafische Sprache zur Modellierung von Software.
+Anwendungsfalldiagramm | Use-Case-Diagramm: zeigt Akteure und ihre Anwendungsfälle.
+include | Use Case bindet einen anderen IMMER mit ein.
+extend | Use Case wird nur UNTER EINER BEDINGUNG erweitert.
+Klassendiagramm | Zeigt Klassen mit Attributen, Methoden und Beziehungen.
+Sichtbarkeit in UML | + public, − private, # protected, ~ package.
+Vererbung | Unterklasse übernimmt Attribute und Methoden der Oberklasse (Pfeil mit leerem Dreieck).
+Assoziation | Allgemeine Beziehung zwischen Klassen (einfache Linie).
+Aggregation | „Hat-ein“-Beziehung: Teile können ohne das Ganze existieren (leere Raute).
+Komposition | Starke „Teil-von“-Beziehung: Teile existieren nicht ohne das Ganze (gefüllte Raute).
+Multiplizität | Wie viele Objekte beteiligt sind, z. B. 1, 0..*, 1..*.
+Interface | Schnittstelle: legt Methoden fest, die eine Klasse implementieren muss.
+Aktivitätsdiagramm | Zeigt Abläufe: Start/Ende, Aktionen, Entscheidungen, Teilung/Synchronisation, Schwimmbahnen.
+### Bildschirmmasken
+Softwareergonomie | Software ist leicht, effizient und zufriedenstellend bedienbar (DIN EN ISO 9241).
+Barrierefreiheit | Nutzbar für alle Menschen, auch mit Einschränkungen – z. B. Screenreader, Kontraste.
+
+# k2 | Klausur 2: Kaufmännische Prozesse | orange
+
+## k2-eco | Wirtschaftlichkeit & Finanzen
+### Analyseverfahren
+Kosten-Nutzen-Analyse | Stellt Kosten und Nutzen einer Investition gegenüber.
+Rentabilitätsberechnung | Berechnet, wie sich das eingesetzte Kapital verzinst.
+SWOT-Analyse | Strengths, Weaknesses, Opportunities, Threats | Stärken/Schwächen (intern) und Chancen/Risiken (extern).
+Make or Buy | Entscheidung: selbst herstellen oder fremd einkaufen.
+DB I | Deckungsbeitrag I | Umsatzerlöse − variable Kosten.
+### Kennzahlen und Vergleiche
+Zeitvergleich | Vergleich derselben Kennzahl über mehrere Perioden.
+Überschuss | Nutzen bzw. Erlöse − Kosten.
+Rentabilität | Gewinn im Verhältnis zum eingesetzten Kapital, in Prozent.
+ROI | Return on Investment | Gewinn ÷ investiertes Kapital × 100.
+ROA | Return on Assets | Gewinn ÷ Gesamtvermögen × 100.
+Amortisation | Zeit, bis eine Investition zurückverdient ist: Anschaffungskosten ÷ jährlicher Rückfluss.
+Cashflow | Zahlungsmittelüberschuss einer Periode: Einzahlungen − Auszahlungen.
+Liquidität | Fähigkeit, Zahlungen fristgerecht zu leisten (Liquidität 1., 2. und 3. Grades).
+Eigenkapitalquote | Eigenkapital ÷ Gesamtkapital × 100.
+Fremdkapitalquote | Fremdkapital ÷ Gesamtkapital × 100.
+Verschuldungsgrad | Fremdkapital ÷ Eigenkapital × 100.
+Prozentanteil | Teil ÷ Ganzes × 100.
+Wirtschaftlichkeit als Kennzahl | Ertrag ÷ Aufwand – über 1 heißt wirtschaftlich.
+### Kalkulation
+Eigenleistung | Selbst erbrachte Leistung, intern kalkuliert (z. B. über Stundensätze).
+Fremdleistung | Von Dritten eingekaufte Leistung.
+Selbstkosten | Alle Kosten eines Produkts: Herstellkosten + Verwaltungs- und Vertriebsgemeinkosten.
+Handelswarenkalkulation | Vom Listeneinkaufspreis über Bezugspreis und Selbstkosten zum Verkaufspreis.
+Zuschlagskalkulation | Gemeinkosten werden per Prozentzuschlag auf die Einzelkosten verteilt.
+Stundensatz | Kosten pro Arbeitsstunde = Gesamtkosten ÷ produktive Stunden.
+Gewinnschwelle | Break-even-Point | Umsatz = Gesamtkosten – ab hier entsteht Gewinn.
+Preisuntergrenze | Kurzfristig: variable Stückkosten; langfristig: Selbstkosten.
+Bezugskalkulation | Listeneinkaufspreis − Rabatt − Skonto + Bezugskosten = Bezugspreis.
+Tagessatz | Preis für einen Arbeitstag, z. B. 8 × Stundensatz.
+Bereitschaftszeit | Zeit, in der Servicepersonal einsatzbereit sein muss – in Wartungsverträgen oft extra vergütet.
+### Finanzierung
+Innenfinanzierung | Kapital aus dem Unternehmen selbst, z. B. aus Gewinnen oder Abschreibungen.
+Außenfinanzierung | Kapital von außen: Kredite, Einlagen, Beteiligungen.
+Selbstfinanzierung | Finanzierung aus einbehaltenen Gewinnen.
+Einlagenfinanzierung | Bisherige Eigentümer bringen zusätzliches Eigenkapital ein.
+Beteiligungsfinanzierung | Neue Gesellschafter bringen Eigenkapital ein, z. B. durch Aktien.
+Annuitätendarlehen | Gleichbleibende Rate aus Zins und Tilgung.
+Abzahlungsdarlehen | Gleiche Tilgung jedes Jahr, dadurch sinkende Raten.
+Fälligkeitsdarlehen | Rückzahlung komplett am Ende der Laufzeit, vorher nur Zinsen.
+Leasing | Nutzung eines Gutes gegen Raten, oft mit Kaufoption – Leasinggeber bleibt Eigentümer.
+Miete | Gebrauchsüberlassung gegen Entgelt, ohne Kaufabsicht.
+### Rechnungswesen und Buchführung
+Inventur | Körperliche Bestandsaufnahme aller Vermögensteile und Schulden.
+Bilanz | Stellt Vermögen (Aktiva) und Kapital (Passiva) zum Stichtag gegenüber.
+GuV | Gewinn- und Verlustrechnung | Stellt Aufwendungen und Erträge gegenüber → Erfolg der Periode.
+Einzahlung / Auszahlung | Zu- bzw. Abfluss von Bargeld oder Bankguthaben.
+Einnahme / Ausgabe | Ein-/Auszahlungen inklusive Forderungen und Verbindlichkeiten.
+Ertrag / Aufwand | Wertzuwachs bzw. Wertverzehr einer Periode – erfolgswirksam.
+Bestandskonten | Aktiv- und Passivkonten der Bilanz.
+Erfolgskonten | Aufwands- und Ertragskonten – werden über die GuV abgeschlossen.
+Umsatzsteuer | Steuer auf Verkäufe (19 % bzw. 7 %), wird dem Kunden berechnet.
+Vorsteuer | Beim Einkauf gezahlte Umsatzsteuer – holt man sich vom Finanzamt zurück.
+Zahllast | Umsatzsteuer − Vorsteuer = an das Finanzamt zu zahlen.
+Rabatt | Sofortiger Preisnachlass, z. B. Mengenrabatt.
+Skonto | Preisnachlass bei Zahlung innerhalb einer kurzen Frist.
+Bonus | Nachträglicher Preisnachlass, z. B. bei hohem Jahresumsatz.
+Bezugskosten | Nebenkosten des Einkaufs, z. B. Fracht, Verpackung, Zoll.
+Abschreibung | AfA – Absetzung für Abnutzung | Erfasst den Wertverlust von Anlagegütern über die Nutzungsdauer.
+GWG | Geringwertiges Wirtschaftsgut | Bis 800 € netto – kann sofort voll abgeschrieben werden.
+Rechnungsprüfung | Prüfung auf sachliche, rechnerische und buchungstechnische Richtigkeit.
+### Kosten- und Leistungsrechnung
+Einzelkosten | Direkt einem Produkt zurechenbar, z. B. Material.
+Gemeinkosten | Nicht direkt zurechenbar (z. B. Miete) – werden per Schlüssel verteilt.
+Fixe Kosten | Unabhängig von der Menge, z. B. Miete.
+Variable Kosten | Steigen mit der Menge, z. B. Material.
+Kostenstelle | Ort, an dem Kosten entstehen, z. B. eine Abteilung.
+Kostenträger | Leistung, die die Kosten tragen muss – Produkt oder Auftrag.
+BAB | Betriebsabrechnungsbogen | Verteilt Gemeinkosten auf Kostenstellen und ermittelt Zuschlagssätze.
+Betriebsergebnis | Leistungen − Kosten: Erfolg aus dem eigentlichen Betriebszweck.
+### Forderungsmanagement
+Forderungsüberwachung | Kontrolle offener Kundenforderungen und ihrer Fälligkeit.
+OP-Liste | Offene-Posten-Liste | Übersicht aller noch nicht bezahlten Rechnungen.
+Mahnwesen | Ablauf bei Zahlungsverzug: Erinnerung, Mahnungen, gerichtliches Mahnverfahren.
+Factoring | Verkauf von Forderungen an einen Factor, der sofort zahlt – gegen Gebühr.
+Zahlungsverzug | Kunde zahlt trotz Fälligkeit nicht – spätestens 30 Tage nach Fälligkeit und Rechnung.
+### Daten für das Rechnungswesen
+Datenquellen | z. B. ERP, Warenwirtschaft, Zeiterfassung, Bankdaten.
+Schnittstelle | Technische Verbindung für den Datenaustausch zwischen Systemen.
+
+## k2-mkt | Marketing & Vertrieb
+### Markt- und Kundenanalyse
+Wettbewerbsbeobachtung | Laufende Analyse der Konkurrenz: Preise, Produkte, Strategie.
+Trendforschung | Erkennt künftige Entwicklungen in Markt und Gesellschaft.
+Marktanalyse | Einmalige Untersuchung eines Marktes zu einem Zeitpunkt.
+Marktbeobachtung | Laufende Untersuchung eines Marktes über einen Zeitraum.
+Kundenpotenzialanalyse | Ermittelt, welche Umsätze mit Kunden künftig möglich sind.
+Kundenwert | Wirtschaftliche Bedeutung eines Kunden (Customer Lifetime Value).
+Kundensegmentierung | Einteilung von Kunden in Gruppen mit ähnlichen Merkmalen.
+Primärforschung | Eigene, neue Datenerhebung, z. B. Umfrage.
+Sekundärforschung | Auswertung vorhandener Daten, z. B. Statistiken.
+Interne Informationsquellen | z. B. Umsatzstatistik, CRM-Daten, Reklamationen.
+Externe Informationsquellen | z. B. Statistisches Bundesamt, Verbände, Studien.
+### Marketingstrategien
+Kostenführerschaft | Günstigster Anbieter durch die niedrigsten Kosten.
+Qualitätsführerschaft | Bester Anbieter durch die höchste Qualität.
+Differenzierung | Abheben von der Konkurrenz durch besondere Merkmale.
+Nischenstrategie | Konzentration auf ein kleines Marktsegment.
+Benchmarking | Vergleich mit den Besten, um sich zu verbessern.
+Portfolioanalyse | BCG-Matrix: Stars, Cash Cows, Question Marks, Poor Dogs.
+Produktlebenszyklus | Einführung, Wachstum, Reife, Sättigung, Rückgang.
+### Marketingmix
+Marketingmix | 4 P: Product, Price, Place, Promotion.
+Preispolitik | Preise, Rabatte und Zahlungsbedingungen festlegen.
+Produktpolitik | Gestaltung von Produkten und Sortiment.
+Kommunikationspolitik | Werbung, PR und Verkaufsförderung – wie man mit Kunden kommuniziert.
+Distributionspolitik | Wie das Produkt zum Kunden kommt: Vertriebswege und Logistik.
+### Marketingmaßnahmen
+Werbung | Beeinflussung von Kunden zum Kauf über Medien.
+Sales Promotion | Verkaufsförderung | Kurzfristige Kaufanreize, z. B. Gewinnspiele, Proben.
+PR | Public Relations | Öffentlichkeitsarbeit für ein positives Image.
+Sponsoring | Förderung mit Geld oder Sachmitteln gegen Werbewirkung.
+Product Placement | Gezielte Platzierung von Produkten in Filmen oder Videos.
+Direktmarketing | Persönliche, gezielte Ansprache einzelner Kunden.
+E-Mail-Marketing | Werbung per E-Mail, z. B. Newsletter – Einwilligung nötig.
+Onlinemarketing | Marketing im Internet, z. B. SEO, Social Media, Anzeigen.
+Inbound-Marketing | Kunden finden das Unternehmen selbst, z. B. über nützliche Inhalte.
+Outbound-Marketing | Unternehmen spricht Kunden aktiv an, z. B. Anzeigen, Kaltakquise.
+Erfolgskontrolle im Marketing | Bewertung von Maßnahmen, z. B. über Klickrate, Umsatz, Conversion Rate.
+### Kundenbeziehung und Vertrieb
+Neukundengewinnung | Akquise neuer Kunden.
+CRM | Customer Relationship Management | Systematische Pflege der Kundenbeziehungen, meist mit Software.
+Kundenzufriedenheit | Kundenerwartungen werden erfüllt oder übertroffen.
+After-Sales-Service | Betreuung nach dem Kauf, z. B. Support, Wartung.
+Direkter Vertrieb | Verkauf direkt an den Kunden, ohne Zwischenhändler.
+Indirekter Vertrieb | Verkauf über Zwischenhändler, z. B. Groß- und Einzelhandel.
+Kundenbindung | Maßnahmen, damit Kunden wiederkommen, z. B. Bonusprogramme.
+Kundenreaktivierung | Rückgewinnung inaktiver Kunden.
+Leistungsbündel | Kombination aus Produkt und Service für eine bestimmte Zielgruppe.
+Kundenbefragung | Erhebung von Kundenmeinungen, z. B. per Fragebogen.
+Logistik | Planung und Steuerung von Material- und Warenflüssen.
+### E-Commerce
+E-Commerce | Elektronischer Handel über das Internet.
+E-Business | Alle Geschäftsprozesse mit elektronischer Unterstützung.
+B2B | Business to Business | Geschäfte zwischen Unternehmen.
+B2C | Business to Consumer | Geschäfte zwischen Unternehmen und Privatkunden.
+B2A | Business to Administration | Geschäfte zwischen Unternehmen und Behörden.
+Marketplace | Online-Marktplatz, auf dem viele Händler verkaufen, z. B. Amazon.
+
+## k2-com | Kundenberatung & Kommunikation
+### Präsentation
+Präsentationstechnik | Methoden, Inhalte verständlich vorzustellen: Struktur, Medien, Körpersprache.
+Diagrammarten | Balken = Vergleich, Linie = Verlauf, Kreis = Anteile.
+CI | Corporate Identity | Einheitliches Erscheinungsbild und Selbstverständnis eines Unternehmens.
+Multiperspektivische Präsentation | Lösung aus technischer, kaufmännischer und Nachhaltigkeits-Sicht vorstellen.
+### Konfliktmanagement
+4-Ohren-Modell | Schulz von Thun: Sachinhalt, Selbstoffenbarung, Beziehung, Appell.
+Sender-Empfänger-Modell | Sender codiert eine Nachricht, Empfänger decodiert sie – Störungen möglich.
+Kommunikationsregeln | z. B. ausreden lassen, Ich-Botschaften, sachlich bleiben.
+Perspektivwechsel | Die Situation aus Sicht des Gegenübers betrachten.
+Aktives Zuhören | Aufmerksam zuhören, nachfragen, Gesagtes zusammenfassen.
+Auftragsklärung | Gemeinsames Klären von Ziel, Umfang und Erwartungen eines Auftrags.
+Deeskalation | Konflikt entschärfen: ruhig bleiben, Verständnis zeigen, sachlich bleiben.
+### Reklamationen und Service
+Serviceanfrage | Anfrage eines Kunden nach Unterstützung oder Information.
+Reklamation | Beanstandung eines Mangels durch den Kunden.
+Service-Management-System | System zur Steuerung von IT-Services, z. B. Ticketsystem nach ISO 20000.
+SLA | Service Level Agreement | Vereinbarung über Servicequalität, z. B. Reaktionszeit und Verfügbarkeit.
+### Produktschulungen
+Schulungsarten | z. B. Präsenzschulung, Online-Schulung, Webinar, Einzelschulung.
+Schulungsmethoden | z. B. Vortrag, praktische Übung, Gruppenarbeit, E-Learning.
+Schulungsdurchführung | Planen, durchführen und den Erfolg prüfen (z. B. per Feedback).
+
+## k2-qm | Qualitätsmanagement
+### Qualitätsmanagement
+PDCA-Zyklus | Plan, Do, Check, Act | Kreislauf zur ständigen Verbesserung (Deming-Kreis).
+KVP | Kontinuierlicher Verbesserungsprozess | Ständige Verbesserung in kleinen Schritten.
+ISO 9001 | Internationale Norm für Qualitätsmanagementsysteme.
+QM-Kennzahlen | Messgrößen zur Qualität, z. B. Fehlerquote, Reklamationsquote.
+### Kontrolle der Leistungserbringung
+Soll-Ist-Vergleich | Vergleicht Planwerte mit tatsächlichen Werten und berechnet die Abweichungen.
+Testprotokoll | Dokumentiert Testfälle, Ergebnisse und gefundene Fehler.
+Abnahmeprotokoll | Kunde bestätigt die Abnahme einer Leistung, inklusive festgestellter Mängel.
+### Prüfverfahren
+Parität | Prüfbit macht die Anzahl der Einsen gerade bzw. ungerade – erkennt einfache Bitfehler.
+Redundanz | Mehrfach vorhandene Komponenten oder Daten für mehr Ausfallsicherheit.
+
+## k2-db | Datenbanken & SQL
+### Datenbankmodelle
+Relationale Datenbank | Speichert Daten in Tabellen, verknüpft über Schlüssel.
+Nicht-relationale Datenbank | Speichert Daten ohne feste Tabellenstruktur.
+NoSQL | Not only SQL | Datenbanken z. B. als Dokument-, Key-Value- oder Graphdatenbank.
+### Datenbankentwurf und Struktur
+ERM | Entity-Relationship-Modell | Grafisches Datenmodell aus Entitäten, Attributen und Beziehungen.
+Kardinalität | Anzahl der Beziehungen zwischen Entitäten: 1:1, 1:n, n:m.
+Attribut | Eigenschaft einer Entität – in der Tabelle eine Spalte.
+Referenzielle Integrität | Fremdschlüssel dürfen nur auf existierende Primärschlüssel verweisen.
+Löschweitergabe | ON DELETE CASCADE: abhängige Datensätze werden mitgelöscht.
+Aktualisierungsweitergabe | ON UPDATE CASCADE: Änderungen am Primärschlüssel werden übernommen.
+Primärschlüssel | Identifiziert jeden Datensatz einer Tabelle eindeutig.
+Fremdschlüssel | Verweist auf den Primärschlüssel einer anderen Tabelle.
+Anomalie | Fehler beim Einfügen, Ändern oder Löschen, verursacht durch Redundanz.
+Redundanz in Datenbanken | Mehrfach gespeicherte Daten – führt zu Anomalien.
+1. Normalform | Alle Attribute sind atomar – keine Mehrfachwerte.
+2. Normalform | 1. NF + jedes Nicht-Schlüsselattribut hängt vom gesamten Primärschlüssel ab.
+3. Normalform | 2. NF + keine transitiven Abhängigkeiten zwischen Nicht-Schlüsselattributen.
+Index | Beschleunigt die Suche in einer Tabelle – wie ein Register im Buch.
+Datenpflege | Aktualisieren, Korrigieren und Bereinigen von Daten.
+### Datentypen
+BOOLEAN | Wahrheitswert: wahr oder falsch.
+INTEGER | Ganze Zahl.
+DECIMAL | Festkommazahl mit fester Genauigkeit – ideal für Währungen.
+DOUBLE | Gleitkommazahl mit doppelter Genauigkeit.
+DATE | Datumswert.
+CHAR | Text mit fester Länge.
+VARCHAR | Text mit variabler Länge (bis zu einem Maximum).
+BLOB | Binary Large Object | Große Binärdaten, z. B. Bilder oder Dateien.
+Geokoordinaten | Längen- und Breitengrad, z. B. als DECIMAL oder eigener Geo-Datentyp.
+Währung als Datentyp | Wird als DECIMAL gespeichert, um Rundungsfehler zu vermeiden.
+### Schnittstellen
+Open Data | Frei zugängliche Daten, die jeder nutzen darf.
+API | Application Programming Interface | Programmierschnittstelle, über die Programme Daten austauschen.
+### SQL – Datendefinition und Rechte
+DDL | Data Definition Language | SQL-Befehle für die Struktur: CREATE, ALTER, DROP.
+CREATE TABLE | Erstellt eine neue Tabelle.
+ALTER TABLE | Ändert eine Tabelle: ADD, DROP oder MODIFY COLUMN.
+DROP TABLE | Löscht eine Tabelle komplett.
+CREATE USER | Legt einen Datenbankbenutzer an.
+GRANT | Vergibt Rechte an Benutzer.
+REVOKE | Entzieht Benutzern Rechte.
+PRIMARY KEY | Legt den Primärschlüssel einer Tabelle fest.
+FOREIGN KEY … REFERENCES | Legt einen Fremdschlüssel an, der auf eine andere Tabelle verweist.
+### SQL – Datenmanipulation
+DML | Data Manipulation Language | SQL-Befehle zum Ändern von Daten: INSERT, UPDATE, DELETE.
+INSERT INTO | Fügt neue Datensätze ein.
+UPDATE | Ändert bestehende Datensätze (UPDATE … SET … WHERE).
+DELETE | Löscht Datensätze – ohne WHERE alle!
+### SQL – Abfragen
+SELECT | Wählt die anzuzeigenden Spalten aus.
+WHERE | Filtert Zeilen nach Bedingungen.
+DISTINCT | Entfernt doppelte Ergebniszeilen.
+INNER JOIN | Nur Datensätze mit Treffer in beiden Tabellen.
+LEFT JOIN | Alle Datensätze der linken Tabelle, rechts nur passende (sonst NULL).
+RIGHT JOIN | Alle Datensätze der rechten Tabelle, links nur passende (sonst NULL).
+EXISTS | Prüft, ob eine Unterabfrage mindestens ein Ergebnis liefert.
+IN | Prüft, ob ein Wert in einer Liste oder Unterabfrage enthalten ist.
+GROUP BY | Gruppiert Zeilen für Aggregatfunktionen.
+HAVING | Filtert Gruppen nach GROUP BY – das WHERE für Gruppen.
+ORDER BY | Sortiert das Ergebnis: ASC aufsteigend, DESC absteigend.
+UNION | Vereinigt die Ergebnisse zweier Abfragen (ohne Duplikate).
+Projektion | Auswahl von Spalten (SELECT).
+Selektion | Auswahl von Zeilen (WHERE).
+Unterabfrage | Subquery: ein SELECT innerhalb einer anderen Abfrage.
+AS | Vergibt einen Aliasnamen für eine Spalte oder Tabelle.
+### SQL – Operatoren
+AND / OR / NOT | Logische Verknüpfung von Bedingungen.
+IS NULL | Prüft, ob ein Feld leer (NULL) ist – nicht mit = NULL!
+LIKE | Mustersuche: % = beliebig viele Zeichen, _ = genau ein Zeichen.
+<> | Ungleich-Operator in SQL.
+### SQL – Funktionen
+COUNT | Zählt Zeilen.
+SUM | Bildet die Summe.
+AVG | Berechnet den Durchschnitt.
+MIN / MAX | Kleinster bzw. größter Wert.
+STDDEV / VARIANCE | Standardabweichung bzw. Varianz.
+CORR | Korrelationskoeffizient zweier Spalten.
+LEFT / RIGHT | Gibt die ersten bzw. letzten n Zeichen eines Textes zurück.
+NOW | Aktuelles Datum mit Uhrzeit.
+YEAR / MONTH / DAY | Gibt Jahr, Monat bzw. Tag eines Datums zurück.
+WEEKDAY | Gibt den Wochentag eines Datums zurück.
+HOUR / MINUTE | Gibt Stunde bzw. Minute eines Zeitwerts zurück.
+DATEADD | Addiert ein Zeitintervall zu einem Datum.
+DATEDIFF | Berechnet die Differenz zwischen zwei Datumswerten.
+
+## k2-law | Recht & Verträge
+### Vertragsarten
+Kaufvertrag | Übergabe und Eigentum einer Sache gegen Kaufpreis (§ 433 BGB).
+Werkvertrag | Geschuldet ist ein ERFOLG, z. B. fertige Software (§ 631 BGB).
+Dienstvertrag | Geschuldet ist eine TÄTIGKEIT, kein Erfolg, z. B. Support-Stunden (§ 611 BGB).
+Mietvertrag | Entgeltliche Gebrauchsüberlassung einer Sache.
+Pachtvertrag | Gebrauch UND Fruchtziehung (Erträge) gegen Entgelt.
+Leasingvertrag | Mietähnliche Überlassung, oft mit Kauf- oder Verlängerungsoption.
+EVB-IT | Ergänzende Vertragsbedingungen für die Beschaffung von IT-Leistungen | Musterverträge für IT-Einkäufe der öffentlichen Hand.
+Servicevertrag | Regelt laufende Leistungen wie Wartung, Support und Reaktionszeiten.
+Software-Abo | Zeitlich begrenztes Nutzungsrecht gegen regelmäßige Gebühr.
+### Angebote
+Verbindliches Angebot | Anbieter ist an sein Angebot gebunden.
+Unverbindliches Angebot | Mit Freizeichnungsklausel, z. B. „freibleibend“ oder „ohne Gewähr“.
+Befristetes Angebot | Gilt nur bis zu einem bestimmten Termin.
+Freizeichnungsklausel | Schränkt die Bindung an ein Angebot ein, z. B. „solange Vorrat reicht“.
+Inhalte eines Angebots | Art, Menge, Qualität, Preis, Liefer- und Zahlungsbedingungen.
+Leistungsbeschreibung | Genaue technische Spezifikation der angebotenen Leistung.
+Bindungsfrist | Unter Anwesenden: sofort. Unter Abwesenden: so lange, wie eine Antwort normalerweise dauert.
+### Vollmachten
+Allgemeine Handlungsvollmacht | Berechtigt zu allen gewöhnlichen Geschäften des Betriebs.
+Artvollmacht | Berechtigt zu einer bestimmten Art von Geschäften, z. B. Einkauf.
+Einzelvollmacht | Berechtigt zu einem einzelnen Geschäft.
+Prokura | Umfassende Vollmacht für fast alle Geschäfte – Eintrag im Handelsregister, Zusatz „ppa.“.
+Elektronisches Genehmigungsverfahren | Digitale Freigabe, z. B. von Bestellungen im Workflow.
+### Gesetze und Regelungen
+BGB | Bürgerliches Gesetzbuch | Regelt das Privatrecht, z. B. Verträge.
+HGB | Handelsgesetzbuch | Sonderrecht für Kaufleute.
+UWG | Gesetz gegen den unlauteren Wettbewerb | Verbietet unfaire Geschäftspraktiken, z. B. irreführende Werbung.
+AGB | Allgemeine Geschäftsbedingungen | Vorformulierte Vertragsbedingungen (§§ 305 ff. BGB).
+Compliance | Einhaltung von Gesetzen und internen Richtlinien.
+LkSG | Lieferkettensorgfaltspflichtengesetz | Pflicht, Menschenrechte und Umweltstandards in der Lieferkette zu achten.
+### Vertragsinhalte und Störungen
+Lieferbedingungen | Regeln Lieferzeit, Lieferort, Versand- und Verpackungskosten.
+Zahlungsbedingungen | Regeln Zahlungsziel, Skonto und Zahlungsart.
+Eigentumsvorbehalt | Ware bleibt bis zur vollständigen Bezahlung Eigentum des Verkäufers.
+Erfüllungsort | Ort, an dem die Leistung erbracht werden muss.
+Gerichtsstand | Ort des zuständigen Gerichts bei Streitigkeiten.
+Gewährleistung | Gesetzliche Mängelhaftung des Verkäufers – 2 Jahre bei neuen Sachen.
+Garantie | Freiwilliges Versprechen von Hersteller oder Händler über die Gewährleistung hinaus.
+Kulanz | Freiwilliges Entgegenkommen ohne rechtliche Pflicht.
+Verjährung | Ansprüche sind nach Fristablauf nicht mehr durchsetzbar – regelmäßig 3 Jahre ab Jahresende.
+Lieferverzug | Nicht-Rechtzeitig-Lieferung | Lieferung trotz Fälligkeit verspätet – meist ist eine Mahnung nötig.
+Schlechtleistung | Mangelhafte Lieferung | Die gelieferte Ware oder Leistung hat einen Mangel.
+Mängelarten | Sachmangel, Rechtsmangel, Falsch- und Zuweniglieferung – offen, versteckt oder arglistig verschwiegen.
+Nacherfüllung | Erstes Recht des Käufers bei Mängeln: Reparatur oder Ersatzlieferung.
+Vertragsgestaltung | Preis und Bedingungen werden in Verhandlungen festgelegt.
+
+## k2-buy | Beschaffung
+### Beschaffungsplanung
+Beschaffungsstrategie | z. B. Single, Dual oder Multiple Sourcing, Global Sourcing.
+Single Sourcing | Nur ein Lieferant für ein Gut.
+Multiple Sourcing | Mehrere Lieferanten für dasselbe Gut.
+KPI in der Beschaffung | z. B. Liefertreue, Einkaufsvolumen, Bestelldurchlaufzeit.
+Strategische Beschaffung | Langfristig: Lieferantenauswahl, Verträge, Strategie.
+Operative Beschaffung | Tagesgeschäft: Bestellungen auslösen und abwickeln.
+Optimale Bestellmenge | Menge, bei der die Summe aus Bestell- und Lagerkosten am geringsten ist.
+Einzelbeschaffung | Beschaffung erst, wenn der Bedarf entsteht.
+Vorratsbeschaffung | Beschaffung auf Lager.
+Just-in-Time | Anlieferung genau zum Bedarfszeitpunkt – kaum Lager nötig.
+Kanban in der Beschaffung | Nachschub per Karte oder Signal, sobald Bestand verbraucht ist (Pull-Prinzip).
+Disposition | Planung von Bedarf, Bestand und Bestellungen.
+### Analysen und Vorgaben
+ABC-Analyse | Einteilung nach Wertanteil: A = hoher Wert/geringe Menge, C = geringer Wert/große Menge.
+Einkaufsrichtlinie | Interne Regeln für den Einkauf: Zuständigkeiten, Freigaben, Grenzen.
+Rahmenvertrag | Langfristiger Vertrag über Konditionen – Abruf nach Bedarf.
+BANF | Bestellanforderung | Interne Anforderung an den Einkauf, etwas zu bestellen.
+Istaufnahme | Erfassung des aktuellen Bestands bzw. Zustands.
+Meldebestand | Bei Erreichen wird bestellt: Tagesverbrauch × Lieferzeit + Mindestbestand.
+Mindestbestand | Eiserner Bestand | Reserve für unvorhergesehene Fälle.
+Höchstbestand | Maximal zu lagernde Menge.
+Predictive Analytics | Vorhersage künftiger Bedarfe aus historischen Daten.
+Einkaufsportfolio | Einteilung der Güter nach Versorgungsrisiko und Bedeutung.
+TCO | Total Cost of Ownership | Alle Kosten über die gesamte Nutzungsdauer: Anschaffung, Betrieb, Entsorgung.
+Fremdbezug | Kauf bei externen Lieferanten.
+Eigenfertigung | Herstellung im eigenen Unternehmen.
+Energieeffizienz | Kriterium beim Einkauf: wenig Stromverbrauch bei gleicher Leistung.
+Refurbishing | Aufarbeitung gebrauchter Geräte für die Wiederverwendung.
+Remarketing | Wiedervermarktung gebrauchter Geräte.
+### Anfrage und Angebot
+RFI | Request for Information | Anfrage nach allgemeinen Informationen über Anbieter und Lösungen.
+RFP | Request for Proposal | Aufforderung zur Abgabe eines detaillierten Lösungsangebots.
+RFQ | Request for Quotation | Preisanfrage für genau spezifizierte Leistungen.
+Allgemeine Anfrage | Bitte um Katalog oder Preisliste – ohne konkreten Bedarf.
+Bestimmte Anfrage | Anfrage nach konkreter Ware, Menge und Bedingungen.
+Ausschreibung | Öffentliche Aufforderung zur Angebotsabgabe, z. B. über Ausschreibungsplattformen.
+### Lieferantenmanagement
+Beschaffungskanal | Weg der Beschaffung, z. B. Hersteller, Großhändler, Online-Shop.
+Lieferantenbewertung | Beurteilung von Lieferanten nach Preis, Qualität, Liefertreue usw.
+Lieferantenauswahl | Entscheidung für einen Lieferanten, z. B. per Nutzwertanalyse.
+Supply-Chain-Kollaboration | Enge Zusammenarbeit entlang der Lieferkette mit gemeinsamer Planung.
+### Digitale Beschaffung
+eAuction | Elektronische Auktion – meist Reverse Auction: Lieferanten unterbieten sich.
+Online-Marktplatz für Unternehmen | Plattform, auf der viele Anbieter Waren für Firmen anbieten.
+Intelligente Beschaffungssysteme | KI-gestützte Systeme, die Bedarfe erkennen und Bestellungen vorschlagen.
+Orchestrierung | Automatisches Zusammenspiel mehrerer Systeme und Prozesse.
+### Entscheidungsfindung
+Quantitativer Angebotsvergleich | Vergleich messbarer Werte, v. a. des Bezugspreises.
+Qualitativer Angebotsvergleich | Vergleich nicht messbarer Kriterien wie Service, Image, Zuverlässigkeit.
+Nutzwertanalyse | Kriterien gewichten, Alternativen bewerten, Punkte × Gewicht summieren – höchster Wert gewinnt.
+Präferenzmatrix | Paarweiser Vergleich von Kriterien, um ihre Gewichtung zu ermitteln.
+### Logistik und Wareneingang
+Lieferlogistik | Transport und Zustellung der Ware.
+Avis | Lieferavis | Vorankündigung einer Lieferung.
+Tracking | Sendungsverfolgung.
+Warenabnahme | Bei Anlieferung prüfen: Anzahl, Verpackung, Lieferschein – Mängel sofort vermerken.
+Einseitiger Handelskauf | Nur einer der Vertragspartner ist Kaufmann.
+Zweiseitiger Handelskauf | Beide sind Kaufleute → unverzügliche Prüf- und Rügepflicht (§ 377 HGB).
+Transportschaden | Beschädigung beim Transport – sofort beim Frachtführer melden.
+RMA | Return Material Authorization | Rücksendenummer bzw. -formular für Retouren und Reparaturen.
+Lagerprozess | Einlagern, Lagern, Kommissionieren und Auslagern von Waren.
+### Abrechnung und Mahnwesen
+eInvoicing | Elektronische Rechnung in strukturiertem Format, z. B. XRechnung, ZUGFeRD.
+Mahnschreiben | Zahlungserinnerung bzw. Mahnung bei überschrittenem Zahlungsziel.
+Zahlungsarten | z. B. Überweisung, Lastschrift, Kreditkarte, PayPal, Barzahlung.
+Provision | Vergütung für die Vermittlung eines Geschäfts, z. B. Prozent vom Umsatz.
+Rückvergütung | Nachträgliche Rückzahlung an den Kunden, z. B. als Bonus.
+### Vertragsstörungen vermeiden
+Qualitätsvorausplanung | Qualitätsanforderungen schon vor der Lieferung festlegen und absichern.
+
+# k3 | Klausur 3: WiSo | green
+
+## k3-job | Berufsbildung, Arbeits- & Tarifrecht
+### Berufsbildung
+Ausbildungsvertrag | Vor Beginn schriftlich: Vertragspartner, Beginn/Dauer, Probezeit, Vergütung, Urlaub, Kündigung.
+Probezeit in der Ausbildung | 1 bis 4 Monate – Kündigung jederzeit ohne Frist und ohne Grund.
+BBiG | Berufsbildungsgesetz | Regelt die Berufsausbildung in Deutschland.
+Duales System | Ausbildung an zwei Lernorten: Betrieb und Berufsschule.
+Lebensbegleitendes Lernen | Weiterlernen während des gesamten Berufslebens.
+Fortbildung | Erweitert die Kenntnisse im bisherigen Beruf.
+Umschulung | Ausbildung in einem neuen Beruf.
+Pflichten des Azubis | z. B. Lernpflicht, Berufsschule besuchen, Weisungen befolgen, Berichtsheft, Schweigepflicht.
+Pflichten des Ausbildenden | z. B. Vergütung zahlen, Ausbildungsmittel kostenlos stellen, freistellen, Zeugnis ausstellen.
+Ausbildungsordnung | Legt Beruf, Dauer, Inhalte und Prüfungen fest – Grundlage für den Betrieb.
+Ausbildungsrahmenplan | Teil der Ausbildungsordnung: sachliche und zeitliche Gliederung der Inhalte.
+Rahmenlehrplan | Lehrplan der Kultusministerkonferenz für die Berufsschule.
+Betrieblicher Ausbildungsplan | Plan des Betriebs, wann welche Inhalte vermittelt werden.
+IHK | Industrie- und Handelskammer | Zuständige Stelle: überwacht die Ausbildung und nimmt Prüfungen ab.
+Berufsschulpflicht | Pflicht zum Berufsschulbesuch – der Betrieb muss dafür und für Prüfungen freistellen.
+Ende der Ausbildung | Mit Bestehen der Abschlussprüfung bzw. Ablauf der Ausbildungszeit.
+Kündigung nach der Probezeit | Azubi: 4 Wochen Frist bei Berufsaufgabe/-wechsel. Beide: fristlos aus wichtigem Grund.
+### Arbeitnehmerschutzgesetze
+ArbSchG | Arbeitsschutzgesetz | Arbeitgeber muss Sicherheit und Gesundheit schützen, z. B. per Gefährdungsbeurteilung.
+BEEG | Bundeselterngeld- und Elternzeitgesetz | Elterngeld und bis zu 3 Jahre Elternzeit pro Kind.
+AGG | Allgemeines Gleichbehandlungsgesetz | Verbietet Benachteiligung, z. B. wegen Geschlecht, Herkunft, Religion, Alter.
+KSchG | Kündigungsschutzgesetz | Kündigung muss sozial gerechtfertigt sein – gilt ab 6 Monaten und mehr als 10 Mitarbeitern.
+JArbSchG | Jugendarbeitsschutzgesetz | Schutz unter 18: max. 8 h am Tag, 40 h pro Woche, 5-Tage-Woche.
+ArbStättV | Arbeitsstättenverordnung | Anforderungen an Arbeitsräume, z. B. Licht, Lüftung, Bildschirmarbeit.
+ArbZG | Arbeitszeitgesetz | Max. 8 h am Tag (bis 10 h mit Ausgleich), 11 h Ruhezeit.
+Pausen nach ArbZG | Mehr als 6 h Arbeit: 30 Min. – mehr als 9 h: 45 Min.
+MuSchG | Mutterschutzgesetz | Schutz Schwangerer: 6 Wochen vor und 8 Wochen nach der Geburt, Kündigungsschutz.
+SGB IX | Sozialgesetzbuch Neuntes Buch | Schwerbehindertenrecht: besonderer Kündigungsschutz, Zusatzurlaub.
+Individualarbeitsrecht | Regelt das Verhältnis zwischen einzelnem Arbeitnehmer und Arbeitgeber.
+Kollektivarbeitsrecht | Regelt Beziehungen zwischen Gruppen: Tarifverträge und Betriebsverfassung.
+Betriebsvereinbarung | Vertrag zwischen Arbeitgeber und Betriebsrat – gilt für alle Mitarbeiter des Betriebs.
+### Mitbestimmung
+BetrVG | Betriebsverfassungsgesetz | Regelt die Mitbestimmung der Arbeitnehmer im Betrieb.
+Betriebsrat | Vertritt die Arbeitnehmer – möglich ab 5 ständigen Arbeitnehmern, Amtszeit 4 Jahre.
+JAV | Jugend- und Auszubildendenvertretung | Vertritt unter 18-Jährige und Azubis unter 25 – Amtszeit 2 Jahre.
+Betriebsratswahl | Wählen darf man ab 16 Jahren, gewählt werden ab 18 Jahren und 6 Monaten im Betrieb.
+Mitbestimmungsrecht | Stärkstes Recht: ohne Zustimmung des Betriebsrats keine Maßnahme, z. B. bei Arbeitszeit.
+Mitwirkungsrecht | Informations-, Anhörungs- und Beratungsrecht – der Arbeitgeber entscheidet aber allein.
+Betriebsversammlung | Versammlung aller Arbeitnehmer einmal pro Quartal mit Bericht des Betriebsrats.
+Einigungsstelle | Schlichtet Streit zwischen Arbeitgeber und Betriebsrat, mit unparteiischem Vorsitz.
+### Tarifrecht
+Tarifvertrag | Vertrag zwischen Gewerkschaft und Arbeitgeber(verband) über Lohn, Arbeitszeit, Urlaub.
+Manteltarifvertrag | Regelt allgemeine Arbeitsbedingungen wie Arbeitszeit und Urlaub – lange Laufzeit.
+Lohn- und Gehaltstarifvertrag | Regelt die Höhe der Vergütung – kurze Laufzeit (ca. 1–2 Jahre).
+Tarifautonomie | Tarifparteien handeln Tarifverträge ohne Einmischung des Staates aus (Art. 9 GG).
+Tarifverhandlung | Verhandlung zwischen Gewerkschaft und Arbeitgebern über einen neuen Tarifvertrag.
+Friedenspflicht | Während der Laufzeit eines Tarifvertrags sind Streiks verboten.
+Arbeitskampf | Streik der Arbeitnehmer oder Aussperrung durch die Arbeitgeber.
+Streik | Gemeinsame Arbeitsniederlegung, organisiert von der Gewerkschaft (Urabstimmung, meist 75 %).
+Aussperrung | Arbeitgeber schließt Arbeitnehmer von Arbeit und Lohn aus.
+Schlichtung | Ein neutraler Schlichter vermittelt, wenn Verhandlungen scheitern.
+Tarifbindung | Tarifvertrag gilt für Mitglieder der Tarifparteien.
+Allgemeinverbindlichkeitserklärung | Staat erklärt einen Tarifvertrag für die ganze Branche gültig.
+Geltungsbereich eines Tarifvertrags | Räumlich, fachlich, persönlich und zeitlich (Laufzeit).
+Arbeitgeberverband | Zusammenschluss von Arbeitgebern – Tarifpartner der Gewerkschaften.
+Gewerkschaft | Zusammenschluss von Arbeitnehmern zur Vertretung ihrer Interessen.
+### Entgelt
+Zeitlohn | Bezahlung nach Arbeitszeit.
+Leistungslohn | Akkord- oder Prämienlohn nach erbrachter Leistung.
+Bruttolohn | Lohn vor allen Abzügen.
+Nettolohn | Brutto − Steuern − Sozialabgaben = Auszahlungsbetrag.
+Lohnsteuer | Einkommensteuer auf Arbeitslohn – abhängig von der Steuerklasse.
+Kirchensteuer | 8 % (Bayern, BW) bzw. 9 % der Lohnsteuer für Kirchenmitglieder.
+Solidaritätszuschlag | 5,5 % der Lohnsteuer – heute nur noch bei hohen Einkommen.
+Sozialabgaben | Beiträge zu Kranken-, Pflege-, Renten- und Arbeitslosenversicherung – etwa halb AG, halb AN.
+VL | Vermögenswirksame Leistungen | Zuschuss des Arbeitgebers zum Sparen, z. B. Bausparvertrag.
+Sozialversicherung | 5 Zweige: Kranken-, Pflege-, Renten-, Arbeitslosen- und Unfallversicherung.
+Unfallversicherung | Zahlt allein der Arbeitgeber – Träger sind die Berufsgenossenschaften.
+Träger der Sozialversicherung | Krankenkassen, Pflegekassen, Rentenversicherung, Bundesagentur für Arbeit, Berufsgenossenschaften.
+### Weiterbildung und Lernen
+Erhaltungsfortbildung | Hält das Wissen auf aktuellem Stand.
+Anpassungsfortbildung | Passt Kenntnisse an neue Anforderungen an.
+Aufstiegsfortbildung | Qualifiziert für höhere Positionen, z. B. Techniker oder Meister.
+Aufstiegs-BAföG | Staatliche Förderung für Aufstiegsfortbildungen.
+Lerntypen | Visuell (sehen), auditiv (hören), motorisch (tun), kommunikativ (besprechen).
+Zeitmanagement | Planung der eigenen Zeit, z. B. Eisenhower-Prinzip oder ALPEN-Methode.
+Moderation | Leitung einer Besprechung oder Gruppenarbeit durch einen neutralen Moderator.
+CBT | Computer Based Training | Lernprogramm offline am Computer.
+WBT | Web Based Training | Lernprogramm online über das Internet.
+Europass | EU-Dokumente, die Qualifikationen europaweit vergleichbar machen.
+Erasmus+ | EU-Mobilitätsprogramm, z. B. für ein Auslandspraktikum in der Ausbildung.
+Europäische Sozialcharta | Vertrag des Europarats, der soziale Grundrechte garantiert.
+Potenzialanalyse | Ermittelt Stärken und Entwicklungsmöglichkeiten einer Person.
+Existenzgründung | Sich selbstständig machen – Chance: Freiheit; Risiko: Kapital, Haftung, Unsicherheit.
+
+## k3-org | Aufbau & Organisation des Betriebs
+### Wirtschaft und Märkte
+Primärer Sektor | Urproduktion: Land- und Forstwirtschaft, Fischerei, Bergbau.
+Sekundärer Sektor | Verarbeitung: Industrie und Handwerk.
+Tertiärer Sektor | Dienstleistungen, z. B. Handel, Banken, IT.
+Globalisierung | Weltweite Verflechtung von Wirtschaft, Politik und Kultur.
+Soziale Marktwirtschaft | Freier Markt mit staatlichem sozialem Ausgleich.
+Erwerbswirtschaftlicher Betrieb | Betrieb, der nach Gewinn strebt.
+Arbeitsteilung | Aufteilung der Arbeit auf Personen, Betriebe oder Länder.
+### Rechtsformen
+GbR | Gesellschaft bürgerlichen Rechts | Mind. 2 Gesellschafter, kein Mindestkapital, unbeschränkte Haftung.
+Einzelunternehmung | Ein Inhaber, haftet unbeschränkt mit seinem Privatvermögen.
+OHG | Offene Handelsgesellschaft | Alle Gesellschafter haften unbeschränkt und solidarisch.
+KG | Kommanditgesellschaft | Komplementär haftet unbeschränkt, Kommanditist nur mit seiner Einlage.
+GmbH & Co. KG | KG, bei der eine GmbH Komplementär ist – Haftung praktisch beschränkt.
+GmbH | Gesellschaft mit beschränkter Haftung | Stammkapital mind. 25.000 € – Haftung nur mit dem Gesellschaftsvermögen.
+UG (haftungsbeschränkt) | Unternehmergesellschaft | „Mini-GmbH“ ab 1 € Stammkapital.
+AG | Aktiengesellschaft | Grundkapital mind. 50.000 € – Organe: Vorstand, Aufsichtsrat, Hauptversammlung.
+Gemeinnützige Organisation | Verfolgt das Gemeinwohl statt Gewinn, z. B. e. V. oder gGmbH.
+### Unternehmensstruktur
+Einliniensystem | Jeder hat genau einen Vorgesetzten – klare, aber lange Wege.
+Mehrliniensystem | Mitarbeiter haben mehrere Fachvorgesetzte.
+Stabliniensystem | Einliniensystem plus beratende Stabsstellen ohne Weisungsbefugnis.
+Spartenorganisation | Gliederung nach Produkten oder Regionen (Divisionen).
+Matrixorganisation | Kombination aus Funktionen und Sparten – jeder hat zwei Vorgesetzte.
+Arbeitsablauf | Reihenfolge der Arbeitsschritte zur Erfüllung einer Aufgabe.
+### Wirtschaftliche Verflechtungen
+Konzern | Rechtlich selbstständige Unternehmen unter einheitlicher Leitung.
+Kartell | Absprache selbstständiger Unternehmen, z. B. über Preise – grundsätzlich verboten.
+Fusion | Verschmelzung von Unternehmen – mindestens eines verliert seine Selbstständigkeit.
+Bundeskartellamt | Überwacht den Wettbewerb und prüft Fusionen.
+### Unternehmensziele
+Produktivität | Ausbringungsmenge ÷ Einsatzmenge (mengenmäßig).
+Wirtschaftlichkeit | Ertrag ÷ Aufwand (wertmäßig) – über 1 ist gut.
+Rentabilität | Gewinn ÷ eingesetztes Kapital × 100.
+Zielkonflikt | Ziele behindern sich gegenseitig, z. B. Gewinn vs. Umweltschutz.
+Zielharmonie | Ziele fördern sich gegenseitig.
+### Interessenvertretungen
+Arbeitnehmerverbände | Vertreten Arbeitnehmerinteressen – vor allem Gewerkschaften.
+Wirtschaftsorganisationen | Vertreten Unternehmensinteressen, z. B. Kammern und Branchenverbände.
+Berufsständische Vertretung | Kammern bestimmter Berufe, z. B. Handwerkskammer, Ärztekammer.
+Prüfungsausschuss | Ehrenamtliche Prüfer (Arbeitgeber, Arbeitnehmer, Lehrer) nehmen die Abschlussprüfung ab.
+Behörden | Erfüllen öffentliche Aufgaben, z. B. Finanzamt, Gewerbeaufsicht, Agentur für Arbeit.
+Vertrauensvolle Zusammenarbeit | BetrVG-Grundsatz: Arbeitgeber und Betriebsrat arbeiten zum Wohl aller zusammen.
+Personalvertretungsgesetz | Wie das BetrVG, aber für den öffentlichen Dienst (Personalrat).
+
+## k3-safe | Sicherheit & Gesundheitsschutz
+### Vorschriften
+ASiG | Arbeitssicherheitsgesetz | Pflicht zur Bestellung von Betriebsärzten und Fachkräften für Arbeitssicherheit.
+BetrSichV | Betriebssicherheitsverordnung | Regelt die sichere Bereitstellung und Nutzung von Arbeitsmitteln.
+UVV | Unfallverhütungsvorschriften | Vorschriften der Berufsgenossenschaften zur Unfallverhütung.
+Bildschirmarbeitsplatz | Heute in der ArbStättV geregelt: Ergonomie, Pausen, Augenuntersuchung.
+Gewerbeaufsicht | Staatliche Aufsichtsbehörde für den Arbeitsschutz.
+Berufsgenossenschaft | Träger der Unfallversicherung – erlässt UVV und kontrolliert die Betriebe.
+### Gefährdungen
+Gefährdungsarten | Mechanisch, elektrisch, thermisch, chemisch, ergonomisch, akustisch, psychisch.
+Gefährdungsbeurteilung | Arbeitgeber ermittelt die Gefahren am Arbeitsplatz und legt Maßnahmen fest.
+Fürsorgepflicht | Arbeitgeber muss Leben und Gesundheit seiner Mitarbeiter schützen.
+Gefahren melden | Arbeitnehmer müssen erkannte Gefahren sofort melden.
+### Gesundheitsschutz
+Ergonomischer Arbeitsplatz | Verstellbarer Tisch und Stuhl, blendfreier Bildschirm auf Augenhöhe, gutes Licht.
+Vorsorgeuntersuchung | z. B. Augenuntersuchung bei Bildschirmarbeit – muss angeboten werden.
+Sicherheitsbeauftragter | Unterstützt ehrenamtlich den Arbeitsschutz – Pflicht ab mehr als 20 Beschäftigten.
+Fachkraft für Arbeitssicherheit | Berät den Arbeitgeber in allen Fragen des Arbeitsschutzes.
+### Sicherheitsvorkehrungen
+IP-Schutzart | Ingress Protection | Schutz gegen Fremdkörper (1. Ziffer) und Wasser (2. Ziffer), z. B. IP67.
+Schutzklasse I | Schutz durch Schutzleiter (Erdung), z. B. PC-Netzteil.
+Schutzklasse II | Schutzisolierung (doppelt isoliert) – Symbol: zwei Quadrate.
+Schutzklasse III | Schutzkleinspannung: max. 50 V Wechsel- bzw. 120 V Gleichspannung.
+CE-Zeichen | Hersteller erklärt die Einhaltung der EU-Richtlinien – kein Prüfsiegel!
+GS-Zeichen | Geprüfte Sicherheit | Freiwilliges Prüfzeichen einer unabhängigen Prüfstelle.
+Fluchtweg | Gekennzeichneter Weg ins Freie oder in einen sicheren Bereich.
+Sammelplatz | Ort, an dem sich alle nach einer Evakuierung treffen.
+Farben der Sicherheitszeichen | Rot = Verbot/Brandschutz, Gelb = Warnung, Blau = Gebot, Grün = Rettung.
+Notausgang | Ausgang für Notfälle – immer frei halten, von innen leicht zu öffnen.
+### Brandschutz
+Brandklasse A | Feste Stoffe, z. B. Holz, Papier, Textilien.
+Brandklasse B | Flüssige oder flüssig werdende Stoffe, z. B. Benzin, Wachs, Kunststoff.
+Brandklasse C | Gase, z. B. Propan, Erdgas.
+Brandklasse D | Metalle, z. B. Magnesium, Aluminium.
+Brandklasse F | Speiseöle und -fette.
+CO₂-Löscher | Für Brandklasse B – geeignet für Elektro- und IT-Geräte, löscht rückstandsfrei.
+Brandschutzordnung | Regelt Brandverhütung und das Verhalten im Brandfall (Teile A, B, C).
+Brandursachen | z. B. defekte Elektrogeräte, überlastete Steckdosen, offenes Feuer.
+Verhalten im Brandfall | Ruhe bewahren, melden, in Sicherheit bringen (kein Aufzug, Türen schließen), dann löschen.
+Löschdecke | Erstickt kleine Brände, z. B. brennende Kleidung.
+Brandmeldung | Notruf 112: Wo? Was? Wie viele Verletzte? Welche Verletzungen? Auf Rückfragen warten.
+### Erste Hilfe
+Ersthelfer | Ausgebildete Mitarbeiter – ab 2 Beschäftigten Pflicht, 5–10 % der Belegschaft.
+Notruf | 112 = Feuerwehr und Rettungsdienst, 110 = Polizei.
+Meldekette | Festgelegte Reihenfolge, wer im Notfall informiert wird.
+Meldepflichtiger Arbeitsunfall | Mehr als 3 Tage arbeitsunfähig → Meldung an die Berufsgenossenschaft.
+Verbandbuch | Dokumentiert jede Erste-Hilfe-Leistung, auch kleine Verletzungen.
+Evakuierung | Geordnetes Räumen des Gebäudes zum Sammelplatz – danach Vollzähligkeit prüfen.
+### IT-Sicherheit am Arbeitsplatz
+Aufgaben des BSI | Warnt vor Gefahren, gibt den IT-Grundschutz heraus, berät Behörden, Firmen und Bürger.
+Ziele der DSGVO | Schutz personenbezogener Daten und freier Datenverkehr in der EU.
+Grundsätze der DSGVO | Rechtmäßigkeit, Zweckbindung, Datenminimierung, Richtigkeit, Speicherbegrenzung, Vertraulichkeit.
+IT-Sicherheitskonzept | Dokument mit Schutzbedarf, Risiken und Maßnahmen für die IT eines Betriebs.
+Clean Desk | Keine vertraulichen Unterlagen offen liegen lassen, Bildschirm beim Verlassen sperren.
+
+## k3-env | Umweltschutz
+### Ressourcenmanagement
+Rationelle Energieverwendung | Energie sparsam und effizient einsetzen.
+Regenerative Energien | Erneuerbar: Sonne, Wind, Wasser, Biomasse, Erdwärme.
+Unnötige Gerätelaufzeiten | Geräte ausschalten statt Standby, Energiesparmodus nutzen.
+Umgang mit Printmedien | Nur Nötiges drucken, doppelseitig, Recyclingpapier.
+Rohstoffe | Hauptbestandteil eines Produkts, z. B. Holz beim Tisch.
+Hilfsstoffe | Nebenbestandteil eines Produkts, z. B. Leim oder Schrauben.
+Betriebsstoffe | Gehen nicht ins Produkt ein, halten die Produktion am Laufen – z. B. Strom, Schmieröl.
+Nachhaltiger Einkauf | Produkte und Lieferanten nach Umwelt- und Sozialkriterien auswählen.
+### Abfallwirtschaft
+Recycling | Wiederverwertung von Abfällen als neuer Rohstoff.
+Abfalltrennung | Getrennt sammeln: Papier, Glas, Verpackungen, Restmüll, Elektroschrott.
+Duales System | Privatwirtschaftliche Entsorgung von Verpackungen (Gelber Sack, Grüner Punkt).
+Abfallhierarchie | Vermeiden > Wiederverwenden > Recyceln > Verwerten > Beseitigen.
+ElektroG | Elektro- und Elektronikgerätegesetz | Regelt Rücknahme und Entsorgung von Elektroschrott.
+Datenträgerentsorgung | Vorher sicher löschen oder physisch vernichten (DIN 66399).
+### Rechtliches
+BImSchG | Bundes-Immissionsschutzgesetz | Schutz vor schädlichen Umwelteinwirkungen wie Lärm und Abgasen.
+TA Lärm / TA Luft | Technische Anleitung | Verwaltungsvorschriften mit Grenzwerten für Lärm bzw. Luftschadstoffe.
+Folgen von Umweltverstößen | Bußgelder, Strafen, Schadensersatz, bis zur Betriebsstilllegung.
+### Risiken der IT
+USV | Unterbrechungsfreie Stromversorgung | Überbrückt Stromausfälle per Akku – Akkus sind Gefahrstoff und Brandrisiko.
+### Nachhaltigkeit
+Nachhaltigkeit | Ökologisch, ökonomisch und sozial so handeln, dass auch künftige Generationen gut leben können.
+
+## k3-digi | Vernetztes Zusammenarbeiten
+### Kommunikation
+Interdisziplinarität | Zusammenarbeit von Personen verschiedener Fachrichtungen.
+Interkulturalität | Zusammenarbeit verschiedener Kulturen – mit Offenheit und Respekt.
+Netiquette | Verhaltensregeln für die Kommunikation im Internet.
+Dienstliche E-Mails | Keine unbekannten Anhänge oder Links öffnen, sachlich und vertraulich schreiben.
+CC | Carbon Copy | Kopie – alle Empfänger sehen sich gegenseitig.
+BCC | Blind Carbon Copy | Blindkopie – Empfänger sind für andere unsichtbar (Datenschutz bei Verteilern).
+### Risiken
+Social-Media-Gefahren | z. B. Datenmissbrauch, Fake News, Cybermobbing, Rufschädigung.
+Social Engineering | Menschen manipulieren, um an vertrauliche Informationen zu kommen.
+Äußerungen über den Arbeitgeber | Rufschädigende Posts können zu Abmahnung oder Kündigung führen.
+Sicherheitsbewusstsein | Achtsam mit Gefahren umgehen, z. B. starke Passwörter, Updates, Vorsicht bei Mails.
+### Werte und Richtlinien
+Ethik | Grundsätze für moralisch richtiges Handeln.
+Compliance-Regelungen | Interne Richtlinien, damit Gesetze und Werte eingehalten werden.
+Diversity | Vielfalt der Belegschaft wertschätzen und fördern.
+Gender-Neutralität | Gleichbehandlung und geschlechtergerechte Sprache, unabhängig vom Geschlecht.
+Code of Conduct | Verhaltenskodex mit den Werten und Ethikregeln eines Unternehmens.
