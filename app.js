@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Karteikarten AP2 – Offline-Lernapp mit Fächer-System (−5 … 0 … +5)
+   GossensBesterMann – Offline-Lernapp mit Fächer-System (−5 … 0 … +5)
    Daten liegen ausschließlich lokal im Browser-Speicher des Geräts.
    ========================================================================== */
 'use strict';
@@ -1303,7 +1303,7 @@ function renderSettings() {
     <div class="list">
       <button class="row destructive" data-action="wipe"><div class="row-main"><div class="row-title">Alle Daten löschen</div></div></button>
     </div>
-    <p class="footnote">Karteikarten AP2 · funktioniert vollständig offline · keine Daten verlassen dein Gerät (außer beim Diktieren, falls kein Offline-Sprachpaket installiert ist).</p>
+    <p class="footnote">GossensBesterMann · funktioniert vollständig offline · keine Daten verlassen dein Gerät (außer beim Diktieren, falls kein Offline-Sprachpaket installiert ist).</p>
   </div>`;
   updatePersistStatus();
 }
@@ -2170,7 +2170,7 @@ function startSession(spec) {
 
 async function exportBackup() {
   const json = JSON.stringify({ app: 'karteikarten-ap2', version: 1, exported: new Date().toISOString(), data: DB }, null, 2);
-  const name = `karteikarten-ap2-backup-${dayKey()}.json`;
+  const name = `gossensbestermann-backup-${dayKey()}.json`;
   const file = new File([json], name, { type: 'application/json' });
   const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
   let how = 'download';
@@ -2187,7 +2187,7 @@ async function exportBackup() {
   }
   try {
     if (how === 'share') {
-      await navigator.share({ files: [file], title: 'Karteikarten-Backup' });
+      await navigator.share({ files: [file], title: 'GossensBesterMann-Backup' });
     } else {
       const url = URL.createObjectURL(file);
       const a = document.createElement('a');

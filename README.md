@@ -1,4 +1,4 @@
-# Karteikarten AP2
+# GossensBesterMann
 
 Offline-Karteikarten-App für die Abschlussprüfung, im Apple-Design, für dein Smartphone (installierbare Web-App/PWA).
 
