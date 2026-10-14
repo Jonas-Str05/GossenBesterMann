@@ -1227,6 +1227,34 @@ const TABS = [
   ['stats', 'Statistik', ICON.stats],
 ];
 
+// Große Überschrift so verkleinern, dass sie mittig zwischen die Knöpfe passt (lange Kategorienamen).
+// --r = Verhältnis groß/klein, --ri = 1/--r → die Verwandlung beim Scrollen bleibt passgenau.
+let measureCtx = null;
+function fitMorphTitle(view) {
+  const nt = view && view.querySelector('.navbar.morph .nav-title');
+  if (!nt) return;
+  const text = nt.querySelector('.nt-big').textContent;
+  measureCtx = measureCtx || document.createElement('canvas').getContext('2d');
+  measureCtx.font = `700 34px ${getComputedStyle(document.body).fontFamily}`;
+  const natural = measureCtx.measureText(text).width * 0.98; // letter-spacing −0,022em
+  const W = $('#app').clientWidth || window.innerWidth;
+  const avail = W - 2 * (6 + 50) - 8;
+  const f = clamp(avail / Math.max(natural, 1), 0.5, 1);
+  const r = 2 * f;
+  nt.style.setProperty('--fs', `${(34 * f).toFixed(1)}px`);
+  nt.style.setProperty('--r', r.toFixed(4));
+  nt.style.setProperty('--ri', (1 / r).toFixed(4));
+  nt.style.maxWidth = `${avail}px`;
+}
+function setMorphTitle(view, title) {
+  const nt = view && view.querySelector('.navbar.morph .nav-title');
+  if (!nt) return;
+  for (const s of nt.children) s.textContent = title;
+  fitMorphTitle(view);
+}
+// Zurück-Knopf der Unterseiten: nur der Pfeil
+const backBtn = (action) => `<button class="icon-btn back-arrow" data-action="${action}" aria-label="Zurück">${ICON.chev}</button>`;
+
 function navbar(title, { left = '', right = '', morph = false } = {}) {
   // morph: große Überschrift steht mittig in der Leiste und wird beim Scrollen zur kleinen
   return `<header class="navbar ${morph ? 'morph' : ''}"><div class="navbar-inner">
@@ -1339,7 +1367,8 @@ function pushPage(page, { onClosed, onBack } = {}) {
     show() {
       page.classList.add('active', 'page');
       page.scrollTop = 0;
-      page.classList.remove('scrolled');
+      updateScroll(page);
+      fitMorphTitle(page);
       sp.set(W);
       requestAnimationFrame(() => { if (!hiding) sp.to(0); });
     },
@@ -1545,9 +1574,9 @@ function initCardsView() {
   v.innerHTML = `${navbar('Alle Karten', {
     left: '<span id="cards-nav-left"></span>',
     right: cardsNavRight(),
+    morph: true,
   })}
-  <div class="content">
-    <h1 class="large-title" id="cards-title">Alle Karten</h1>
+  <div class="content morph-content">
     <div class="add-wide"><button class="btn-tinted" data-action="new-card">${ICON.plus}<span>Karte hinzufügen</span></button></div>
     <div class="chips" id="card-chips"></div>
     <div class="chips sub" id="card-subchips" hidden></div>
@@ -1788,7 +1817,7 @@ function renderCardsNavLeft() {
   const slot = $('#cards-nav-left');
   if (slot) slot.innerHTML = UI.select
     ? '<button class="nav-btn bold" data-action="toggle-select">Fertig</button>'
-    : `<button class="nav-btn back" data-action="cards-back">${ICON.chev}<span>Karten</span></button>`;
+    : backBtn('cards-back');
 }
 const cardsPageMode = () => UI.cardsPageCat || UI.cardsLevel != null;
 const cardsPageTitle = () => (UI.cardsLevel != null ? `Ebene ${fmtLevel(UI.cardsLevel)}`
@@ -1805,10 +1834,7 @@ function setSelectMode(on, firstId = null) {
 
 function renderSelectBar() {
   const n = UI.selected.size;
-  const t = $('#cards-title');
-  if (t) t.textContent = UI.select ? (n ? `${n} ausgewählt` : 'Auswählen') : cardsPageTitle();
-  const nt = $('#view-cards .nav-title');
-  if (nt) nt.textContent = cardsPageTitle();
+  setMorphTitle($('#view-cards'), UI.select ? (n ? `${n} ausgewählt` : 'Auswählen') : cardsPageTitle());
   $('#select-bar').innerHTML = `
     <button data-action="bulk-move" ${n ? '' : 'disabled'}>${ICON.move}<span>Kategorie</span></button>
     <button data-action="bulk-level" ${n ? '' : 'disabled'}>${ICON.reset}<span>Ebene</span></button>
@@ -2014,9 +2040,8 @@ function renderSettings() {
       <label class="switch"><input type="checkbox" data-setting="${key}" ${s[key] ? 'checked' : ''} aria-label="${esc(label)}"><span></span></label>
     </div>`;
 
-  v.innerHTML = navbar('Einstellungen', { left: `<button class="nav-btn back" data-action="settings-back">${ICON.chev}<span>${esc((TABS.find((t) => t[0] === UI.tab) || TABS[0])[1])}</span></button>` }) + `
-  <div class="content">
-    <h1 class="large-title">Einstellungen</h1>
+  v.innerHTML = navbar('Einstellungen', { left: backBtn('settings-back'), morph: true }) + `
+  <div class="content morph-content">
 
     <div class="section-header" style="margin-top:8px">Design</div>
     <div class="segmented" role="radiogroup" aria-label="Design">
@@ -5135,6 +5160,8 @@ function boot() {
       if (UI.tab === 'stats') renderStats(); else UI.statsDirty = true;
     }, 200);
   });
+
+  window.addEventListener('resize', () => { for (const v of $$('.view')) fitMorphTitle(v); });
 
   // GitHub-Backup: beim Verlassen der App sofort sichern, beim Start Ausstehendes nachholen
   document.addEventListener('visibilitychange', () => { if (document.hidden) GH.flush(); });

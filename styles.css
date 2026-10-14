@@ -162,19 +162,23 @@ svg { display: block; }
   transform-origin: 50% 50%;
   will-change: transform, opacity;
 }
+.navbar.morph .nav-title { min-width: 0; }
+.navbar.morph .nav-title > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .navbar.morph .nt-big {
-  font-size: 34px;
+  font-size: var(--fs, 34px);
   line-height: 1.12;
   font-weight: 700;
   letter-spacing: -.022em;
-  transform: scale(calc(1 - .5 * var(--morph, 0)));
+  transform: scale(calc(1 - (1 - var(--ri, .5)) * var(--morph, 0)));
   opacity: clamp(0, calc(1 - (var(--morph, 0) - .25) / .5), 1);
 }
 .navbar.morph .nt-small {
-  transform: scale(calc(2 - var(--morph, 0)));
+  transform: scale(calc(var(--r, 2) - (var(--r, 2) - 1) * var(--morph, 0)));
   opacity: clamp(0, calc((var(--morph, 0) - .25) / .5), 1);
 }
 .morph-content { padding-top: 10px; }
+/* Zurück auf Unterseiten: nur der Pfeil */
+.icon-btn.back-arrow svg { width: 24px; height: 24px; transform: scaleX(-1); stroke-width: 2.6; }
 .nav-left { justify-self: start; display: flex; }
 .nav-right { justify-self: end; display: flex; align-items: center; }
 
