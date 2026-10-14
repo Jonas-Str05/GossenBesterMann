@@ -1799,7 +1799,7 @@ function renderCategories() {
     <div class="list icons">
       <button class="row" data-action="auto-distribute">
         ${rowIcon(ICON.sparkles, 'purple')}
-        <div class="row-main"><div class="row-title">Automatisch verteilen</div><div class="row-sub">${inboxN ? `${plural(inboxN, 'unsortierte Karte', 'unsortierte Karten')} zuordnen` : 'Passende Kategorie vorschlagen lassen'}</div></div>${chev}
+        <div class="row-main"><div class="row-title">Automatisch verteilen</div><div class="row-sub">${inboxN ? `${plural(inboxN, 'unsortierte Karte', 'unsortierte Karten')} zuordnen` : 'Keine unsortierten Karten'}</div></div>${chev}
       </button>
       <button class="row" data-action="manual-distribute">
         ${rowIcon(ICON.hand, 'blue')}
@@ -2340,8 +2340,7 @@ function problemBlock(sc) {
           <div class="row-main"><div class="row-title clamp1">${esc(c.front)}</div><div class="row-sub">${c.wrong}× nicht gewusst von ${n} · ${pctOf(c.right, n)} % Quote</div></div>${chev}
         </button>`;
       }).join('')}
-    </div>
-    <div class="btn-stack"><button class="btn-tinted" data-action="learn-problems" data-scope="${esc(sc.key)}">${ICON.flame}<span>Problemkarten lernen</span></button></div>`
+    </div>`
     : '<p class="footnote" style="margin-top:0">Noch keine Problemkarten – hier landen Karten, die du mindestens zweimal und überwiegend nicht gewusst hast.</p>'}`;
 }
 
@@ -2796,8 +2795,7 @@ function openCategoryStats(cat) {
       ${activityBlock(sc, 30)}
       ${problemBlock(sc)}
       <div class="btn-stack">
-        <button class="btn-primary" data-cs="learn">${ICON.learn}<span>Kategorie lernen</span></button>
-        <button class="btn-plain" data-cs="show">Karten anzeigen</button>
+        <button class="btn-tinted" data-cs="show">Karten anzeigen</button>
       </div>`,
     onMount: (sh) => bindCharts(sh.body),
   });
@@ -2805,8 +2803,7 @@ function openCategoryStats(cat) {
     const b = e.target.closest('[data-cs]');
     if (!b) return;
     sheet.close();
-    if (b.dataset.cs === 'learn') startSession({ type: 'category', categoryId: cat.id, label: catPath(cat) });
-    else openCardsPage(cat.id);
+    openCardsPage(cat.id);
   });
 }
 
@@ -3156,7 +3153,6 @@ function openCategoryEditor(cat = null, opts = {}) {
           <div class="mini-bars" aria-label="Verteilung über die Ebenen">${LEVELS.map((l) => `<span style="height:${counts[l] ? Math.max(10, (counts[l] / maxC) * 100) : 8}%;${counts[l] ? `background:${levelColor(l)}` : ''}"></span>`).join('')}</div>
         </div>
         <div class="btn-stack">
-          ${cs.length ? `<button class="btn-primary" type="button" data-ce="learn">${ICON.learn}<span>Diese Kategorie lernen</span></button>` : ''}
           <button class="btn-plain" type="button" data-ce="show">Karten anzeigen</button>
           <button class="btn-plain" type="button" data-ce="add">Karte hinzufügen</button>
           ${isInbox ? '' : '<button class="btn-plain destructive" type="button" data-ce="delete">Kategorie löschen</button>'}
@@ -3245,7 +3241,6 @@ function openCategoryEditor(cat = null, opts = {}) {
     const b = e.target.closest('[data-ce]');
     if (!b) return;
     const act = b.dataset.ce;
-    if (act === 'learn') { sheet.close(); startSession({ type: 'category', categoryId: cat.id, label: cat.name }); }
     if (act === 'show') { sheet.close(); openCardsPage(cat.id); }
     if (act === 'add') { sheet.close(); openCardEditor(null, { categoryId: cat.id }); }
     if (act === 'delete') {
@@ -3297,7 +3292,6 @@ function openGroupEditor(group = null) {
       ${group ? `
         <div class="form-label">${plural(kids.length, 'Kategorie', 'Kategorien')} · ${plural(cs.length, 'Karte', 'Karten')}</div>
         <div class="btn-stack" style="margin-top:0">
-          ${cs.length ? `<button class="btn-primary" type="button" data-ge="learn">${ICON.learn}<span>Ganzen Bereich lernen</span></button>` : ''}
           <button class="btn-plain" type="button" data-ge="add">Kategorie hinzufügen</button>
           <button class="btn-plain destructive" type="button" data-ge="delete">Bereich auflösen</button>
         </div>
@@ -3346,7 +3340,6 @@ function openGroupEditor(group = null) {
     const b = e.target.closest('[data-ge]');
     if (!b) return;
     const act = b.dataset.ge;
-    if (act === 'learn') { sheet.close(); startSession({ type: 'group', groupId: group.id, label: group.name }); }
     if (act === 'add') { sheet.close(); openCategoryEditor(null, { parentId: group.id }); }
     if (act === 'delete') {
       const ok = await confirmDialog({ title: `„${group.name}“ auflösen?`, message: 'Kategorien und Karten bleiben erhalten.', confirm: 'Auflösen', destructive: true });
@@ -3375,13 +3368,13 @@ function openAutoDistribute() {
     });
     return;
   }
-  let scope = cardsIn('inbox').length ? 'inbox' : 'all';
+  // nur unsortierte Karten – bereits verteilte bleiben, wo sie sind
   let proposals = [];
   const off = new Set();
 
   const compute = () => {
     const model = buildModel();
-    const pool = scope === 'inbox' ? cardsIn('inbox') : DB.cards;
+    const pool = cardsIn('inbox');
     proposals = [];
     for (const card of pool) {
       const s = suggestCategory(`${card.front} ${card.back} ${card.hint}`, model, card);
@@ -3391,24 +3384,19 @@ function openAutoDistribute() {
   };
 
   const render = (sheet) => {
-    const pool = scope === 'inbox' ? cardsIn('inbox') : DB.cards;
+    const pool = cardsIn('inbox');
     const n = proposals.filter((p) => !off.has(p.card.id)).length;
     sheet.body.innerHTML = `
-      <div class="segmented" style="margin-top:6px">
-        <button class="${scope === 'inbox' ? 'on' : ''}" data-scope="inbox">Nur Unsortiert</button>
-        <button class="${scope === 'all' ? 'on' : ''}" data-scope="all">Alle Karten</button>
-      </div>
       ${proposals.length ? `
         <div class="list-meta"><span>${plural(proposals.length, 'Vorschlag', 'Vorschläge')} für ${plural(pool.length, 'Karte', 'Karten')}</span></div>
         <div class="list">
           ${proposals.map((p) => {
             const to = catById(p.to);
-            const from = catById(p.card.categoryId);
             return `<button class="row" data-toggle="${esc(p.card.id)}">
               <span class="check ${off.has(p.card.id) ? '' : 'on'}">${ICON.check}</span>
               <div class="row-main">
                 <div class="row-title clamp1">${esc(p.card.front)}</div>
-                <div class="row-sub clamp1">${scope === 'all' ? `${esc(from.name)} → ` : ''}<span class="cat-dot" style="--c:var(--${to.color})"></span><b style="font-weight:600;color:var(--label)">${esc(to.name)}</b></div>
+                <div class="row-sub clamp1"><span class="cat-dot" style="--c:var(--${to.color})"></span><b style="font-weight:600;color:var(--label)">${esc(to.name)}</b></div>
               </div>
             </button>`;
           }).join('')}
@@ -3418,9 +3406,8 @@ function openAutoDistribute() {
         <div class="empty">
           <div class="empty-icon" style="background:color-mix(in srgb,var(--purple) 14%,transparent);color:var(--purple)">${ICON.sparkles}</div>
           <h2>Keine Vorschläge</h2>
-          <p>${scope === 'all' && pool.length ? 'Alles passt: Keine Karte müsste in eine andere Kategorie verschoben werden.' : pool.length ? 'Für diese Karten wurde keine eindeutig passende Kategorie gefunden. Ergänze Stichwörter bei deinen Kategorien oder ordne ein paar Karten manuell zu – daraus lernt die Verteilung.' : 'Hier gibt es keine Karten zum Verteilen.'}</p>
-        </div>`}
-      <p class="footnote">Vorschläge basieren auf den Stichwörtern deiner Kategorien und den Wörtern der Karten, die bereits darin liegen.</p>`;
+          <p>${pool.length ? 'Für diese Karten wurde keine eindeutig passende Kategorie gefunden. Ergänze Stichwörter bei deinen Kategorien oder ordne ein paar Karten manuell zu – daraus lernt die Verteilung.' : 'Keine unsortierten Karten.'}</p>
+        </div>`}`;
   };
 
   compute();
@@ -3431,8 +3418,6 @@ function openAutoDistribute() {
     onMount: (sh) => render(sh),
   });
   sheet.body.addEventListener('click', (e) => {
-    const sc = e.target.closest('[data-scope]');
-    if (sc) { scope = sc.dataset.scope; compute(); render(sheet); return; }
     const tg = e.target.closest('[data-toggle]');
     if (tg) {
       const id = tg.dataset.toggle;
@@ -4725,7 +4710,6 @@ function boot() {
   if (action) {
     history.replaceState(null, '', location.pathname);
     if (action === 'new') setTimeout(() => openCardEditor(), 50);
-    if (action === 'weak' && DB.cards.length) setTimeout(() => startSession({ type: 'weighted' }), 50);
   }
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {

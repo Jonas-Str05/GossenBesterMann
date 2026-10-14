@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.11.4 | Automatisch verteilen nur für unsortierte Karten, Lernen nur noch im Lernen-Tab |
 | 1.11.3 | Standardsortierung alphabetisch, „Bearbeiten“ in Kategorien entfernt |
 | 1.11.2 | Kein „0 % gewusst“ bei leeren Bereichen, Doppeltipp auf Bereich = neue Kategorie |
 | 1.11.1 | Sortierung „Zuletzt gelernt“, Ø Ebene unter „Alle Karten“, zwei Erklärtexte entfernt |

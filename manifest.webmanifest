@@ -17,7 +17,6 @@
     { "src": "icons/app-icon-v2-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Neue Karte", "url": "./?action=new", "icons": [{ "src": "icons/app-icon-v2-192.png", "sizes": "192x192" }] },
-    { "name": "Schwächen lernen", "url": "./?action=weak", "icons": [{ "src": "icons/app-icon-v2-192.png", "sizes": "192x192" }] }
+    { "name": "Neue Karte", "url": "./?action=new", "icons": [{ "src": "icons/app-icon-v2-192.png", "sizes": "192x192" }] }
   ]
 }
