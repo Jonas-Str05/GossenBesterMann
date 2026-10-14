@@ -208,7 +208,7 @@ function defaultDB() {
       voiceAutoNext: false,
       sessionSize: 20,
       lastCategory: 'inbox',
-      cardSort: 'new',
+      cardSort: 'alpha',
       installDismissed: false,
     },
     meta: { lastBackup: 0, created: Date.now() },
@@ -287,7 +287,7 @@ function normalize(d) {
     .filter((t) => t && t.card && (t.card.front || t.card.back) && +t.at >= trashLimit)
     .map((t) => ({ at: +t.at, cat: String(t.cat || ''), card: t.card }))
     .slice(-MAX_TRASH);
-  return {
+  const out = {
     version: 1,
     categories,
     cards,
@@ -297,6 +297,9 @@ function normalize(d) {
     settings: { ...def.settings, ...(d.settings && typeof d.settings === 'object' ? d.settings : {}) },
     meta: { ...def.meta, ...(d.meta && typeof d.meta === 'object' ? d.meta : {}) },
   };
+  // einmalig: Standardsortierung ist jetzt alphabetisch
+  if (!out.meta.sortAlpha) { out.settings.cardSort = 'alpha'; out.meta.sortAlpha = true; }
+  return out;
 }
 
 function loadDB() {
@@ -1311,8 +1314,7 @@ function openCardsPage(catId = null, { filter = null, select = false } = {}) {
   const input = $('#card-search');
   if (input) input.value = '';
   const right = $('#view-cards .nav-right');
-  right.innerHTML = `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>` +
-    (catId ? `<button class="nav-btn" data-action="edit-category" data-id="${esc(catId)}">Bearbeiten</button>` : '');
+  right.innerHTML = `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`;
   if (UI.select) setSelectMode(false);
   renderCardsNavLeft();
   renderCardsList();
@@ -1509,11 +1511,11 @@ function bindLongPress(list) {
 }
 
 const SORTS = {
+  alpha: ['Alphabetisch', (a, b) => a.front.localeCompare(b.front, 'de', { sensitivity: 'base' })],
   new: ['Neueste zuerst', (a, b) => b.created - a.created],
   weak: ['Schwächste zuerst', (a, b) => a.level - b.level || b.created - a.created],
   strong: ['Stärkste zuerst', (a, b) => b.level - a.level || b.created - a.created],
   recent: ['Zuletzt gelernt', (a, b) => (b.last || 0) - (a.last || 0) || b.created - a.created],
-  alpha: ['Alphabetisch', (a, b) => a.front.localeCompare(b.front, 'de', { sensitivity: 'base' })],
 };
 
 // Filter: 'all' | 'g:<Bereich-ID>' | 'g:none' (ohne Bereich) | <Kategorie-ID>
@@ -1535,7 +1537,7 @@ function filteredCards() {
   else if (f.startsWith('g:')) list = cardsInGroup(f.slice(2));
   else if (f !== 'all') list = list.filter((c) => c.categoryId === f);
   if (q) list = list.filter((c) => `${c.front}\n${c.back}\n${c.hint}`.toLowerCase().includes(q));
-  const sort = SORTS[DB.settings.cardSort] || SORTS.new;
+  const sort = SORTS[DB.settings.cardSort] || SORTS.alpha;
   return [...list].sort(sort[1]);
 }
 
@@ -1603,7 +1605,7 @@ function renderCardsList() {
     box.innerHTML = `
       <div class="list-meta"><span>${plural(list.length, 'Karte', 'Karten')}</span>
         ${sel ? `<button data-action="select-all">${list.every((c) => UI.selected.has(c.id)) ? 'Keine auswählen' : 'Alle auswählen'}</button>`
-              : `<button data-action="sort">${ICON.sort.replace('<svg', '<svg width="15" height="15"')}${SORTS[DB.settings.cardSort][0]}</button>`}
+              : `<button data-action="sort">${ICON.sort.replace('<svg', '<svg width="15" height="15"')}${(SORTS[DB.settings.cardSort] || SORTS.alpha)[0]}</button>`}
       </div>
       <div class="list">
         ${list.map((c) => {
