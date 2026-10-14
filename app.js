@@ -1449,7 +1449,6 @@ function renderLearn() {
           <div class="row-main"><div class="row-title">Gemerkte Karten</div><div class="row-sub">${plural(pinnedN, 'Karte', 'Karten')} zum Überarbeiten markiert</div></div>${chev}
         </button>
       </div>` : ''}
-      <p class="footnote">Gewusst → ein Fach nach oben, nicht gewusst → ein Fach nach unten. Neue Karten starten bei 0, der Bereich reicht von −5 bis +5.</p>
     `}
   </div>`;
 }
@@ -3234,7 +3233,6 @@ function openGroupEditor(group = null) {
         <div class="form-label">Name des Bereichs</div>
         <div class="field"><input type="text" data-g="name" value="${esc(group ? group.name : '')}" placeholder="z. B. Klausur 1: IT-Systemlösung" autocomplete="off" enterkeyhint="done"></div>
       </div>
-      <p class="footnote">Tipp: Mit „Klausur 1: …“ wird „Klausur 1“ als Kurzname in Filtern angezeigt.</p>
       <div class="form-label">Farbe</div>
       <div class="colors" id="g-colors"></div>
       ${group ? `
@@ -3244,7 +3242,7 @@ function openGroupEditor(group = null) {
           <button class="btn-plain" type="button" data-ge="add">Kategorie hinzufügen</button>
           <button class="btn-plain destructive" type="button" data-ge="delete">Bereich auflösen</button>
         </div>
-        <p class="footnote">Beim Auflösen bleiben alle Kategorien und Karten erhalten – sie landen unter „Weitere“.</p>` : ''}
+        ` : ''}
     </div>`;
 
   let sheet;
