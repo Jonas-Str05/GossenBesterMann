@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.12.2 | Android-Zurück wechselt erst in den Lernen-Tab |
 | 1.12.1 | Plus-Menü ohne Abbrechen, Plus im Lernen-Tab wie im Karten-Tab |
 | 1.12.0 | Langes Drücken auf eine Fach-Säule zeigt ihre Karten, Sortieren ohne Abbrechen |
 | 1.11.9 | Drei Erklärtexte im Karten-Tab entfernt |

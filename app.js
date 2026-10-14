@@ -534,7 +534,13 @@ function closeOverlay(o, opts) {
   if (i < 0) return;
   stack.splice(i, 1);
   o.hide(opts);
-  if (!stack.length && armed && !pendingBack) {
+  syncBackGuard();
+}
+// Zurück-Eintrag nötig, solange ein Overlay offen ist oder ein anderer Tab als „Lernen“ aktiv ist
+const needBackGuard = () => stack.length > 0 || UI.tab !== 'learn';
+function syncBackGuard() {
+  if (needBackGuard()) arm();
+  else if (armed && !pendingBack) {
     pendingBack = true;
     armed = false;
     history.back();
@@ -543,12 +549,13 @@ function closeOverlay(o, opts) {
 window.addEventListener('popstate', () => {
   if (pendingBack) {
     pendingBack = false;
-    if (stack.length) arm();
+    if (needBackGuard()) arm();
     return;
   }
   armed = false;
   const top = stack[stack.length - 1];
-  if (!top) return;
+  // ohne Overlay: erst zurück in den Lernen-Tab, erst dort schließt Zurück die App
+  if (!top) { if (UI.tab !== 'learn') setTab('learn'); return; }
   arm();
   if (top.onBack) top.onBack(); else closeOverlay(top);
 });
@@ -1229,6 +1236,7 @@ function setTab(t) {
   v.scrollTop = v._st || 0;
   v.classList.toggle('scrolled', v.scrollTop > 40);
   renderTabbar();
+  syncBackGuard();
 }
 
 function refresh() {
