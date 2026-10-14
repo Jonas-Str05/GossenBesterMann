@@ -1233,11 +1233,31 @@ button.bold { font-weight: 600; }
   border-radius: 22px;
   text-align: left;
   color: #fff;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--blue) 82%, #7EB6FF), var(--blue) 55%, color-mix(in srgb, var(--blue) 75%, var(--indigo)));
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--blue) 35%, transparent);
-  transition: transform .14s ease, box-shadow .2s ease;
+  cursor: pointer;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* zwei Farbverläufe übereinander – beim Moduswechsel blendet der obere weich ein/aus */
+  --hero-smart: linear-gradient(135deg, #FF9426 0%, #FF5E3A 50%, #EE3462 100%);
+  --hero-equal: linear-gradient(135deg, #1FB0A8 0%, #1E8FDB 50%, #3462E6 100%);
+  background: var(--hero-smart);
+  box-shadow: 0 10px 28px rgba(255, 94, 77, .35);
+  transition: transform .14s ease, box-shadow .45s ease;
+  -webkit-user-select: none;
+  user-select: none;
 }
-.hero-learn:active { transform: scale(.98); box-shadow: 0 4px 14px color-mix(in srgb, var(--blue) 30%, transparent); }
+.hero-learn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--hero-equal);
+  opacity: 0;
+  transition: opacity .45s ease;
+}
+.hero-learn[data-mode="equal"]::before { opacity: 1; }
+.hero-learn[data-mode="equal"] { box-shadow: 0 10px 28px rgba(42, 140, 232, .35); }
+.hero-learn:active:not(:has(.hero-mode:active)) { transform: scale(.98); }
 .hero-learn-text b { display: block; font-size: 26px; font-weight: 700; letter-spacing: -.022em; line-height: 1.15; }
 .hero-learn-text span { display: block; font-size: 14px; opacity: .85; margin-top: 3px; }
 .hero-learn-play {
@@ -1249,6 +1269,50 @@ button.bold { font-weight: 600; }
   background: rgba(255, 255, 255, .22);
 }
 .hero-learn-play svg { width: 26px; height: 26px; margin-left: 3px; }
+/* Regler: zwei Stellungen, der weiße „Daumen“ gleitet weich hin und her */
+.hero-mode {
+  grid-column: 1 / -1;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .22);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.hero-mode-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .14);
+  transition: transform .42s cubic-bezier(.3, 1.25, .5, 1);
+}
+.hero-learn[data-mode="equal"] .hero-mode-thumb { transform: translateX(100%); }
+.hero-mode-opt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  font-size: 14px;
+  font-weight: 650;
+  color: rgba(255, 255, 255, .92);
+  transition: color .3s ease;
+  white-space: nowrap;
+}
+.hero-mode-opt svg { width: 16px; height: 16px; }
+.hero-learn[data-mode="smart"] .hero-mode-opt[data-opt="smart"] { color: #F2553F; }
+.hero-learn[data-mode="equal"] .hero-mode-opt[data-opt="equal"] { color: #2A86E0; }
+.hero-mode:active .hero-mode-thumb { transform: scale(.96); }
+.hero-learn[data-mode="equal"] .hero-mode:active .hero-mode-thumb { transform: translateX(100%) scale(.96); }
+
 .hero-learn-goal { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; }
 .hero-learn-bar { flex: 1; height: 6px; border-radius: 3px; background: rgba(255, 255, 255, .25); overflow: hidden; }
 .hero-learn-bar i { display: block; height: 100%; border-radius: 3px; background: #fff; }

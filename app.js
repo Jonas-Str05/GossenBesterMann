@@ -1103,6 +1103,10 @@ function smartQueue(n) {
     .map((x) => x.id);
 }
 const smartSize = () => DB.settings.sessionSize || 30;
+// Untertitel des Start-Buttons je nach Lernmodus
+const heroSub = (mode) => (mode === 'equal'
+  ? `${DB.settings.sessionSize || 'Alle'} Karten · zufällig, jede gleich oft`
+  : `${smartSize()} Karten · schwache & lange nicht gesehene zuerst`);
 
 function buildQueue(spec) {
   if (spec.type === 'smart') return smartQueue(spec.count || smartSize());
@@ -1325,15 +1329,21 @@ function renderLearn() {
       const goal = DB.settings.dailyGoal || 50;
       const done = today.r + today.w;
       const p = clamp(done / goal, 0, 1);
+      const mode = DB.settings.learnMode === 'equal' ? 'equal' : 'smart';
       return `
-      <button class="hero-learn" data-action="start-smart">
+      <div class="hero-learn" data-mode="${mode}" data-action="start-hero" role="button" tabindex="0" aria-label="Lernrunde starten">
         <div class="hero-learn-text">
           <b>${done ? 'Weiterlernen' : 'Jetzt lernen'}</b>
-          <span>${smartSize()} Karten · schwache & lange nicht gesehene zuerst</span>
+          <span class="hero-learn-sub">${heroSub(mode)}</span>
         </div>
         <span class="hero-learn-play" aria-hidden="true">${ICON.play}</span>
+        <div class="hero-mode" data-action="toggle-learn-mode" role="switch" tabindex="0" aria-checked="${mode === 'equal'}" aria-label="Lernmodus: Schwächen zuerst oder alle gleich">
+          <span class="hero-mode-thumb" aria-hidden="true"></span>
+          <span class="hero-mode-opt" data-opt="smart">${ICON.flame}Schwächen zuerst</span>
+          <span class="hero-mode-opt" data-opt="equal">${ICON.shuffle}Alle gleich</span>
+        </div>
         <div class="hero-learn-goal"><div class="hero-learn-bar"><i style="width:${p * 100}%"></i></div><small>${done} / ${goal} heute${p >= 1 ? ' · Ziel erreicht' : ''}</small></div>
-      </button>`;
+      </div>`;
     })() : ''}
     ${n === 0 ? `
       <div class="empty">
@@ -1392,22 +1402,14 @@ function renderLearn() {
         })()}
       </div>` : ''}
 
-      <div class="section-header">Lernen starten</div>
+      ${pinnedN ? `
+      <div class="section-header">Gemerkt</div>
       <div class="list icons">
-        <button class="row" data-action="start-weighted">
-          ${rowIcon(ICON.flame, 'orange')}
-          <div class="row-main"><div class="row-title">Schwächen zuerst</div><div class="row-sub">Zufällig – schwache Karten deutlich öfter</div></div>${chev}
-        </button>
-        <button class="row" data-action="start-equal">
-          ${rowIcon(ICON.shuffle, 'blue')}
-          <div class="row-main"><div class="row-title">Alle zufällig</div><div class="row-sub">Jede Karte gleich oft</div></div>${chev}
-        </button>
-        ${pinnedN ? `
         <button class="row" data-action="start-pinned">
           ${rowIcon(ICON.bookmark, 'orange')}
           <div class="row-main"><div class="row-title">Gemerkte Karten</div><div class="row-sub">${plural(pinnedN, 'Karte', 'Karten')} zum Überarbeiten markiert</div></div>${chev}
-        </button>` : ''}
-      </div>
+        </button>
+      </div>` : ''}
       <p class="footnote">Gewusst → ein Fach nach oben, nicht gewusst → ein Fach nach unten. Neue Karten starten bei 0, der Bereich reicht von −5 bis +5.</p>
     `}
   </div>`;
@@ -4143,6 +4145,21 @@ const ACTIONS = {
   'open-settings': () => openSettings(),
   'settings-back': () => { if (UI.settingsOv) closeOverlay(UI.settingsOv); },
   'start-smart': () => startSession({ type: 'smart', label: 'Empfohlene Runde' }),
+  'start-hero': () => {
+    if (DB.settings.learnMode === 'equal') startSession({ type: 'equal', label: 'Alle gleich' });
+    else startSession({ type: 'smart', label: 'Schwächen zuerst' });
+  },
+  // Regler im Start-Button: Modus wechseln, ohne neu zu zeichnen (damit Farbe & Regler weich animieren)
+  'toggle-learn-mode': (b) => {
+    const next = DB.settings.learnMode === 'equal' ? 'smart' : 'equal';
+    DB.settings.learnMode = next;
+    save();
+    const hero = b.closest('.hero-learn');
+    hero.dataset.mode = next;
+    b.setAttribute('aria-checked', String(next === 'equal'));
+    $('.hero-learn-sub', hero).textContent = heroSub(next);
+    haptic(8);
+  },
   'start-pinned': () => startSession({ type: 'pinned', label: 'Gemerkte Karten' }),
   'start-group': (b) => { const g = catById(b.dataset.id); if (g) startSession({ type: 'group', groupId: g.id, label: g.name }); },
   'open-group': (b) => pickGroupSheet(b.dataset.id),
@@ -4294,6 +4311,14 @@ document.addEventListener('change', (e) => {
     if (t.checked && t.dataset.setting === 'haptics') haptic(10);
   }
   if (t.id === 'file-input' && t.files && t.files[0]) importBackupFile(t.files[0]);
+});
+
+// Tastatur: Elemente mit role="button"/"switch" per Enter oder Leertaste auslösen
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('[data-action][role="button"], [data-action][role="switch"]')) {
+    e.preventDefault();
+    e.target.click();
+  }
 });
 
 // Ctrl/Cmd+K: neue Karte (Desktop-Komfort)
