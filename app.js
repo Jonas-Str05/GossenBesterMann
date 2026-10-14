@@ -1313,8 +1313,7 @@ function openCardsPage(catId = null, { filter = null, select = false } = {}) {
   UI.search = '';
   const input = $('#card-search');
   if (input) input.value = '';
-  $('#card-search-box').hidden = true;
-  $('#view-cards .nav-right').innerHTML = cardsNavRight();
+  $('#view-cards .navbar').classList.remove('searching');
   if (UI.select) setSelectMode(false);
   renderCardsNavLeft();
   renderCardsList();
@@ -1325,7 +1324,11 @@ function openCardsPage(catId = null, { filter = null, select = false } = {}) {
     let me = null;
     me = UI.cardsOv = pushPage($('#view-cards'), {
       // Android-Zurück im Auswahlmodus beendet erst die Auswahl
-      onBack: () => { if (UI.select) { setSelectMode(false); return false; } return true; },
+      onBack: () => {
+        if (UI.select) { setSelectMode(false); return false; }
+        if (cardSearchOpen()) { setCardSearch(false); return false; }
+        return true;
+      },
       onClosed: () => {
         if (UI.cardsOv !== me) return;
         if (UI.select) setSelectMode(false);
@@ -1458,7 +1461,27 @@ function renderLearn() {
 
 // ---- Karten ---------------------------------------------------------------
 
-const cardsNavRight = () => `<button class="icon-btn" data-action="toggle-card-search" aria-label="Suchen">${ICON.search}</button>`;
+// Suche in der Navigationsleiste: wächst aus der Lupe heraus nach links
+const cardsNavRight = () => `
+  <div class="nav-search" id="card-search-box">
+    <button class="ns-icon" type="button" data-action="open-card-search" aria-label="Suchen">${ICON.search}</button>
+    <input id="card-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen" tabindex="-1">
+    <button class="ns-close" type="button" data-action="toggle-card-search" aria-label="Suche schließen" tabindex="-1">${ICON.x}</button>
+  </div>`;
+const cardSearchOpen = () => $('#view-cards .navbar').classList.contains('searching');
+function setCardSearch(on) {
+  const bar = $('#view-cards .navbar');
+  const input = $('#card-search');
+  bar.classList.toggle('searching', on);
+  input.tabIndex = on ? 0 : -1;
+  $('#card-search-box .ns-close').tabIndex = on ? 0 : -1;
+  if (on) {
+    input.focus({ preventScroll: true });
+  } else {
+    input.blur();
+    if (UI.search || input.value) { input.value = ''; UI.search = ''; renderCardsList(); }
+  }
+}
 
 function initCardsView() {
   const v = $('#view-cards');
@@ -1468,7 +1491,6 @@ function initCardsView() {
   })}
   <div class="content">
     <h1 class="large-title" id="cards-title">Alle Karten</h1>
-    <label class="search" id="card-search-box" hidden>${ICON.search}<input id="card-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen"></label>
     <div class="add-wide"><button class="btn-tinted" data-action="new-card">${ICON.plus}<span>Karte hinzufügen</span></button></div>
     <div class="chips" id="card-chips"></div>
     <div class="chips sub" id="card-subchips" hidden></div>
@@ -4253,17 +4275,8 @@ function openTextImport() {
 
 const ACTIONS = {
   tab: (b) => setTab(b.dataset.tab),
-  'toggle-card-search': () => {
-    const box = $('#card-search-box');
-    const input = $('#card-search');
-    box.hidden = !box.hidden;
-    if (box.hidden) {
-      if (UI.search) { input.value = ''; UI.search = ''; renderCardsList(); }
-    } else {
-      $('#view-cards').scrollTop = 0;
-      input.focus();
-    }
-  },
+  'toggle-card-search': () => setCardSearch(!cardSearchOpen()),
+  'open-card-search': () => setCardSearch(true),
   'new-card': () => openCardEditor(null, cardsPageOpen() && catById(UI.cardsFilter) && !isGroup(catById(UI.cardsFilter)) ? { categoryId: UI.cardsFilter } : {}),
   'edit-card': (b) => { const c = cardById(b.dataset.id); if (c) openCardEditor(c); },
   'new-category': () => openCategoryEditor(null),
