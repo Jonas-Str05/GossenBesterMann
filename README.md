@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.16.1 | Play-Pfeil mittig im Kreis |
 | 1.16.0 | Mittige Überschriften mit Übergang auch in Kartenlisten und Einstellungen, Zurück nur als Pfeil |
 | 1.15.1 | Play-Knopf im Lernen-Tab pulsiert |
 | 1.15.0 | Nach oben wischen = Merken, Wiederholung nach Zeit, Tagesziel automatisch aus Prüfungsterminen, Wischen in der Kartenliste, Haptik bei der Überschrift, Backup-Erinnerung |

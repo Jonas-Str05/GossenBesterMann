@@ -1419,7 +1419,7 @@ button.bold { font-weight: 600; }
   place-items: center;
   background: rgba(255, 255, 255, .22);
 }
-.hero-learn-play svg { width: 26px; height: 26px; margin-left: 3px; }
+.hero-learn-play svg { width: 26px; height: 26px; } /* Dreieck ist im Symbol bereits optisch zentriert */
 /* Play-Knopf pulsiert sanft (weißer Ring auf dem Verlauf) */
 .hero-learn-play { animation: play-pulse 1.8s cubic-bezier(.4, 0, .2, 1) infinite; }
 @keyframes play-pulse {
