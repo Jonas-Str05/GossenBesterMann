@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.11.2 | Kein „0 % gewusst“ bei leeren Bereichen, Doppeltipp auf Bereich = neue Kategorie |
 | 1.11.1 | Sortierung „Zuletzt gelernt“, Ø Ebene unter „Alle Karten“, zwei Erklärtexte entfernt |
 | 1.11.0 | Karten-Tab: Bereiche aufklappbar, langes Drücken öffnet Einstellungen |
 | 1.10.1 | Erklärtexte im Bereich-Editor und im Lernen-Tab entfernt |

@@ -1427,7 +1427,7 @@ function renderLearn() {
             ${rowIcon(ICON.learn, g.color, true)}
             <div class="row-main">
               <div class="row-title clamp1">${esc(g.name)}</div>
-              <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')} · ${pct} % gewusst</div>
+              <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')}${cs.length ? ` · ${pct} % gewusst` : ''}</div>
               <div class="gbar" style="--c:var(--${g.color})"><span style="width:${pct}%"></span></div>
             </div>${chev}
           </button>`;
@@ -1771,7 +1771,7 @@ function renderCategories() {
               ${rowIcon(b.group ? ICON.learn : ICON.folder, b.color, true)}
               <div class="row-main">
                 <div class="row-title clamp1">${esc(b.name)}</div>
-                <div class="row-sub">${plural(b.kids.length, 'Kategorie', 'Kategorien')} · ${plural(cs.length, 'Karte', 'Karten')} · ${pct} % gewusst</div>
+                <div class="row-sub">${plural(b.kids.length, 'Kategorie', 'Kategorien')} · ${plural(cs.length, 'Karte', 'Karten')}${cs.length ? ` · ${pct} % gewusst` : ''}</div>
                 <div class="gbar" style="--c:var(--${b.color})"><span style="width:${pct}%"></span></div>
               </div>
               <span class="chev lib-chev">${ICON.chevDown}</span>
@@ -4293,6 +4293,19 @@ const ACTIONS = {
   'toggle-lib-group': (b) => {
     const id = b.dataset.id;
     const box = b.closest('.lib-group');
+    // Doppelter Tipp: Aufklappen des ersten Tipps zurücknehmen und neue Kategorie in diesem Bereich anlegen
+    const now = Date.now();
+    const last = UI.lastGroupTap;
+    if (last && last.id === id && now - last.t < 350) {
+      UI.lastGroupTap = null;
+      if (last.wasOpen) UI.libOpen.add(id); else UI.libOpen.delete(id);
+      box.classList.toggle('open', last.wasOpen);
+      b.setAttribute('aria-expanded', String(last.wasOpen));
+      haptic(10);
+      openCategoryEditor(null, { parentId: id === 'none' ? null : id });
+      return;
+    }
+    UI.lastGroupTap = { id, t: now, wasOpen: UI.libOpen.has(id) };
     const open = !UI.libOpen.has(id);
     if (open) UI.libOpen.add(id); else UI.libOpen.delete(id);
     box.classList.toggle('open', open);
