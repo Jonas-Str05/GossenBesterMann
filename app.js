@@ -315,6 +315,7 @@ function loadDB() {
 function save() {
   try {
     localStorage.setItem(KEY, JSON.stringify(DB));
+    GH.schedule();
     return true;
   } catch (e) {
     console.error(e);
@@ -1911,6 +1912,10 @@ function renderSettings() {
 
     <div class="section-header">Backup</div>
     <div class="list icons">
+      <button class="row" data-action="github-backup">
+        ${rowIcon(CAT_ICONS.cloud, 'indigo')}
+        <div class="row-main"><div class="row-title">GitHub-Backup</div><div class="row-sub">${GH.token() ? (GH.lastError() ? `<span style="color:var(--red)">${esc(GH.lastError())}</span>` : `Zuletzt: ${fmtDate(GH.lastAt())}`) : 'Aus'}</div></div>${chev}
+      </button>
       <button class="row" data-action="export">
         ${rowIcon(ICON.upload, 'blue')}
         <div class="row-main"><div class="row-title">Backup exportieren</div><div class="row-sub">Zuletzt: ${fmtDate(DB.meta.lastBackup)}</div></div>${chev}
@@ -4217,6 +4222,10 @@ async function importBackupFile(file) {
     toast('Die Datei ist kein gültiges Backup.', 'error');
     return;
   }
+  await importBackupData(parsed);
+}
+
+async function importBackupData(parsed) {
   const incoming = normalize(parsed && parsed.data ? parsed.data : parsed);
   if (!incoming.cards.length && incoming.categories.length <= 1) {
     toast('Im Backup wurden keine Karten gefunden.', 'error');
@@ -4254,6 +4263,213 @@ async function importBackupFile(file) {
   save();
   refresh();
   toast('Backup importiert');
+}
+
+// ---------------------------------------------------------------------------
+// GitHub-Backup: speichert den Lernstand automatisch als backup.json im Branch „backup“
+// (eigener Branch → GitHub Pages baut deswegen nicht neu). Der Token bleibt nur auf diesem Gerät
+// und landet nie im Lernstand oder in einem Export.
+// ---------------------------------------------------------------------------
+
+const GH = (() => {
+  const K_TOKEN = 'gbm-gh-token';
+  const K_AT = 'gbm-gh-at';
+  const K_HASH = 'gbm-gh-hash';
+  const BRANCH = 'backup';
+  const PATH = 'backup.json';
+  const ls = {
+    get: (k) => { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } },
+    set: (k, v) => { try { if (v) localStorage.setItem(k, v); else localStorage.removeItem(k); } catch (e) { /* ignore */ } },
+  };
+  // Repository aus der Adresse ableiten (owner.github.io/repo/), sonst Standard
+  const repo = (() => {
+    const m = location.hostname.match(/^([^.]+)\.github\.io$/i);
+    const seg = location.pathname.split('/').filter(Boolean)[0];
+    return m && seg ? `${m[1]}/${seg}` : 'Jonas-Str05/GossenBesterMann';
+  })();
+  const api = (p) => `https://api.github.com/repos/${repo}${p}`;
+  let timer = 0;
+  let busy = null;
+  let lastError = '';
+
+  const token = () => ls.get(K_TOKEN);
+  const headers = (extra = {}) => ({
+    Authorization: `Bearer ${token()}`,
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    ...extra,
+  });
+  const b64 = (str) => {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  };
+  const fail = async (res) => {
+    const msg = res.status === 401 ? 'Token ungültig'
+      : res.status === 403 || res.status === 404 ? 'Keine Schreibrechte für das Repository'
+      : `GitHub-Fehler ${res.status}`;
+    throw new Error(msg);
+  };
+
+  async function ensureBranch() {
+    const r = await fetch(api(`/git/ref/heads/${BRANCH}`), { headers: headers(), cache: 'no-store' });
+    if (r.ok) return;
+    if (r.status !== 404) return fail(r);
+    const info = await fetch(api(''), { headers: headers(), cache: 'no-store' });
+    if (!info.ok) return fail(info);
+    const base = (await info.json()).default_branch || 'main';
+    const head = await fetch(api(`/git/ref/heads/${base}`), { headers: headers(), cache: 'no-store' });
+    if (!head.ok) return fail(head);
+    const sha = (await head.json()).object.sha;
+    const mk = await fetch(api('/git/refs'), { method: 'POST', headers: headers(), body: JSON.stringify({ ref: `refs/heads/${BRANCH}`, sha }) });
+    if (!mk.ok && mk.status !== 422) return fail(mk);
+  }
+
+  async function currentSha() {
+    const r = await fetch(api(`/contents/${PATH}?ref=${BRANCH}`), { headers: headers(), cache: 'no-store' });
+    if (r.status === 404) return null;
+    if (!r.ok) return fail(r);
+    return (await r.json()).sha;
+  }
+
+  // force: auch ohne Änderung hochladen (Button „Jetzt sichern“)
+  async function backup(force = false) {
+    if (!token() || !navigator.onLine) return false;
+    if (busy) return busy;
+    const data = JSON.stringify(DB);
+    const hash = fnv(data);
+    if (!force && hash === ls.get(K_HASH)) return false;
+    busy = (async () => {
+      try {
+        await ensureBranch();
+        const sha = await currentSha();
+        const json = JSON.stringify({ app: 'karteikarten-ap2', version: 1, exported: new Date().toISOString(), data: DB }, null, 1);
+        const res = await fetch(api(`/contents/${PATH}`), {
+          method: 'PUT',
+          headers: headers(),
+          body: JSON.stringify({
+            message: `Backup ${new Date().toLocaleString('de-DE')} · ${DB.cards.length} Karten`,
+            content: b64(json),
+            branch: BRANCH,
+            ...(sha ? { sha } : {}),
+          }),
+        });
+        if (!res.ok) await fail(res);
+        ls.set(K_HASH, hash);
+        ls.set(K_AT, String(Date.now()));
+        lastError = '';
+        return true;
+      } catch (e) {
+        lastError = e && e.message && !/fetch/i.test(e.message) ? e.message : 'Keine Verbindung';
+        throw e;
+      } finally {
+        busy = null;
+        if (UI.settingsOv && stack.includes(UI.settingsOv)) renderSettings();
+      }
+    })();
+    return busy;
+  }
+
+  async function restore() {
+    const r = await fetch(api(`/contents/${PATH}?ref=${BRANCH}`), {
+      headers: headers({ Accept: 'application/vnd.github.raw+json' }),
+      cache: 'no-store',
+    });
+    if (r.status === 404) throw new Error('Noch kein Backup vorhanden');
+    if (!r.ok) await fail(r);
+    return r.json();
+  }
+
+  return {
+    repo,
+    token,
+    setToken: (t) => { ls.set(K_TOKEN, t.trim()); ls.set(K_HASH, ''); },
+    lastAt: () => +ls.get(K_AT) || 0,
+    lastError: () => lastError,
+    busy: () => !!busy,
+    backup,
+    restore,
+    // nach Änderungen gesammelt sichern (nicht bei jedem einzelnen Tipp)
+    schedule() {
+      if (!token()) return;
+      clearTimeout(timer);
+      timer = setTimeout(() => backup().catch(() => {}), 30000);
+    },
+    // beim Verlassen der App sofort sichern
+    flush() {
+      if (!token()) return;
+      clearTimeout(timer);
+      backup().catch(() => {});
+    },
+  };
+})();
+
+function openGitHubBackup() {
+  const render = (sh) => {
+    const on = !!GH.token();
+    const err = GH.lastError();
+    sh.body.innerHTML = `
+      <div class="form-label">Token</div>
+      <div class="field"><input type="password" data-gh="token" value="${esc(GH.token())}" placeholder="github_pat_…" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done"></div>
+      <p class="footnote">${esc(GH.repo)} · Branch „backup“</p>
+      ${on ? `
+        <div class="list" style="margin-top:8px">
+          <div class="row"><div class="row-main"><div class="row-title">Zuletzt gesichert</div>${err ? `<div class="row-sub" style="color:var(--red)">${esc(err)}</div>` : ''}</div><span class="row-value">${GH.busy() ? '…' : fmtDate(GH.lastAt())}</span></div>
+        </div>
+        <div class="btn-stack">
+          <button class="btn-primary" data-gh="now">${ICON.upload}<span>Jetzt sichern</span></button>
+          <button class="btn-plain" data-gh="restore">Wiederherstellen</button>
+          <button class="btn-plain destructive" data-gh="off">Trennen</button>
+        </div>` : `
+        <div class="btn-stack"><button class="btn-primary" data-gh="save">Verbinden</button></div>`}`;
+  };
+  const sheet = openSheet({
+    title: 'GitHub-Backup',
+    compact: true,
+    left: { label: 'Fertig' },
+    body: '',
+    onMount: render,
+    onClose: () => renderSettings(),
+  });
+  sheet.body.addEventListener('click', async (e) => {
+    const b = e.target.closest('button[data-gh]');
+    if (!b) return;
+    const act = b.dataset.gh;
+    const input = $('[data-gh="token"]', sheet.body);
+    if (act === 'save' || act === 'now') {
+      if (act === 'save') {
+        if (!input.value.trim()) { input.focus(); return; }
+        GH.setToken(input.value);
+      }
+      b.disabled = true;
+      try {
+        await GH.backup(true);
+        toast('Gesichert');
+      } catch (err) {
+        toast(GH.lastError() || 'Sichern fehlgeschlagen', 'error');
+        if (act === 'save') GH.setToken('');
+      }
+      render(sheet);
+    }
+    if (act === 'restore') {
+      b.disabled = true;
+      try {
+        const data = await GH.restore();
+        sheet.close();
+        await importBackupData(data);
+      } catch (err) {
+        toast(err.message || 'Wiederherstellen fehlgeschlagen', 'error');
+        render(sheet);
+      }
+    }
+    if (act === 'off') {
+      const ok = await confirmDialog({ title: 'GitHub-Backup trennen?', message: 'Das Backup auf GitHub bleibt erhalten.', confirm: 'Trennen', destructive: true });
+      if (!ok) return;
+      GH.setToken('');
+      render(sheet);
+    }
+  });
 }
 
 function openTextImport() {
@@ -4467,6 +4683,7 @@ const ACTIONS = {
   'manual-distribute': () => openCardsPage(null, { filter: cardsIn('inbox').length ? 'inbox' : 'all', select: true }),
   export: () => exportBackup(),
   import: () => { const f = $('#file-input'); f.value = ''; f.click(); },
+  'github-backup': () => openGitHubBackup(),
   'text-import': () => openTextImport(),
   install: async () => {
     if (!UI.installEvt) return;
@@ -4762,6 +4979,10 @@ function boot() {
       if (UI.tab === 'stats') renderStats(); else UI.statsDirty = true;
     }, 200);
   });
+
+  // GitHub-Backup: beim Verlassen der App sofort sichern, beim Start Ausstehendes nachholen
+  document.addEventListener('visibilitychange', () => { if (document.hidden) GH.flush(); });
+  setTimeout(() => GH.flush(), 5000);
 
   // Daten aus einem anderen Tab übernehmen
   window.addEventListener('storage', (e) => {
