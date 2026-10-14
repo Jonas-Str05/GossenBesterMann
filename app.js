@@ -1512,6 +1512,7 @@ const SORTS = {
   new: ['Neueste zuerst', (a, b) => b.created - a.created],
   weak: ['Schwächste zuerst', (a, b) => a.level - b.level || b.created - a.created],
   strong: ['Stärkste zuerst', (a, b) => b.level - a.level || b.created - a.created],
+  recent: ['Zuletzt gelernt', (a, b) => (b.last || 0) - (a.last || 0) || b.created - a.created],
   alpha: ['Alphabetisch', (a, b) => a.front.localeCompare(b.front, 'de', { sensitivity: 'base' })],
 };
 
@@ -1747,8 +1748,13 @@ function renderCategories() {
     <div class="list icons" style="--inset:66px">
       <button class="row" data-action="open-all-cards">
         ${rowIcon(ICON.cards, 'indigo', true)}
-        <div class="row-main"><div class="row-title">Alle Karten</div><div class="row-sub">Mit Filtern, Sortierung und Auswahl</div></div>
-        <span class="row-value">${fmtNum(DB.cards.length)}</span>${chev}
+        <div class="row-main"><div class="row-title">Alle Karten</div><div class="row-sub">${(() => {
+          const n = DB.cards.length;
+          if (!n) return '0 Karten';
+          const avg = DB.cards.reduce((a, c) => a + c.level, 0) / n;
+          const a = Math.abs(avg).toLocaleString('de-DE', { maximumFractionDigits: 1 });
+          return `${plural(n, 'Karte', 'Karten')} · Ø Ebene ${avg > 0.05 ? '+' : avg < -0.05 ? '−' : ''}${a}`;
+        })()}</div></div>${chev}
       </button>
     </div>
     <div class="section-header">Bereiche</div>
@@ -1798,7 +1804,7 @@ function renderCategories() {
         <div class="row-main"><div class="row-title">Manuell verteilen</div><div class="row-sub">Mehrere Karten auswählen und verschieben</div></div>${chev}
       </button>
     </div>
-    <p class="footnote">Die automatische Verteilung nutzt die Stichwörter deiner Kategorien und lernt aus den Karten, die du schon zugeordnet hast.</p>`;
+    `;
 }
 
 // ---- Einstellungen ---------------------------------------------------------
@@ -2515,7 +2521,7 @@ function renderStats() {
     body = `
       <div class="chips stat-chips">${chip('all', 'Alle Karten')}${gs.map((g) => chip(g.id, groupShort(g), g.color)).join('')}</div>
       ${order.map((k) => `<div class="stat-section" data-key="${k}">${render[k]()}</div>`).join('')}
-      <p class="footnote">Tippe auf ein Diagramm für genaue Werte. Halte einen Baustein gedrückt, um ihn zu verschieben.</p>`;
+      `;
   }
 
   v.innerHTML = navbar('Statistik', { left: gearBtn(), right }) + `
