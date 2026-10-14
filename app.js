@@ -1362,7 +1362,7 @@ function renderLearn() {
 
   v.innerHTML = navbar('Lernen', {
     left: gearBtn(),
-    right: `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`,
+    right: `<button class="icon-btn" data-action="lib-add" aria-label="Hinzufügen">${ICON.plus}</button>`,
   }) + `
   <div class="content">
     <h1 class="large-title">Lernen</h1>
@@ -4349,6 +4349,7 @@ const ACTIONS = {
   'cards-back': () => { if (cardsPageOpen()) closeOverlay(UI.cardsOv); },
   'lib-add': async () => {
     const v = await actionSheet({
+      noCancel: true,
       actions: [
         { label: 'Neue Karte', value: 'card' },
         { label: 'Neue Kategorie', value: 'cat' },
