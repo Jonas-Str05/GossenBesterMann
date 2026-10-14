@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.12.0 | Langes Drücken auf eine Fach-Säule zeigt ihre Karten, Sortieren ohne Abbrechen |
 | 1.11.9 | Drei Erklärtexte im Karten-Tab entfernt |
 | 1.11.8 | Suchfeld wächst oben aus der Lupe heraus |
 | 1.11.7 | Karten-Tab ohne „% gewusst“, „Neue Karte“ über „Neue Kategorie“ |

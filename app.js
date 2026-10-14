@@ -782,7 +782,7 @@ const promptDialog = ({ title, message, placeholder, value, confirm = 'OK' }) =>
     ],
   });
 
-function actionSheet({ title, message, actions }) {
+function actionSheet({ title, message, actions, noCancel = false }) {
   return new Promise((resolve) => {
     const root = el(`
       <div class="overlay dialog-overlay">
@@ -792,7 +792,7 @@ function actionSheet({ title, message, actions }) {
             ${title || message ? `<div class="asheet-head">${title ? `<b>${esc(title)}</b>` : ''}${esc(message || '')}</div>` : ''}
             ${actions.map((a, i) => `<button data-i="${i}" class="${a.style || ''}">${esc(a.label)}</button>`).join('')}
           </div>
-          <div class="asheet-group cancel"><button data-i="-1">Abbrechen</button></div>
+          ${noCancel ? '' : '<div class="asheet-group cancel"><button data-i="-1">Abbrechen</button></div>'}
         </div>
       </div>`);
     const box = $('.asheet', root);
@@ -1306,9 +1306,10 @@ function pushPage(page, { onClosed, onBack } = {}) {
 }
 
 // Kartenliste als Seite: alle Karten (mit Filtern) oder nur eine Kategorie
-function openCardsPage(catId = null, { filter = null, select = false } = {}) {
+function openCardsPage(catId = null, { filter = null, select = false, level = null } = {}) {
   const already = cardsPageOpen();
   UI.cardsPageCat = catId;
+  UI.cardsLevel = level; // nur Karten einer Ebene (langes Drücken auf eine Säule)
   UI.cardsFilter = catId || filter || 'all';
   UI.search = '';
   const input = $('#card-search');
@@ -1333,6 +1334,7 @@ function openCardsPage(catId = null, { filter = null, select = false } = {}) {
         if (UI.cardsOv !== me) return;
         if (UI.select) setSelectMode(false);
         UI.cardsPageCat = null;
+        UI.cardsLevel = null;
         UI.cardsFilter = 'all';
       },
     });
@@ -1561,6 +1563,7 @@ function filteredCards() {
   else if (f === 'g:none') { const ids = ungroupedCardCats(); list = list.filter((c) => ids.has(c.categoryId)); }
   else if (f.startsWith('g:')) list = cardsInGroup(f.slice(2));
   else if (f !== 'all') list = list.filter((c) => c.categoryId === f);
+  if (UI.cardsLevel != null) list = list.filter((c) => c.level === UI.cardsLevel);
   if (q) list = list.filter((c) => `${c.front}\n${c.back}\n${c.hint}`.toLowerCase().includes(q));
   const sort = SORTS[DB.settings.cardSort] || SORTS.alpha;
   return [...list].sort(sort[1]);
@@ -1572,8 +1575,8 @@ function renderCardsList() {
   if (!valid) UI.cardsFilter = 'all';
   const chips = $('#card-chips');
   // Kategorie-Seite: keine Filter-Chips, nur die Karten dieser Kategorie
-  chips.hidden = !!UI.cardsPageCat;
-  if (UI.cardsPageCat) $('#card-subchips').hidden = true;
+  chips.hidden = !!cardsPageMode();
+  if (cardsPageMode()) $('#card-subchips').hidden = true;
   const gs = groups();
   const ug = ungrouped();
   const ugCount = DB.cards.filter((c) => ug.some((x) => x.id === c.categoryId)).length;
@@ -1585,7 +1588,7 @@ function renderCardsList() {
     ? `<button class="chip pin ${UI.cardsFilter === 'pinned' ? 'on' : ''}" style="--c:var(--orange)" data-action="filter" data-cat="pinned">${ICON.bookmarkFill}Gemerkt <span class="n">${pinnedN}</span></button>`
     : '';
 
-  if (UI.cardsPageCat) {
+  if (cardsPageMode()) {
     // Kategorie-Seite: Chips bleiben ausgeblendet
   } else if (!gs.length) {
     // ohne Bereiche: eine Zeile mit allen Kategorien
@@ -1608,7 +1611,7 @@ function renderCardsList() {
     }
   }
   // aktiven Chip in den sichtbaren Bereich der horizontalen Leiste holen
-  for (const row of UI.cardsPageCat ? [] : [chips, $('#card-subchips')]) {
+  for (const row of cardsPageMode() ? [] : [chips, $('#card-subchips')]) {
     const on = $('.chip.on', row);
     if (!on || row.hidden) continue;
     const l = on.offsetLeft - 16;
@@ -1656,7 +1659,9 @@ function renderCardsNavLeft() {
     ? '<button class="nav-btn bold" data-action="toggle-select">Fertig</button>'
     : `<button class="nav-btn back" data-action="cards-back">${ICON.chev}<span>Karten</span></button>`;
 }
-const cardsPageTitle = () => (UI.cardsPageCat && catById(UI.cardsPageCat) ? catById(UI.cardsPageCat).name : 'Alle Karten');
+const cardsPageMode = () => UI.cardsPageCat || UI.cardsLevel != null;
+const cardsPageTitle = () => (UI.cardsLevel != null ? `Ebene ${fmtLevel(UI.cardsLevel)}`
+  : UI.cardsPageCat && catById(UI.cardsPageCat) ? catById(UI.cardsPageCat).name : 'Alle Karten');
 
 function setSelectMode(on, firstId = null) {
   UI.select = on;
@@ -1728,6 +1733,30 @@ function bindLibLongPress(box) {
   });
   for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) box.addEventListener(ev, cancel);
   box.addEventListener('contextmenu', (e) => { if (e.target.closest('.lib-press')) e.preventDefault(); });
+}
+
+// Lernen-Tab: langes Drücken auf eine Fach-Säule zeigt alle Karten dieser Ebene
+function bindLevelLongPress(box) {
+  let timer = 0;
+  let start = null;
+  const cancel = () => { clearTimeout(timer); timer = 0; };
+  box.addEventListener('pointerdown', (e) => {
+    const bar = e.target.closest('.bar[data-level]');
+    if (!bar || bar.disabled || e.button !== 0) return;
+    start = { x: e.clientX, y: e.clientY };
+    timer = setTimeout(() => {
+      cancel();
+      UI.suppressAnyClick = true; // der folgende Klick soll keine Lernrunde starten
+      setTimeout(() => { UI.suppressAnyClick = false; }, 700);
+      haptic(15);
+      openCardsPage(null, { level: +bar.dataset.level });
+    }, 480);
+  });
+  box.addEventListener('pointermove', (e) => {
+    if (timer && start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) cancel();
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) box.addEventListener(ev, cancel);
+  box.addEventListener('contextmenu', (e) => { if (e.target.closest('.bar[data-level]')) e.preventDefault(); });
 }
 
 // Suchergebnisse im Karten-Tab
@@ -4355,7 +4384,7 @@ const ACTIONS = {
   'pick-level': () => pickLevelSheet(),
   filter: (b) => { UI.cardsFilter = b.dataset.cat; renderCardsList(); },
   sort: async () => {
-    const v = await actionSheet({ title: 'Sortieren', actions: Object.entries(SORTS).map(([k, [label]]) => ({ label: (DB.settings.cardSort === k ? '✓ ' : '') + label, value: k })) });
+    const v = await actionSheet({ title: 'Sortieren', noCancel: true, actions: Object.entries(SORTS).map(([k, [label]]) => ({ label: (DB.settings.cardSort === k ? '✓ ' : '') + label, value: k })) });
     if (v) { DB.settings.cardSort = v; save(); renderCardsList(); }
   },
   'toggle-select': () => setSelectMode(!UI.select),
@@ -4682,6 +4711,7 @@ function boot() {
   renderTabbar();
   initCardsView();
   initLibraryView();
+  bindLevelLongPress($('#view-learn'));
   setupStatsGestures($('#view-stats'));
   refresh(); // alle Ansichten zeichnen – ohne diesen Aufruf bleibt die App leer
   $('#view-learn').classList.add('active');
