@@ -1186,8 +1186,7 @@ const UI = {
 
 const TABS = [
   ['learn', 'Lernen', ICON.learn],
-  ['cards', 'Karten', ICON.cards],
-  ['categories', 'Kategorien', ICON.folder],
+  ['categories', 'Karten', ICON.cards],
   ['stats', 'Statistik', ICON.stats],
 ];
 
@@ -1208,8 +1207,9 @@ function renderTabbar() {
 }
 
 function setTab(t) {
-  // offene Einstellungen-Seite zuerst schließen
+  // offene Seiten (Einstellungen, Kartenliste) zuerst schließen
   if (UI.settingsOv && stack.includes(UI.settingsOv)) closeOverlay(UI.settingsOv);
+  if (UI.cardsOv && stack.includes(UI.cardsOv)) closeOverlay(UI.cardsOv);
   if (t === 'stats' && UI.statsDirty) renderStats();
   if (t === UI.tab) {
     const v = $(`.view[data-tab="${t}"]`);
@@ -1257,9 +1257,13 @@ darkMQ.addEventListener('change', () => applyTheme(true));
 
 // Einstellungen als iOS-artige Push-Seite (von rechts), Zurück per Taste oder Android-Zurück
 function openSettings() {
-  const page = $('#view-settings');
-  const base = $(`.view[data-tab="${UI.tab}"]`);
   renderSettings();
+  UI.settingsOv = pushPage($('#view-settings'));
+}
+
+// Seite von rechts hereinschieben (iOS-Navigation); die Ansicht dahinter weicht leicht nach links aus
+function pushPage(page, { onClosed, onBack } = {}) {
+  const base = $(`.view[data-tab="${UI.tab}"]`);
   const W = window.innerWidth;
   let done = false;
   let hiding = false;
@@ -1275,6 +1279,7 @@ function openSettings() {
     page.classList.remove('active', 'page');
     page.style.transform = '';
     base.style.transform = '';
+    if (onClosed) onClosed();
   };
   const ov = {
     kind: 'page',
@@ -1290,11 +1295,45 @@ function openSettings() {
       sp.to(W, { onRest: finish });
       setTimeout(finish, 1200);
     },
-    onBack() { closeOverlay(ov); },
+    onBack() { if (onBack && onBack() === false) return; closeOverlay(ov); },
   };
-  UI.settingsOv = ov;
   pushOverlay(ov);
+  return ov;
 }
+
+// Kartenliste als Seite: alle Karten (mit Filtern) oder nur eine Kategorie
+function openCardsPage(catId = null, { filter = null, select = false } = {}) {
+  const already = cardsPageOpen();
+  UI.cardsPageCat = catId;
+  UI.cardsFilter = catId || filter || 'all';
+  UI.search = '';
+  const input = $('#card-search');
+  if (input) input.value = '';
+  const right = $('#view-cards .nav-right');
+  right.innerHTML = `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>` +
+    (catId ? `<button class="nav-btn" data-action="edit-category" data-id="${esc(catId)}">Bearbeiten</button>` : '');
+  if (UI.select) setSelectMode(false);
+  renderCardsNavLeft();
+  renderCardsList();
+  if (already) {
+    // schon offen (z. B. aus einem Sheet heraus): nur Inhalt tauschen
+    $('#view-cards').scrollTop = 0;
+  } else {
+    let me = null;
+    me = UI.cardsOv = pushPage($('#view-cards'), {
+      // Android-Zurück im Auswahlmodus beendet erst die Auswahl
+      onBack: () => { if (UI.select) { setSelectMode(false); return false; } return true; },
+      onClosed: () => {
+        if (UI.cardsOv !== me) return;
+        if (UI.select) setSelectMode(false);
+        UI.cardsPageCat = null;
+        UI.cardsFilter = 'all';
+      },
+    });
+  }
+  if (select) setSelectMode(true);
+}
+const cardsPageOpen = () => !!(UI.cardsOv && stack.includes(UI.cardsOv));
 
 // ---- Lernen ---------------------------------------------------------------
 
@@ -1419,12 +1458,12 @@ function renderLearn() {
 
 function initCardsView() {
   const v = $('#view-cards');
-  v.innerHTML = `${navbar('Karten', {
+  v.innerHTML = `${navbar('Alle Karten', {
     left: '<span id="cards-nav-left"></span>',
     right: `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`,
   })}
   <div class="content">
-    <h1 class="large-title" id="cards-title">Karten</h1>
+    <h1 class="large-title" id="cards-title">Alle Karten</h1>
     <label class="search">${ICON.search}<input id="card-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen"></label>
     <div class="chips" id="card-chips"></div>
     <div class="chips sub" id="card-subchips" hidden></div>
@@ -1504,6 +1543,9 @@ function renderCardsList() {
   const valid = f === 'all' || f === 'g:none' || f === 'pinned' || (f.startsWith('g:') ? isGroup(catById(f.slice(2))) : catById(f) && !isGroup(catById(f)));
   if (!valid) UI.cardsFilter = 'all';
   const chips = $('#card-chips');
+  // Kategorie-Seite: keine Filter-Chips, nur die Karten dieser Kategorie
+  chips.hidden = !!UI.cardsPageCat;
+  if (UI.cardsPageCat) $('#card-subchips').hidden = true;
   const gs = groups();
   const ug = ungrouped();
   const ugCount = DB.cards.filter((c) => ug.some((x) => x.id === c.categoryId)).length;
@@ -1515,7 +1557,9 @@ function renderCardsList() {
     ? `<button class="chip pin ${UI.cardsFilter === 'pinned' ? 'on' : ''}" style="--c:var(--orange)" data-action="filter" data-cat="pinned">${ICON.bookmarkFill}Gemerkt <span class="n">${pinnedN}</span></button>`
     : '';
 
-  if (!gs.length) {
+  if (UI.cardsPageCat) {
+    // Kategorie-Seite: Chips bleiben ausgeblendet
+  } else if (!gs.length) {
     // ohne Bereiche: eine Zeile mit allen Kategorien
     chips.innerHTML = chip('all', 'Alle', DB.cards.length, null, UI.cardsFilter === 'all') + pinChip +
       sortedCats().map((c) => chip(c.id, c.name, cardsIn(c.id).length, c.color, UI.cardsFilter === c.id)).join('');
@@ -1536,7 +1580,7 @@ function renderCardsList() {
     }
   }
   // aktiven Chip in den sichtbaren Bereich der horizontalen Leiste holen
-  for (const row of [chips, $('#card-subchips')]) {
+  for (const row of UI.cardsPageCat ? [] : [chips, $('#card-subchips')]) {
     const on = $('.chip.on', row);
     if (!on || row.hidden) continue;
     const l = on.offsetLeft - 16;
@@ -1568,7 +1612,7 @@ function renderCardsList() {
             <span class="lvl" style="--c:${levelColor(c.level)}">${fmtLevel(c.level)}</span>
             <div class="row-main">
               <div class="row-title clamp2">${c.pinned ? `<span class="row-pin" aria-label="Gemerkt">${ICON.bookmarkFill}</span>` : ''}${esc(c.front)}</div>
-              <div class="row-sub clamp1"><span class="cat-dot" style="--c:var(--${cat.color})"></span>${esc(cat.name)} · ${esc(c.back.replace(/\s+/g, ' '))}</div>
+              <div class="row-sub clamp1">${UI.cardsPageCat ? '' : `<span class="cat-dot" style="--c:var(--${cat.color})"></span>${esc(cat.name)} · `}${esc(c.back.replace(/\s+/g, ' '))}</div>
             </div>
             ${sel ? '' : chev}
           </button>`;
@@ -1580,8 +1624,11 @@ function renderCardsList() {
 
 function renderCardsNavLeft() {
   const slot = $('#cards-nav-left');
-  if (slot) slot.innerHTML = UI.select ? '<button class="nav-btn bold" data-action="toggle-select">Fertig</button>' : gearBtn();
+  if (slot) slot.innerHTML = UI.select
+    ? '<button class="nav-btn bold" data-action="toggle-select">Fertig</button>'
+    : `<button class="nav-btn back" data-action="cards-back">${ICON.chev}<span>Karten</span></button>`;
 }
+const cardsPageTitle = () => (UI.cardsPageCat && catById(UI.cardsPageCat) ? catById(UI.cardsPageCat).name : 'Alle Karten');
 
 function setSelectMode(on, firstId = null) {
   UI.select = on;
@@ -1595,7 +1642,9 @@ function setSelectMode(on, firstId = null) {
 function renderSelectBar() {
   const n = UI.selected.size;
   const t = $('#cards-title');
-  if (t) t.textContent = UI.select ? (n ? `${n} ausgewählt` : 'Auswählen') : 'Karten';
+  if (t) t.textContent = UI.select ? (n ? `${n} ausgewählt` : 'Auswählen') : cardsPageTitle();
+  const nt = $('#view-cards .nav-title');
+  if (nt) nt.textContent = cardsPageTitle();
   $('#select-bar').innerHTML = `
     <button data-action="bulk-move" ${n ? '' : 'disabled'}>${ICON.move}<span>Kategorie</span></button>
     <button data-action="bulk-level" ${n ? '' : 'disabled'}>${ICON.reset}<span>Ebene</span></button>
@@ -1604,13 +1653,51 @@ function renderSelectBar() {
 
 // ---- Kategorien -------------------------------------------------------------
 
-function renderCategories() {
+// Karten-Tab: Grundgerüst (Navigationsleiste, Titel, Suche) einmal anlegen
+function initLibraryView() {
   const v = $('#view-categories');
+  v.innerHTML = navbar('Karten', { left: gearBtn(), right: `<button class="icon-btn" data-action="lib-add" aria-label="Hinzufügen">${ICON.plus}</button>` }) + `
+  <div class="content">
+    <h1 class="large-title">Karten</h1>
+    <label class="search">${ICON.search}<input id="lib-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen"></label>
+    <div id="lib-body"></div>
+  </div>`;
+  $('#lib-search').addEventListener('input', (e) => { UI.libSearch = e.target.value; renderCategories(); });
+}
+
+// Suchergebnisse im Karten-Tab
+function libSearchHTML(q) {
+  const ql = q.trim().toLowerCase();
+  const hits = DB.cards.filter((c) => `${c.front}\n${c.back}\n${c.hint}`.toLowerCase().includes(ql));
+  if (!hits.length) return '<div class="empty"><h2>Keine Treffer</h2><p>Keine Karte passt zu deiner Suche.</p></div>';
+  const shown = hits.slice(0, 200);
+  return `
+    <div class="list-meta"><span>${plural(hits.length, 'Treffer', 'Treffer')}${hits.length > shown.length ? ` · die ersten ${shown.length}` : ''}</span></div>
+    <div class="list">
+      ${shown.map((c) => {
+        const cat = catById(c.categoryId);
+        return `<button class="row" data-action="edit-card" data-id="${esc(c.id)}">
+          <span class="lvl" style="--c:${levelColor(c.level)}">${fmtLevel(c.level)}</span>
+          <div class="row-main">
+            <div class="row-title clamp2">${esc(c.front)}</div>
+            <div class="row-sub clamp1"><span class="cat-dot" style="--c:var(--${cat.color})"></span>${esc(cat.name)} · ${esc(c.back.replace(/\s+/g, ' '))}</div>
+          </div>
+        </button>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderCategories() {
+  const v = $('#lib-body');
+  if (!v) return;
+  // offene Kategorie-Seite schließen, falls die Kategorie gelöscht wurde
+  if (UI.cardsPageCat && !catById(UI.cardsPageCat) && cardsPageOpen()) closeOverlay(UI.cardsOv);
+  if ((UI.libSearch || '').trim()) { v.innerHTML = libSearchHTML(UI.libSearch); return; }
   const inboxN = cardsIn('inbox').length;
   const catRow = (c) => {
     const cs = cardsIn(c.id);
     const avg = cs.length ? cs.reduce((a, x) => a + x.level, 0) / cs.length : null;
-    return `<button class="row" data-action="edit-category" data-id="${esc(c.id)}">
+    return `<button class="row" data-action="open-category" data-id="${esc(c.id)}">
       ${rowIcon(catIcon(c), c.color, true)}
       <div class="row-main">
         <div class="row-title clamp1">${esc(c.name)}</div>
@@ -1619,9 +1706,14 @@ function renderCategories() {
     </button>`;
   };
   const gs = groups();
-  v.innerHTML = navbar('Kategorien', { left: gearBtn(), right: `<button class="icon-btn" data-action="new-category" aria-label="Neue Kategorie">${ICON.plus}</button>` }) + `
-  <div class="content">
-    <h1 class="large-title">Kategorien</h1>
+  v.innerHTML = `
+    <div class="list icons" style="--inset:66px">
+      <button class="row" data-action="open-all-cards">
+        ${rowIcon(ICON.cards, 'indigo', true)}
+        <div class="row-main"><div class="row-title">Alle Karten</div><div class="row-sub">Mit Filtern, Sortierung und Auswahl</div></div>
+        <span class="row-value">${fmtNum(DB.cards.length)}</span>${chev}
+      </button>
+    </div>
     ${gs.map((g) => {
       const kids = childrenOf(g.id);
       return `
@@ -1656,8 +1748,7 @@ function renderCategories() {
         <div class="row-main"><div class="row-title">Manuell verteilen</div><div class="row-sub">Mehrere Karten auswählen und verschieben</div></div>${chev}
       </button>
     </div>
-    <p class="footnote">Die automatische Verteilung nutzt die Stichwörter deiner Kategorien und lernt aus den Karten, die du schon zugeordnet hast.</p>
-  </div>`;
+    <p class="footnote">Die automatische Verteilung nutzt die Stichwörter deiner Kategorien und lernt aus den Karten, die du schon zugeordnet hast.</p>`;
 }
 
 // ---- Einstellungen ---------------------------------------------------------
@@ -2657,7 +2748,7 @@ function openCategoryStats(cat) {
     if (!b) return;
     sheet.close();
     if (b.dataset.cs === 'learn') startSession({ type: 'category', categoryId: cat.id, label: catPath(cat) });
-    else { UI.cardsFilter = cat.id; setTab('cards'); renderCardsList(); }
+    else openCardsPage(cat.id);
   });
 }
 
@@ -3097,7 +3188,7 @@ function openCategoryEditor(cat = null, opts = {}) {
     if (!b) return;
     const act = b.dataset.ce;
     if (act === 'learn') { sheet.close(); startSession({ type: 'category', categoryId: cat.id, label: cat.name }); }
-    if (act === 'show') { sheet.close(); UI.cardsFilter = cat.id; setTab('cards'); renderCardsList(); }
+    if (act === 'show') { sheet.close(); openCardsPage(cat.id); }
     if (act === 'add') { sheet.close(); openCardEditor(null, { categoryId: cat.id }); }
     if (act === 'delete') {
       const n = cardsIn(cat.id).length;
@@ -4114,7 +4205,7 @@ function openTextImport() {
 
 const ACTIONS = {
   tab: (b) => setTab(b.dataset.tab),
-  'new-card': () => openCardEditor(null, UI.tab === 'cards' && catById(UI.cardsFilter) && !isGroup(catById(UI.cardsFilter)) ? { categoryId: UI.cardsFilter } : {}),
+  'new-card': () => openCardEditor(null, cardsPageOpen() && catById(UI.cardsFilter) && !isGroup(catById(UI.cardsFilter)) ? { categoryId: UI.cardsFilter } : {}),
   'edit-card': (b) => { const c = cardById(b.dataset.id); if (c) openCardEditor(c); },
   'new-category': () => openCategoryEditor(null),
   'new-group': () => openGroupEditor(null),
@@ -4142,6 +4233,21 @@ const ACTIONS = {
     haptic(5);
   },
   'open-trash': () => openTrash(),
+  'open-category': (b) => { const c = catById(b.dataset.id); if (c) openCardsPage(c.id); },
+  'open-all-cards': () => openCardsPage(null),
+  'cards-back': () => { if (cardsPageOpen()) closeOverlay(UI.cardsOv); },
+  'lib-add': async () => {
+    const v = await actionSheet({
+      actions: [
+        { label: 'Neue Karte', value: 'card' },
+        { label: 'Neue Kategorie', value: 'cat' },
+        { label: 'Neuer Bereich', value: 'group' },
+      ],
+    });
+    if (v === 'card') openCardEditor(null);
+    if (v === 'cat') openCategoryEditor(null);
+    if (v === 'group') openGroupEditor(null);
+  },
   'open-settings': () => openSettings(),
   'settings-back': () => { if (UI.settingsOv) closeOverlay(UI.settingsOv); },
   'start-smart': () => startSession({ type: 'smart', label: 'Empfohlene Runde' }),
@@ -4232,7 +4338,7 @@ const ACTIONS = {
   'stat-edit': () => { UI.statEdit = !UI.statEdit; renderStats(); $('#view-stats').scrollTop = 0; haptic(5); },
   'stat-reset-order': () => { delete DB.settings.statOrder; save(); renderStats(); toast('Standard-Reihenfolge wiederhergestellt'); },
   'auto-distribute': () => openAutoDistribute(),
-  'manual-distribute': () => { UI.cardsFilter = cardsIn('inbox').length ? 'inbox' : 'all'; setTab('cards'); setSelectMode(true); },
+  'manual-distribute': () => openCardsPage(null, { filter: cardsIn('inbox').length ? 'inbox' : 'all', select: true }),
   export: () => exportBackup(),
   import: () => { const f = $('#file-input'); f.value = ''; f.click(); },
   'text-import': () => openTextImport(),
@@ -4493,6 +4599,7 @@ function boot() {
   applyTheme();
   renderTabbar();
   initCardsView();
+  initLibraryView();
   setupStatsGestures($('#view-stats'));
   refresh(); // alle Ansichten zeichnen – ohne diesen Aufruf bleibt die App leer
   $('#view-learn').classList.add('active');
