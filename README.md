@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.15.1 | Play-Knopf im Lernen-Tab pulsiert |
 | 1.15.0 | Nach oben wischen = Merken, Wiederholung nach Zeit, Tagesziel automatisch aus Prüfungsterminen, Wischen in der Kartenliste, Haptik bei der Überschrift, Backup-Erinnerung |
 | 1.14.1 | Rundenende: „Falsche“ rechts, hervorgehoben und pulsierend |
 | 1.14.0 | GitHub-Backup: Lernstand automatisch im Branch „backup“ sichern und wiederherstellen |
