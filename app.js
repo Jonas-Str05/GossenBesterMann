@@ -1201,10 +1201,11 @@ const TABS = [
   ['stats', 'Statistik', ICON.stats],
 ];
 
-function navbar(title, { left = '', right = '' } = {}) {
-  return `<header class="navbar"><div class="navbar-inner">
+function navbar(title, { left = '', right = '', morph = false } = {}) {
+  // morph: große Überschrift steht mittig in der Leiste und wird beim Scrollen zur kleinen
+  return `<header class="navbar ${morph ? 'morph' : ''}"><div class="navbar-inner">
     <div class="nav-left">${left}</div>
-    <div class="nav-title">${esc(title)}</div>
+    <div class="nav-title">${morph ? `<span class="nt-big" aria-hidden="true">${esc(title)}</span><span class="nt-small">${esc(title)}</span>` : esc(title)}</div>
     <div class="nav-right">${right}</div>
   </div></header>`;
 }
@@ -1215,6 +1216,15 @@ const rowIcon = (icon, color, lg) => `<span class="row-icon ${lg ? 'lg' : ''}" s
 function renderTabbar() {
   $('#tabbar').innerHTML = TABS.map(([id, label, icon]) =>
     `<button class="tab ${UI.tab === id ? 'active' : ''}" role="tab" aria-selected="${UI.tab === id}" data-action="tab" data-tab="${id}">${icon}<span>${label}</span></button>`).join('');
+}
+
+// Scroll-Zustand: Leistenhintergrund + Fortschritt der Überschriften-Verwandlung (0 = groß, 1 = klein)
+const MORPH_DIST = 44;
+function updateScroll(v) {
+  const y = v.scrollTop;
+  v.classList.toggle('scrolled', y > 40);
+  const p = Math.min(1, Math.max(0, y / MORPH_DIST));
+  if (p !== v._morph) { v._morph = p; v.style.setProperty('--morph', p.toFixed(4)); }
 }
 
 function setTab(t) {
@@ -1234,7 +1244,7 @@ function setTab(t) {
   for (const v of $$('.view')) v.classList.toggle('active', v.dataset.tab === t);
   const v = $(`.view[data-tab="${t}"]`);
   v.scrollTop = v._st || 0;
-  v.classList.toggle('scrolled', v.scrollTop > 40);
+  updateScroll(v);
   renderTabbar();
   syncBackGuard();
 }
@@ -1371,9 +1381,9 @@ function renderLearn() {
   v.innerHTML = navbar('Lernen', {
     left: gearBtn(),
     right: `<button class="icon-btn" data-action="lib-add" aria-label="Hinzufügen">${ICON.plus}</button>`,
+    morph: true,
   }) + `
-  <div class="content">
-    <h1 class="large-title">Lernen</h1>
+  <div class="content morph-content">
     ${showInstall ? `
       <div class="banner">
         ${rowIcon(ICON.phone, 'blue', true)}
@@ -1697,9 +1707,8 @@ function renderSelectBar() {
 // Karten-Tab: Grundgerüst (Navigationsleiste, Titel, Suche) einmal anlegen
 function initLibraryView() {
   const v = $('#view-categories');
-  v.innerHTML = navbar('Karten', { left: gearBtn(), right: `<button class="icon-btn" data-action="lib-add" aria-label="Hinzufügen">${ICON.plus}</button>` }) + `
-  <div class="content">
-    <h1 class="large-title">Karten</h1>
+  v.innerHTML = navbar('Karten', { left: gearBtn(), right: `<button class="icon-btn" data-action="lib-add" aria-label="Hinzufügen">${ICON.plus}</button>`, morph: true }) + `
+  <div class="content morph-content">
     <label class="search">${ICON.search}<input id="lib-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen"></label>
     <div id="lib-body"></div>
   </div>`;
@@ -2551,7 +2560,7 @@ function renderStats() {
 
   const edit = !!UI.statEdit && DB.cards.length > 0;
   const right = DB.cards.length
-    ? `<button class="nav-btn ${edit ? 'bold' : ''}" data-action="stat-edit">${edit ? 'Fertig' : 'Anordnen'}</button>`
+    ? `<button class="icon-btn" data-action="stat-edit" aria-label="${edit ? 'Fertig' : 'Anordnen'}">${edit ? ICON.check : ICON.sort}</button>`
     : '';
   const render = {
     today: () => `<div class="section-header">Heute</div>${todayBlock()}`,
@@ -2591,9 +2600,8 @@ function renderStats() {
       `;
   }
 
-  v.innerHTML = navbar('Statistik', { left: gearBtn(), right }) + `
-    <div class="content">
-      <h1 class="large-title">Statistik</h1>
+  v.innerHTML = navbar('Statistik', { left: gearBtn(), right, morph: true }) + `
+    <div class="content morph-content">
       ${body}
     </div>`;
   if (!edit) bindCharts(v);
@@ -4725,7 +4733,7 @@ function boot() {
   refresh(); // alle Ansichten zeichnen – ohne diesen Aufruf bleibt die App leer
   $('#view-learn').classList.add('active');
   for (const v of $$('.view')) {
-    v.addEventListener('scroll', () => v.classList.toggle('scrolled', v.scrollTop > 40), { passive: true });
+    v.addEventListener('scroll', () => updateScroll(v), { passive: true });
   }
   if (DB.cards.length) requestPersist();
 
