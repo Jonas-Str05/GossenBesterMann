@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.13.1 | Sortierung beim App-Start immer alphabetisch |
 | 1.13.0 | Tab-Überschriften mittig oben, fließender Übergang beim Scrollen, Anordnen als Symbol |
 | 1.12.2 | Android-Zurück wechselt erst in den Lernen-Tab |
 | 1.12.1 | Plus-Menü ohne Abbrechen, Plus im Lernen-Tab wie im Karten-Tab |

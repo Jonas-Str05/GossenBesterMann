@@ -297,8 +297,6 @@ function normalize(d) {
     settings: { ...def.settings, ...(d.settings && typeof d.settings === 'object' ? d.settings : {}) },
     meta: { ...def.meta, ...(d.meta && typeof d.meta === 'object' ? d.meta : {}) },
   };
-  // einmalig: Standardsortierung ist jetzt alphabetisch
-  if (!out.meta.sortAlpha) { out.settings.cardSort = 'alpha'; out.meta.sortAlpha = true; }
   return out;
 }
 
@@ -4724,6 +4722,7 @@ function requestPersist() {
 
 function boot() {
   loadDB();
+  DB.settings.cardSort = 'alpha'; // bei jedem App-Start wieder alphabetisch sortieren
   applyTheme();
   renderTabbar();
   initCardsView();
