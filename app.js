@@ -1820,7 +1820,7 @@ function renderCategories() {
       </button>
       <button class="row accent" data-action="new-group">
         <span class="row-icon lg" style="--c:transparent;color:var(--blue)">${ICON.layers}</span>
-        <div class="row-main"><div class="row-title">Neuer Bereich</div><div class="row-sub">z. B. eine Prüfung, die Kategorien bündelt</div></div>
+        <div class="row-main"><div class="row-title">Neuer Bereich</div></div>
       </button>
     </div>
 
@@ -1828,11 +1828,11 @@ function renderCategories() {
     <div class="list icons">
       <button class="row" data-action="auto-distribute">
         ${rowIcon(ICON.sparkles, 'purple')}
-        <div class="row-main"><div class="row-title">Automatisch verteilen</div><div class="row-sub">${inboxN ? `${plural(inboxN, 'unsortierte Karte', 'unsortierte Karten')} zuordnen` : 'Keine unsortierten Karten'}</div></div>${chev}
+        <div class="row-main"><div class="row-title">Automatisch verteilen</div>${inboxN ? `<div class="row-sub">${plural(inboxN, 'unsortierte Karte', 'unsortierte Karten')} zuordnen</div>` : ''}</div>${chev}
       </button>
       <button class="row" data-action="manual-distribute">
         ${rowIcon(ICON.hand, 'blue')}
-        <div class="row-main"><div class="row-title">Manuell verteilen</div><div class="row-sub">Mehrere Karten auswählen und verschieben</div></div>${chev}
+        <div class="row-main"><div class="row-title">Manuell verteilen</div></div>${chev}
       </button>
     </div>
     `;
@@ -3434,7 +3434,7 @@ function openAutoDistribute() {
         <div class="empty">
           <div class="empty-icon" style="background:color-mix(in srgb,var(--purple) 14%,transparent);color:var(--purple)">${ICON.sparkles}</div>
           <h2>Keine Vorschläge</h2>
-          <p>${pool.length ? 'Für diese Karten wurde keine eindeutig passende Kategorie gefunden. Ergänze Stichwörter bei deinen Kategorien oder ordne ein paar Karten manuell zu – daraus lernt die Verteilung.' : 'Keine unsortierten Karten.'}</p>
+          ${pool.length ? `<p>Für diese Karten wurde keine eindeutig passende Kategorie gefunden. Ergänze Stichwörter bei deinen Kategorien oder ordne ein paar Karten manuell zu – daraus lernt die Verteilung.</p>` : ''}
         </div>`}`;
   };
 
