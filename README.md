@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.9.5 | Prüfung antippen öffnet ihre Kategorien; „Eine Kategorie“ und „Eine Ebene“ entfernt |
 | 1.9.4 | Statistik-Bausteine in der normalen Ansicht per langem Drücken verschieben |
 | 1.9.3 | Fix: Updates werden sofort erkannt (sw.js trägt die Version, kein HTTP-Cache für version.js) |
 | 1.9.2 | Fix: App blieb beim Start schwarz (Ansichten wurden nicht gezeichnet) |

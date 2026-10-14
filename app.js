@@ -338,7 +338,14 @@ const cardsInGroup = (gid) => {
   return DB.cards.filter((c) => ids.has(c.categoryId));
 };
 // Kurzname eines Bereichs: „Klausur 1: IT-Systemlösung“ → „Klausur 1“
-const groupShort = (g) => g.name.split(':')[0].trim();
+// Kurzname eines Bereichs für Filter-Chips:
+// „Klausur 1: IT-Systemlösung“ → „Klausur 1“, „IT-Systemlösung (Klausur 1)“ → „Klausur 1“
+const groupShort = (g) => {
+  const n = g.name.trim();
+  if (n.includes(':')) return n.split(':')[0].trim();
+  const m = n.match(/\(([^)]+)\)\s*$/);
+  return m ? m[1].trim() : n;
+};
 const catPath = (c) => {
   const g = c.parentId && catById(c.parentId);
   return g ? `${groupShort(g)} › ${c.name}` : c.name;
@@ -1366,7 +1373,7 @@ function renderLearn() {
           const cs = cardsInGroup(g.id);
           const known = cs.filter((c) => c.level > 0).length;
           const pct = cs.length ? Math.round((known / cs.length) * 100) : 0;
-          return `<button class="row" data-action="start-group" data-id="${esc(g.id)}" ${cs.length ? '' : 'disabled'}>
+          return `<button class="row" data-action="open-group" data-id="${esc(g.id)}" ${cs.length ? '' : 'disabled'}>
             ${rowIcon(ICON.learn, g.color, true)}
             <div class="row-main">
               <div class="row-title clamp1">${esc(g.name)}</div>
@@ -1375,6 +1382,14 @@ function renderLearn() {
             </div>${chev}
           </button>`;
         }).join('')}
+        ${(() => {
+          // Kategorien ohne Prüfung (z. B. „Unsortiert“) bleiben so erreichbar
+          const n = ungrouped().reduce((a, c) => a + cardsIn(c.id).length, 0);
+          return n ? `<button class="row" data-action="open-group" data-id="none">
+            ${rowIcon(ICON.folder, 'gray', true)}
+            <div class="row-main"><div class="row-title">Weitere Kategorien</div><div class="row-sub">${plural(n, 'Karte', 'Karten')} ohne Prüfung</div></div>${chev}
+          </button>` : '';
+        })()}
       </div>` : ''}
 
       <div class="section-header">Lernen starten</div>
@@ -1386,14 +1401,6 @@ function renderLearn() {
         <button class="row" data-action="start-equal">
           ${rowIcon(ICON.shuffle, 'blue')}
           <div class="row-main"><div class="row-title">Alle zufällig</div><div class="row-sub">Jede Karte gleich oft</div></div>${chev}
-        </button>
-        <button class="row" data-action="pick-category">
-          ${rowIcon(ICON.folder, 'purple')}
-          <div class="row-main"><div class="row-title">Eine Kategorie</div><div class="row-sub">${plural(catsWithCards, 'Kategorie', 'Kategorien')} mit Karten</div></div>${chev}
-        </button>
-        <button class="row" data-action="pick-level">
-          ${rowIcon(ICON.layers, 'green')}
-          <div class="row-main"><div class="row-title">Eine Ebene</div><div class="row-sub">${weak ? `${plural(weak, 'Karte', 'Karten')} im negativen Bereich` : 'z. B. nur deine schwächsten Karten'}</div></div>${chev}
         </button>
         ${pinnedN ? `
         <button class="row" data-action="start-pinned">
@@ -3304,6 +3311,56 @@ function openAutoDistribute() {
 // Lern-Auswahl
 // ---------------------------------------------------------------------------
 
+// Prüfung antippen: ganze Prüfung oder eine ihrer Kategorien lernen ('none' = Kategorien ohne Prüfung)
+function pickGroupSheet(gid) {
+  const g = gid === 'none' ? null : catById(gid);
+  const cats = g ? childrenOf(g.id) : ungrouped();
+  const all = g ? cardsInGroup(g.id) : cats.flatMap((c) => cardsIn(c.id));
+  const known = all.filter((c) => c.level > 0).length;
+  const row = (c) => {
+    const cs = cardsIn(c.id);
+    const p = cs.length ? Math.round((cs.filter((x) => x.level > 0).length / cs.length) * 100) : 0;
+    const weak = cs.filter((x) => x.level < 0).length;
+    return `<button class="row" data-cat="${esc(c.id)}" ${cs.length ? '' : 'disabled'}>
+      ${rowIcon(catIcon(c), c.color, true)}
+      <div class="row-main">
+        <div class="row-title clamp1">${esc(c.name)}</div>
+        <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')} · ${p} % gewusst${weak ? ` · ${weak} schwach` : ''}</div>
+      </div>${chev}
+    </button>`;
+  };
+  const sheet = openSheet({
+    title: g ? groupShort(g) : 'Weitere Kategorien',
+    compact: true,
+    left: { label: 'Abbrechen' },
+    body: `
+      <div class="list icons" style="--inset:66px">
+        <button class="row" data-all ${all.length ? '' : 'disabled'}>
+          ${rowIcon(ICON.play, g ? g.color : 'gray', true)}
+          <div class="row-main">
+            <div class="row-title">${g ? 'Ganze Prüfung lernen' : 'Alle lernen'}</div>
+            <div class="row-sub">${plural(all.length, 'Karte', 'Karten')} · ${pctOf(known, all.length)} % gewusst</div>
+          </div>${chev}
+        </button>
+      </div>
+      <div class="section-header">Kategorien</div>
+      <div class="list icons" style="--inset:66px">${cats.map(row).join('')}</div>`,
+  });
+  sheet.body.addEventListener('click', (e) => {
+    if (e.target.closest('[data-all]')) {
+      sheet.close();
+      if (g) startSession({ type: 'group', groupId: g.id, label: g.name });
+      else startSession({ type: 'retry', ids: all.map((c) => c.id), label: 'Weitere Kategorien' });
+      return;
+    }
+    const b = e.target.closest('[data-cat]');
+    if (!b) return;
+    const cat = catById(b.dataset.cat);
+    sheet.close();
+    startSession({ type: 'category', categoryId: cat.id, label: catPath(cat) });
+  });
+}
+
 function pickCategorySheet() {
   const row = (c) => {
     const cs = cardsIn(c.id);
@@ -4088,6 +4145,7 @@ const ACTIONS = {
   'start-smart': () => startSession({ type: 'smart', label: 'Empfohlene Runde' }),
   'start-pinned': () => startSession({ type: 'pinned', label: 'Gemerkte Karten' }),
   'start-group': (b) => { const g = catById(b.dataset.id); if (g) startSession({ type: 'group', groupId: g.id, label: g.name }); },
+  'open-group': (b) => pickGroupSheet(b.dataset.id),
   'pick-category': () => pickCategorySheet(),
   'pick-level': () => pickLevelSheet(),
   filter: (b) => { UI.cardsFilter = b.dataset.cat; renderCardsList(); },
