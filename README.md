@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.11.7 | Karten-Tab ohne „% gewusst“, „Neue Karte“ über „Neue Kategorie“ |
 | 1.11.6 | Kartenliste: großer „Karte hinzufügen“-Button, Suche als Lupe oben rechts, Stichwort-Text entfernt |
 | 1.11.5 | Doppeltipp auf Bereich entfernt |
 | 1.11.4 | Automatisch verteilen nur für unsortierte Karten, Lernen nur noch im Lernen-Tab |

@@ -1776,7 +1776,7 @@ function renderCategories() {
               ${rowIcon(b.group ? ICON.learn : ICON.folder, b.color, true)}
               <div class="row-main">
                 <div class="row-title clamp1">${esc(b.name)}</div>
-                <div class="row-sub">${plural(b.kids.length, 'Kategorie', 'Kategorien')} · ${plural(cs.length, 'Karte', 'Karten')}${cs.length ? ` · ${pct} % gewusst` : ''}</div>
+                <div class="row-sub">${plural(b.kids.length, 'Kategorie', 'Kategorien')} · ${plural(cs.length, 'Karte', 'Karten')}</div>
                 <div class="gbar" style="--c:var(--${b.color})"><span style="width:${pct}%"></span></div>
               </div>
               <span class="chev lib-chev">${ICON.chevDown}</span>
@@ -1788,6 +1788,10 @@ function renderCategories() {
         }).join('')}
     </div>
     <div class="list icons" style="margin-top:12px;--inset:66px">
+      <button class="row accent" data-action="new-card">
+        <span class="row-icon lg" style="--c:transparent;color:var(--blue)">${ICON.cards}</span>
+        <div class="row-main"><div class="row-title">Neue Karte</div></div>
+      </button>
       <button class="row accent" data-action="new-category">
         <span class="row-icon lg" style="--c:transparent;color:var(--blue)">${ICON.plus}</span>
         <div class="row-main"><div class="row-title">Neue Kategorie</div></div>
