@@ -3328,7 +3328,7 @@ function pickGroupSheet(gid) {
       <div class="row-main">
         <div class="row-title clamp1">${esc(c.name)}</div>
         <div class="row-sub">${plural(cs.length, 'Karte', 'Karten')} · ${p} % gewusst${weak ? ` · ${weak} schwach` : ''}</div>
-      </div>${chev}
+      </div>
     </button>`;
   };
   const sheet = openSheet({
@@ -3342,7 +3342,7 @@ function pickGroupSheet(gid) {
           <div class="row-main">
             <div class="row-title">${g ? 'Ganze Prüfung lernen' : 'Alle lernen'}</div>
             <div class="row-sub">${plural(all.length, 'Karte', 'Karten')} · ${pctOf(known, all.length)} % gewusst</div>
-          </div>${chev}
+          </div>
         </button>
       </div>
       <div class="section-header">Kategorien</div>

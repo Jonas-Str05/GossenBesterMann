@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.9.7 | Keine Pfeile in der Prüfungs-Auswahl (Tipp startet direkt) |
 | 1.9.6 | Lernmodus-Regler im „Jetzt lernen“-Button (Schwächen zuerst / Alle gleich) |
 | 1.9.5 | Prüfung antippen öffnet ihre Kategorien; „Eine Kategorie“ und „Eine Ebene“ entfernt |
 | 1.9.4 | Statistik-Bausteine in der normalen Ansicht per langem Drücken verschieben |
