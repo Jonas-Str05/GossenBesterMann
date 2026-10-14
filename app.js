@@ -4280,19 +4280,6 @@ const ACTIONS = {
   'toggle-lib-group': (b) => {
     const id = b.dataset.id;
     const box = b.closest('.lib-group');
-    // Doppelter Tipp: Aufklappen des ersten Tipps zurücknehmen und neue Kategorie in diesem Bereich anlegen
-    const now = Date.now();
-    const last = UI.lastGroupTap;
-    if (last && last.id === id && now - last.t < 350) {
-      UI.lastGroupTap = null;
-      if (last.wasOpen) UI.libOpen.add(id); else UI.libOpen.delete(id);
-      box.classList.toggle('open', last.wasOpen);
-      b.setAttribute('aria-expanded', String(last.wasOpen));
-      haptic(10);
-      openCategoryEditor(null, { parentId: id === 'none' ? null : id });
-      return;
-    }
-    UI.lastGroupTap = { id, t: now, wasOpen: UI.libOpen.has(id) };
     const open = !UI.libOpen.has(id);
     if (open) UI.libOpen.add(id); else UI.libOpen.delete(id);
     box.classList.toggle('open', open);
