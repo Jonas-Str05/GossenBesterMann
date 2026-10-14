@@ -1313,8 +1313,8 @@ function openCardsPage(catId = null, { filter = null, select = false } = {}) {
   UI.search = '';
   const input = $('#card-search');
   if (input) input.value = '';
-  const right = $('#view-cards .nav-right');
-  right.innerHTML = `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`;
+  $('#card-search-box').hidden = true;
+  $('#view-cards .nav-right').innerHTML = cardsNavRight();
   if (UI.select) setSelectMode(false);
   renderCardsNavLeft();
   renderCardsList();
@@ -1458,15 +1458,18 @@ function renderLearn() {
 
 // ---- Karten ---------------------------------------------------------------
 
+const cardsNavRight = () => `<button class="icon-btn" data-action="toggle-card-search" aria-label="Suchen">${ICON.search}</button>`;
+
 function initCardsView() {
   const v = $('#view-cards');
   v.innerHTML = `${navbar('Alle Karten', {
     left: '<span id="cards-nav-left"></span>',
-    right: `<button class="icon-btn" data-action="new-card" aria-label="Neue Karte">${ICON.plus}</button>`,
+    right: cardsNavRight(),
   })}
   <div class="content">
     <h1 class="large-title" id="cards-title">Alle Karten</h1>
-    <label class="search">${ICON.search}<input id="card-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen"></label>
+    <label class="search" id="card-search-box" hidden>${ICON.search}<input id="card-search" type="search" placeholder="Karten durchsuchen" enterkeyhint="search" autocomplete="off" aria-label="Karten durchsuchen"></label>
+    <div class="add-wide"><button class="btn-tinted" data-action="new-card">${ICON.plus}<span>Karte hinzufügen</span></button></div>
     <div class="chips" id="card-chips"></div>
     <div class="chips sub" id="card-subchips" hidden></div>
     <div id="cards-list"></div>
@@ -3145,8 +3148,7 @@ function openCategoryEditor(cat = null, opts = {}) {
       <div class="form-group">
         <div class="form-label">Stichwörter <span class="opt">· optional</span></div>
         <div class="field"><textarea data-c="keywords" rows="1" placeholder="z. B. Subnetz, IPv4, Router, OSI">${esc(cat ? cat.keywords.join(', ') : '')}</textarea></div>
-      </div>
-      <p class="footnote">Durch Komma getrennt. Karten mit diesen Wörtern werden automatisch dieser Kategorie zugeordnet.</p>`}
+      </div>`}
       ${cat ? `
         <div class="form-label">${plural(cs.length, 'Karte', 'Karten')}</div>
         <div class="list">
@@ -4247,6 +4249,17 @@ function openTextImport() {
 
 const ACTIONS = {
   tab: (b) => setTab(b.dataset.tab),
+  'toggle-card-search': () => {
+    const box = $('#card-search-box');
+    const input = $('#card-search');
+    box.hidden = !box.hidden;
+    if (box.hidden) {
+      if (UI.search) { input.value = ''; UI.search = ''; renderCardsList(); }
+    } else {
+      $('#view-cards').scrollTop = 0;
+      input.focus();
+    }
+  },
   'new-card': () => openCardEditor(null, cardsPageOpen() && catById(UI.cardsFilter) && !isGroup(catById(UI.cardsFilter)) ? { categoryId: UI.cardsFilter } : {}),
   'edit-card': (b) => { const c = cardById(b.dataset.id); if (c) openCardEditor(c); },
   'new-category': () => openCategoryEditor(null),

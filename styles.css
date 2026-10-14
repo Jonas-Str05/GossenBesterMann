@@ -508,6 +508,8 @@ button.row:active, .row.tappable:active { background: var(--fill2); transition: 
   background: var(--fill);
   color: var(--label2);
 }
+.search[hidden] { display: none; }
+.add-wide { margin: 0 16px 12px; }
 .search svg { width: 18px; height: 18px; flex: none; }
 .search input {
   flex: 1;
