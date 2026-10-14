@@ -202,6 +202,7 @@ function defaultDB() {
     settings: {
       theme: 'system', // 'system' | 'light' | 'dark'
       dailyGoal: 50,
+      goalAuto: true, // Tagesziel aus den Prüfungsterminen berechnen
       dailyMinutes: 20,
       haptics: true,
       voicePunct: true,
@@ -1095,13 +1096,39 @@ function poolFor(spec) {
 // „Jetzt lernen“: sinnvolle Auswahl ohne Wiederholungen in der Runde.
 // Gewichtung: schwache Ebenen deutlich öfter, lange nicht gesehene Karten öfter,
 // neue Karten in Maßen, heute schon gelernte Karten selten.
+// Wiederholung nach Zeit: positive Ebenen sind erst nach diesem Abstand (Tage) wieder fällig
+const INTERVAL_DAYS = { 1: 1, 2: 2, 3: 4, 4: 7, 5: 14 };
 function smartWeight(c, now) {
   const seen = c.right + c.wrong > 0;
   if (!seen) return 4;
   const days = (now - (c.last || 0)) / 86400000;
+  const iv = INTERVAL_DAYS[c.level];
+  if (iv) {
+    // noch nicht fällig: kommt nur ganz selten dran; überfällig: umso öfter
+    if (days < iv) return weightOf(c.level) * 0.03;
+    return weightOf(c.level) * 1.5 * (1 + Math.min(days - iv, 21) / 3);
+  }
   const recency = days < 0.5 ? 0.25 : 1 + Math.min(days, 21) / 3;
   return weightOf(c.level) * recency;
 }
+
+// Tagesziel: automatisch aus den Prüfungsterminen (Karten unter Ebene +3 brauchen noch Wiederholungen)
+function autoGoal() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  let perDay = 0;
+  let any = false;
+  for (const g of groups()) {
+    if (!g.examDate) continue;
+    const days = Math.round((new Date(`${g.examDate}T00:00:00`) - today) / 86400000);
+    if (days < 1) continue;
+    any = true;
+    const need = cardsInGroup(g.id).reduce((a, c) => a + Math.max(0, 3 - c.level), 0) * 1.3;
+    perDay += need / days;
+  }
+  if (!any) return null;
+  return Math.min(300, Math.max(20, Math.ceil(perDay / 5) * 5));
+}
+const dailyGoal = () => (DB.settings.goalAuto !== false && autoGoal()) || DB.settings.dailyGoal || 50;
 function smartQueue(n) {
   const now = Date.now();
   // gewichtete Stichprobe ohne Zurücklegen (Efraimidis-Spirakis)
@@ -1115,7 +1142,7 @@ const smartSize = () => DB.settings.sessionSize || 30;
 // Untertitel des Start-Buttons je nach Lernmodus
 const heroSub = (mode) => (mode === 'equal'
   ? `${DB.settings.sessionSize || 'Alle'} Karten · zufällig, jede gleich oft`
-  : `${smartSize()} Karten · schwache & lange nicht gesehene zuerst`);
+  : `${smartSize()} Karten · fällige & schwache zuerst`);
 
 function buildQueue(spec) {
   if (spec.type === 'smart') return smartQueue(spec.count || smartSize());
@@ -1219,11 +1246,16 @@ function renderTabbar() {
 
 // Scroll-Zustand: Leistenhintergrund + Fortschritt der Überschriften-Verwandlung (0 = groß, 1 = klein)
 const MORPH_DIST = 44;
-function updateScroll(v) {
+function updateScroll(v, byUser = false) {
   const y = v.scrollTop;
   v.classList.toggle('scrolled', y > 40);
   const p = Math.min(1, Math.max(0, y / MORPH_DIST));
-  if (p !== v._morph) { v._morph = p; v.style.setProperty('--morph', p.toFixed(4)); }
+  if (p !== v._morph) {
+    // ganz leichtes Klicken, sobald die Überschrift beim Scrollen komplett klein geworden ist
+    if (byUser && p === 1 && v._morph < 1 && v.querySelector('.navbar.morph')) haptic(4);
+    v._morph = p;
+    v.style.setProperty('--morph', p.toFixed(4));
+  }
 }
 
 function setTab(t) {
@@ -1389,8 +1421,14 @@ function renderLearn() {
         <div class="row-main"><div class="row-title">App installieren</div><div class="row-sub">Für Offline-Nutzung auf den Startbildschirm.</div></div>
         <button class="btn-small" data-action="install">Installieren</button>
       </div>` : ''}
+    ${backupDue() ? `
+      <div class="banner">
+        ${rowIcon(ICON.upload, 'indigo', true)}
+        <div class="row-main"><div class="row-title">Backup</div><div class="row-sub">Zuletzt: ${fmtDate(DB.meta.lastBackup)}</div></div>
+        <button class="btn-small" data-action="export">Sichern</button>
+      </div>` : ''}
     ${n ? (() => {
-      const goal = DB.settings.dailyGoal || 50;
+      const goal = dailyGoal();
       const done = today.r + today.w;
       const p = clamp(done / goal, 0, 1);
       const mode = DB.settings.learnMode === 'equal' ? 'equal' : 'smart';
@@ -1518,6 +1556,82 @@ function initCardsView() {
   $('#card-search').addEventListener('input', (e) => { UI.search = e.target.value; renderCardsList(); });
   renderCardsNavLeft();
   bindLongPress($('#cards-list'));
+  bindRowSwipe($('#cards-list'));
+}
+
+// Wischen in der Kartenliste (wie iOS-Mail): nach rechts = merken, nach links = löschen (Papierkorb)
+function bindRowSwipe(list) {
+  let d = null;
+  const reset = (row, animate = true) => {
+    row.style.transition = animate ? 'transform .32s cubic-bezier(.32,.72,0,1)' : '';
+    row.style.transform = '';
+  };
+  list.addEventListener('pointerdown', (e) => {
+    const row = e.target.closest('.card-row');
+    if (!row || e.button !== 0 || UI.select) return;
+    d = { row, id: row.dataset.id, x0: e.clientX, y0: e.clientY, axis: null, dx: 0, armed: false, bg: null, pid: e.pointerId };
+  });
+  list.addEventListener('pointermove', (e) => {
+    if (!d || e.pointerId !== d.pid) return;
+    const dx = e.clientX - d.x0;
+    const dy = e.clientY - d.y0;
+    if (!d.axis) {
+      if (Math.hypot(dx, dy) < 10) return;
+      if (Math.abs(dx) < Math.abs(dy) * 1.2) { d = null; return; }
+      d.axis = 'x';
+      try { d.row.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      const card = cardById(d.id);
+      const bg = el(`<div class="swipe-bg" aria-hidden="true">
+        <span class="sw-pin">${card && card.pinned ? ICON.bookmark : ICON.bookmarkFill}</span>
+        <span class="sw-del">${ICON.trash}</span></div>`);
+      bg.style.top = `${d.row.offsetTop}px`;
+      bg.style.height = `${d.row.offsetHeight}px`;
+      d.row.parentElement.appendChild(bg);
+      d.bg = bg;
+      d.row.style.transition = 'none';
+      d.row.classList.add('swiping');
+    }
+    const w = d.row.offsetWidth;
+    // über die Schwelle hinaus gebremst
+    const lim = w * 0.42;
+    d.dx = Math.abs(dx) <= lim ? dx : Math.sign(dx) * (lim + rubber(Math.abs(dx) - lim, w, 0.4));
+    d.row.style.transform = `translate3d(${d.dx}px,0,0)`;
+    d.bg.classList.toggle('right', d.dx > 0);
+    const armed = Math.abs(d.dx) > w * 0.3;
+    if (armed !== d.armed) { d.armed = armed; d.bg.classList.toggle('armed', armed); if (armed) haptic(8); }
+  });
+  const end = (e, cancelled) => {
+    if (!d || e.pointerId !== d.pid) return;
+    const s = d;
+    d = null;
+    if (!s.axis) return;
+    UI.suppressClick = true; // der Klick nach dem Wischen soll nicht den Editor öffnen
+    setTimeout(() => { UI.suppressClick = false; }, 350);
+    s.row.classList.remove('swiping');
+    const card = cardById(s.id);
+    const removeBg = () => { if (s.bg) s.bg.remove(); };
+    if (cancelled || !s.armed || !card) { reset(s.row); setTimeout(removeBg, 330); return; }
+    if (s.dx < 0) {
+      // Löschen: Zeile ganz hinausschieben, dann in den Papierkorb
+      s.row.style.transition = 'transform .25s ease-in';
+      s.row.style.transform = 'translate3d(-110%,0,0)';
+      haptic(12);
+      setTimeout(() => {
+        trashCards([card]);
+        save();
+        refresh();
+        toast('Im Papierkorb');
+      }, 230);
+    } else {
+      if (card.pinned) delete card.pinned; else card.pinned = true;
+      save();
+      haptic(10);
+      reset(s.row);
+      setTimeout(() => { removeBg(); renderCardsList(); }, 330);
+    }
+  };
+  list.addEventListener('pointerup', (e) => end(e, false));
+  list.addEventListener('pointercancel', (e) => end(e, true));
 }
 
 // Langes Drücken auf eine Karte: Auswahlmodus starten und diese Karte auswählen
@@ -2515,7 +2629,7 @@ function todayBlock() {
   const dm = dayMap(sc);
   const e = dm.get(dayKey()) || { r: 0, w: 0, ms: 0 };
   const n = e.r + e.w;
-  const goal = DB.settings.dailyGoal || 50;
+  const goal = dailyGoal();
   const minGoal = DB.settings.dailyMinutes || 20;
   const mins = Math.round(e.ms / 60000);
   const acc = n ? e.r / n : 0;
@@ -2919,9 +3033,11 @@ function openGoals() {
   const MIN_GOALS = [10, 15, 20, 30, 45, 60];
   const render = (sh) => {
     const s = DB.settings;
+    const auto = autoGoal();
+    const isAuto = !!auto && s.goalAuto !== false;
     sh.body.innerHTML = `
       <div class="form-label">Karten pro Tag</div>
-      <div class="segmented">${CARD_GOALS.map((v) => `<button class="${s.dailyGoal === v ? 'on' : ''}" data-goal="${v}">${v}</button>`).join('')}</div>
+      <div class="segmented">${auto ? `<button class="${isAuto ? 'on' : ''}" data-goal="auto">Auto</button>` : ''}${CARD_GOALS.map((v) => `<button class="${!isAuto && s.dailyGoal === v ? 'on' : ''}" data-goal="${v}">${v}</button>`).join('')}</div>
       <div class="form-label">Lernzeit pro Tag (Minuten)</div>
       <div class="segmented">${MIN_GOALS.map((v) => `<button class="${s.dailyMinutes === v ? 'on' : ''}" data-mins="${v}">${v}</button>`).join('')}</div>
       <p class="footnote">Die Ringe füllen sich, wenn du dein Tagesziel erreichst. Der dritte Ring zeigt deine Trefferquote von heute.</p>`;
@@ -2937,7 +3053,8 @@ function openGoals() {
   sheet.body.addEventListener('click', (e) => {
     const g = e.target.closest('[data-goal]');
     const m = e.target.closest('[data-mins]');
-    if (g) DB.settings.dailyGoal = +g.dataset.goal;
+    if (g && g.dataset.goal === 'auto') DB.settings.goalAuto = true;
+    else if (g) { DB.settings.goalAuto = false; DB.settings.dailyGoal = +g.dataset.goal; }
     if (m) DB.settings.dailyMinutes = +m.dataset.mins;
     if (g || m) { save(); haptic(4); render(sheet); }
   });
@@ -3766,24 +3883,34 @@ function startSession(spec) {
         </div>
         <div class="tint yes"><span>${ICON.check}Gewusst</span></div>
         <div class="tint no"><span>${ICON.x}Nicht gewusst</span></div>
+        <div class="tint pin"><span>${ICON.bookmarkFill}${card.pinned ? 'Nicht merken' : 'Merken'}</span></div>
       </div>`);
     const inner = $('.flash-inner', node);
     const tYes = $('.tint.yes', node);
     const tNo = $('.tint.no', node);
+    const tPin = $('.tint.pin', node);
     const W = () => stage.clientWidth || 320;
-    const st = { x: from ? from * W() * 1.3 : 0, enter: from || instant ? 1 : 0, angle: revealed ? 180 : 0 };
+    const PIN_DIST = 90; // so weit nach oben ziehen, dann „Merken“
+    const st = { x: from ? from * W() * 1.3 : 0, y: 0, enter: from || instant ? 1 : 0, angle: revealed ? 180 : 0 };
 
     const apply = () => {
       const w = W();
       const sc = 0.94 + 0.06 * st.enter;
-      const ty = (1 - st.enter) * 30;
+      const ty = (1 - st.enter) * 30 + st.y;
       node.style.transform = `translate3d(${st.x}px, ${ty}px, 0) rotate(${(st.x / w) * 9}deg) scale(${sc})`;
       node.style.opacity = from ? '1' : String(clamp(0.55 + st.enter * 0.9, 0, 1));
       tYes.style.opacity = String(clamp(st.x / (w * 0.28), 0, 1));
       tNo.style.opacity = String(clamp(-st.x / (w * 0.28), 0, 1));
+      tPin.style.opacity = String(clamp(-st.y / PIN_DIST, 0, 1));
       if (!reduceMotion.matches) inner.style.transform = `rotateY(${st.angle}deg)`;
     };
     const xs = new Spring(st.x, { damping: 1, response: 0.38, precision: 0.5 }, (x) => { st.x = x; apply(); });
+    const ys = new Spring(0, { damping: 0.72, response: 0.42, precision: 0.5 }, (y) => { st.y = y; apply(); });
+    // Nach oben wischen geht nur, wenn die Rückseite nicht selbst scrollen muss
+    const canPullUp = () => {
+      const sc = $('.face.back .face-scroll', node);
+      return !sc || sc.scrollHeight <= sc.clientHeight + 2;
+    };
     const es = new Spring(st.enter, { damping: 1, response: 0.36, precision: 0.002 }, (v) => { st.enter = v; apply(); });
     const fs = new Spring(st.angle, { damping: 0.82, response: 0.5, precision: 0.2 }, (a) => { st.angle = a; apply(); });
     if (reduceMotion.matches && revealed) node.classList.add('flipped');
@@ -3805,7 +3932,13 @@ function startSession(spec) {
       },
       get flipped() { return fs.target === 180 || node.classList.contains('flipped'); },
       showHint() { const h = $('.hint-wrap', node); if (h) h.classList.add('show'); },
-      setPinned(on) { for (const b of $$('.pin-badge', node)) b.hidden = !on; },
+      setPinned(on) {
+        for (const b of $$('.pin-badge', node)) b.hidden = !on;
+        const lbl = $('.tint.pin span', node);
+        if (lbl) lbl.innerHTML = `${ICON.bookmarkFill}${on ? 'Nicht merken' : 'Merken'}`;
+      },
+      // nach dem Aufdecken: Wischen nach oben erlauben (touch-action none), sofern nichts scrollen muss
+      updatePull() { node.classList.toggle('pull', canPullUp()); },
       leave(dir, velocity) {
         node.classList.add('locked');
         node.style.zIndex = '3';
@@ -3842,7 +3975,16 @@ function startSession(spec) {
         if (drag.axis === 'x') { try { node.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ } }
       }
       // Wischen ist erst nach dem Aufdecken möglich – vorher bleibt die Karte ruhig liegen
-      if (drag.axis !== 'x' || !S.revealed) return;
+      if (!S.revealed) return;
+      if (drag.axis === 'y') {
+        if (!node.classList.contains('pull')) return;
+        // nach oben folgt die Karte dem Finger (gebremst), nach unten kaum
+        const y = dy < 0 ? -rubber(-dy, 260, 0.9) : rubber(dy, 260, 0.15);
+        ys.set(y);
+        const armedNow = -y >= PIN_DIST;
+        if (armedNow !== !!drag.pinArmed) { drag.pinArmed = armedNow; if (armedNow) haptic(8); }
+        return;
+      }
       xs.set(drag.sx + dx);
     });
     const end = (e, cancelled) => {
@@ -3851,6 +3993,14 @@ function startSession(spec) {
       drag = null;
       if (!d.axis) {
         if (!cancelled && performance.now() - d.t0 < 600) onTap();
+        return;
+      }
+      if (d.axis === 'y') {
+        if (!S.revealed || !node.classList.contains('pull')) return;
+        const vy = d.vt.get().y;
+        const fling = vy < -900 && st.y < -40;
+        if (!cancelled && (st.y <= -PIN_DIST || fling)) togglePin();
+        ys.to(0, { velocity: vy });
         return;
       }
       if (d.axis !== 'x' || !S.revealed) return;
@@ -3878,6 +4028,7 @@ function startSession(spec) {
     if (S.revealed || S.done) return;
     S.revealed = true;
     S.view.flip(true);
+    S.view.updatePull();
     haptic(6);
     renderActions();
   }
@@ -3897,6 +4048,7 @@ function startSession(spec) {
     stage.appendChild(view.node);
     S.view = view;
     view.enter();
+    if (S.revealed) view.updatePull();
     updateTop();
     renderActions();
   }
@@ -3951,6 +4103,7 @@ function startSession(spec) {
     stage.appendChild(view.node);
     S.view = view;
     view.enter();
+    view.updatePull();
     renderActions();
   }
 
@@ -4206,7 +4359,7 @@ async function exportBackup() {
     }
     DB.meta.lastBackup = Date.now();
     save();
-    renderSettings();
+    refresh();
     toast('Backup exportiert');
   } catch (e) {
     if (e && e.name === 'AbortError') return;
@@ -4404,6 +4557,9 @@ const GH = (() => {
     },
   };
 })();
+
+// Erinnerung im Lernen-Tab: ohne GitHub-Backup alle 7 Tage zum Sichern auffordern (nur wenn schon gelernt wurde)
+const backupDue = () => !GH.token() && DB.reviews.length > 0 && Date.now() - (DB.meta.lastBackup || 0) > 7 * 86400000;
 
 function openGitHubBackup() {
   const render = (sh) => {
@@ -4949,7 +5105,7 @@ function boot() {
   refresh(); // alle Ansichten zeichnen – ohne diesen Aufruf bleibt die App leer
   $('#view-learn').classList.add('active');
   for (const v of $$('.view')) {
-    v.addEventListener('scroll', () => updateScroll(v), { passive: true });
+    v.addEventListener('scroll', () => updateScroll(v, true), { passive: true });
   }
   if (DB.cards.length) requestPersist();
 

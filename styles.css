@@ -321,6 +321,30 @@ button.row:active, .row.tappable:active { background: var(--fill2); transition: 
   background: var(--sep);
 }
 .list.icons { --inset: 60px; }
+
+/* Wischen in der Kartenliste: Aktion liegt hinter der Zeile */
+#cards-list .list { position: relative; }
+#cards-list .card-row { touch-action: pan-y; z-index: 1; }
+#cards-list .card-row.swiping { background: var(--bg2); }
+.swipe-bg {
+  position: absolute;
+  left: 0; right: 0;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 24px;
+  background: var(--red);
+  color: #fff;
+  transition: background-color .2s ease;
+}
+.swipe-bg.right { justify-content: flex-start; background: var(--orange); }
+.swipe-bg span { display: grid; place-items: center; transition: transform .2s cubic-bezier(.32,.72,0,1); }
+.swipe-bg span svg { width: 24px; height: 24px; }
+.swipe-bg .sw-pin, .swipe-bg.right .sw-del { display: none; }
+.swipe-bg.right .sw-pin { display: grid; }
+.swipe-bg:not(.armed) { filter: saturate(.55) brightness(.9); }
+.swipe-bg.armed span { transform: scale(1.25); }
 .row-main { flex: 1; min-width: 0; padding: 11px 0; }
 .row-title { font-size: 17px; line-height: 22px; letter-spacing: -.005em; }
 .row-sub { font-size: 14px; line-height: 19px; color: var(--label2); margin-top: 1px; }
@@ -1199,6 +1223,10 @@ button.bold { font-weight: 600; }
 .tint.yes span { background: var(--green); }
 .tint.no { background: color-mix(in srgb, var(--red) 14%, transparent); box-shadow: inset 0 0 0 2.5px var(--red); }
 .tint.no span { background: var(--red); }
+.tint.pin { background: color-mix(in srgb, var(--orange) 14%, transparent); box-shadow: inset 0 0 0 2.5px var(--orange); }
+.tint.pin span { background: var(--orange); }
+/* aufgedeckt und nichts zu scrollen: auch vertikale Gesten gehören der Karte (nach oben = Merken) */
+.flash.pull, .flash.pull * { touch-action: none; }
 
 .session-actions { display: flex; flex-direction: column; gap: 10px; padding: 10px 20px 18px; }
 .act-row { display: flex; gap: 12px; min-height: 58px; align-items: center; }
