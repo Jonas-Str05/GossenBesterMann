@@ -3712,8 +3712,8 @@ function startSession(spec) {
     if (S.done) {
       const wrong = [...new Set(S.results.filter((r) => !r.correct).map((r) => r.id))];
       actions.innerHTML = `
-        ${wrong.length ? `<button class="pill-btn" data-s="retry">${ICON.reset}<span>Falsche (${wrong.length})</span></button>` : ''}
-        <button class="pill-btn primary" data-s="close">${ICON.check}<span>Fertig</span></button>`;
+        <button class="pill-btn ${wrong.length ? '' : 'primary'}" data-s="close">${ICON.check}<span>Fertig</span></button>
+        ${wrong.length ? `<button class="pill-btn primary pulse" data-s="retry">${ICON.reset}<span>Falsche (${wrong.length})</span></button>` : ''}`;
       return;
     }
     const card = currentCard();

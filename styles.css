@@ -1463,6 +1463,16 @@ button.bold { font-weight: 600; }
 .pill-btn.hint { color: color-mix(in srgb, var(--orange) 90%, var(--label)); }
 .pill-btn:disabled { opacity: .45; }
 .pill-btn:not(:disabled):active { transform: scale(.96); }
+/* „Falsche wiederholen“ lädt sanft pulsierend zum Weiterlernen ein */
+.pill-btn.pulse { animation: pill-pulse 1.8s cubic-bezier(.4, 0, .2, 1) infinite; }
+.pill-btn.pulse:active { animation: none; }
+@keyframes pill-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--blue) 55%, transparent); }
+  50% { transform: scale(1.035); }
+  70% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--blue) 0%, transparent); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--blue) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .pill-btn.pulse { animation: none; } }
 .rate-btn {
   flex: 1;
   height: 66px;
