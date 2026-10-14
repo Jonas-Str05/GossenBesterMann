@@ -3863,8 +3863,8 @@ function startSession(spec) {
     const tools = `
       <div class="tool-row ${S.revealed ? 'show' : ''}" ${S.revealed ? '' : 'aria-hidden="true"'}>
         <button class="tool-btn ${card.pinned ? 'on' : ''}" data-s="pin" ${S.revealed ? '' : 'disabled tabindex="-1"'} aria-pressed="${!!card.pinned}">${card.pinned ? ICON.bookmarkFill : ICON.bookmark}<span>${card.pinned ? 'Gemerkt' : 'Merken'}</span></button>
-        <button class="tool-btn" data-s="edit" ${S.revealed ? '' : 'disabled tabindex="-1"'}>${ICON.pencil}<span>Bearbeiten</span></button>
         <button class="tool-btn destructive" data-s="delete" ${S.revealed ? '' : 'disabled tabindex="-1"'}>${ICON.trash}<span>Löschen</span></button>
+        <button class="tool-btn" data-s="edit" ${S.revealed ? '' : 'disabled tabindex="-1"'}>${ICON.pencil}<span>Bearbeiten</span></button>
       </div>`;
     if (!S.revealed) {
       actions.innerHTML = `${tools}
