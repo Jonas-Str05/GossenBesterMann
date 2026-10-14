@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.11.0 | Karten-Tab: Bereiche aufklappbar, langes Drücken öffnet Einstellungen |
 | 1.10.1 | Erklärtexte im Bereich-Editor und im Lernen-Tab entfernt |
 | 1.10.0 | Tabs Karten und Kategorien zusammengelegt: Kategorie öffnet ihre Karten, „Alle Karten“, Suche |
 | 1.9.7 | Keine Pfeile in der Prüfungs-Auswahl (Tipp startet direkt) |

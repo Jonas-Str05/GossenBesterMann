@@ -1177,6 +1177,7 @@ function undoRating(rec) {
 
 const UI = {
   tab: 'learn',
+  libOpen: new Set(), // aufgeklappte Bereiche im Karten-Tab (beim Start alle zu)
   cardsFilter: 'all',
   search: '',
   select: false,
@@ -1662,6 +1663,43 @@ function initLibraryView() {
     <div id="lib-body"></div>
   </div>`;
   $('#lib-search').addEventListener('input', (e) => { UI.libSearch = e.target.value; renderCategories(); });
+  bindLibLongPress($('#lib-body'));
+}
+
+// Langes Drücken im Karten-Tab: Kategorie → Kategorie-Einstellungen, Bereich → Bereich-Einstellungen
+function bindLibLongPress(box) {
+  let timer = 0;
+  let start = null;
+  let row = null;
+  const cancel = () => {
+    clearTimeout(timer);
+    timer = 0;
+    if (row) row.classList.remove('pressing');
+    row = null;
+  };
+  box.addEventListener('pointerdown', (e) => {
+    const r = e.target.closest('.lib-press');
+    if (!r || e.button !== 0) return;
+    row = r;
+    start = { x: e.clientX, y: e.clientY };
+    r.classList.add('pressing');
+    timer = setTimeout(() => {
+      const id = r.dataset.id;
+      const isGroupRow = r.classList.contains('lib-group-row');
+      cancel();
+      UI.suppressAnyClick = true; // der folgende Klick soll nicht öffnen/aufklappen
+      setTimeout(() => { UI.suppressAnyClick = false; }, 700);
+      haptic(15);
+      const c = catById(id);
+      if (!c) return; // „Weitere“ hat keine Einstellungen
+      if (isGroupRow) openGroupEditor(c); else openCategoryEditor(c);
+    }, 480);
+  });
+  box.addEventListener('pointermove', (e) => {
+    if (timer && start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) cancel();
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) box.addEventListener(ev, cancel);
+  box.addEventListener('contextmenu', (e) => { if (e.target.closest('.lib-press')) e.preventDefault(); });
 }
 
 // Suchergebnisse im Karten-Tab
@@ -1696,7 +1734,7 @@ function renderCategories() {
   const catRow = (c) => {
     const cs = cardsIn(c.id);
     const avg = cs.length ? cs.reduce((a, x) => a + x.level, 0) / cs.length : null;
-    return `<button class="row" data-action="open-category" data-id="${esc(c.id)}">
+    return `<button class="row lib-press" data-action="open-category" data-id="${esc(c.id)}">
       ${rowIcon(catIcon(c), c.color, true)}
       <div class="row-main">
         <div class="row-title clamp1">${esc(c.name)}</div>
@@ -1713,17 +1751,30 @@ function renderCategories() {
         <span class="row-value">${fmtNum(DB.cards.length)}</span>${chev}
       </button>
     </div>
-    ${gs.map((g) => {
-      const kids = childrenOf(g.id);
-      return `
-      <div class="section-header"><span class="clamp1">${esc(g.name)}</span><button data-action="edit-category" data-id="${esc(g.id)}">Bearbeiten</button></div>
-      <div class="list icons" style="--inset:66px">
-        ${kids.length ? kids.map(catRow).join('') : `<div class="row"><div class="row-main"><div class="row-sub">Noch keine Kategorien in diesem Bereich</div></div></div>`}
-      </div>`;
-    }).join('')}
-    <div class="section-header">${gs.length ? 'Weitere' : ''}</div>
-    <div class="list icons" style="--inset:66px">
-      ${ungrouped().map(catRow).join('')}
+    <div class="section-header">Bereiche</div>
+    <div class="list icons lib-groups" style="--inset:66px">
+      ${[...gs.map((g) => ({ id: g.id, name: g.name, color: g.color, kids: childrenOf(g.id), group: g })),
+         ...(ungrouped().length ? [{ id: 'none', name: gs.length ? 'Weitere' : 'Kategorien', color: 'gray', kids: ungrouped(), group: null }] : [])]
+        .map((b) => {
+          const cs = b.kids.flatMap((c) => cardsIn(c.id));
+          const pct = cs.length ? Math.round((cs.filter((c) => c.level > 0).length / cs.length) * 100) : 0;
+          const open = UI.libOpen.has(b.id);
+          return `
+          <div class="lib-group ${open ? 'open' : ''}" data-gid="${esc(b.id)}">
+            <button class="row lib-group-row lib-press" data-action="toggle-lib-group" data-id="${esc(b.id)}" aria-expanded="${open}">
+              ${rowIcon(b.group ? ICON.learn : ICON.folder, b.color, true)}
+              <div class="row-main">
+                <div class="row-title clamp1">${esc(b.name)}</div>
+                <div class="row-sub">${plural(b.kids.length, 'Kategorie', 'Kategorien')} · ${plural(cs.length, 'Karte', 'Karten')} · ${pct} % gewusst</div>
+                <div class="gbar" style="--c:var(--${b.color})"><span style="width:${pct}%"></span></div>
+              </div>
+              <span class="chev lib-chev">${ICON.chevDown}</span>
+            </button>
+            <div class="lib-kids"><div>
+              ${b.kids.length ? b.kids.map(catRow).join('') : '<div class="row"><div class="row-main"><div class="row-sub">Noch keine Kategorien in diesem Bereich</div></div></div>'}
+            </div></div>
+          </div>`;
+        }).join('')}
     </div>
     <div class="list icons" style="margin-top:12px;--inset:66px">
       <button class="row accent" data-action="new-category">
@@ -4232,6 +4283,16 @@ const ACTIONS = {
   },
   'open-trash': () => openTrash(),
   'open-category': (b) => { const c = catById(b.dataset.id); if (c) openCardsPage(c.id); },
+  // Bereich auf-/zuklappen ohne Neuzeichnen, damit es weich animiert
+  'toggle-lib-group': (b) => {
+    const id = b.dataset.id;
+    const box = b.closest('.lib-group');
+    const open = !UI.libOpen.has(id);
+    if (open) UI.libOpen.add(id); else UI.libOpen.delete(id);
+    box.classList.toggle('open', open);
+    b.setAttribute('aria-expanded', String(open));
+    haptic(5);
+  },
   'open-all-cards': () => openCardsPage(null),
   'cards-back': () => { if (cardsPageOpen()) closeOverlay(UI.cardsOv); },
   'lib-add': async () => {

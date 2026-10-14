@@ -1144,6 +1144,32 @@ button.bold { font-weight: 600; }
 .tool-btn.on { background: color-mix(in srgb, var(--orange) 18%, var(--bg2)); color: color-mix(in srgb, var(--orange) 85%, var(--label)); }
 .tool-btn.destructive { color: var(--red); }
 
+/* Karten-Tab: Bereiche auf- und zuklappen */
+.lib-group { position: relative; }
+.lib-group + .lib-group::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  left: 66px;
+  height: .5px;
+  background: var(--sep);
+  z-index: 1;
+}
+.lib-chev svg { width: 16px; height: 16px; transition: transform .35s var(--spring); }
+.lib-group.open .lib-chev svg { transform: rotate(180deg); }
+.lib-kids {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .4s var(--spring);
+}
+.lib-group.open .lib-kids { grid-template-rows: 1fr; }
+.lib-kids > div { overflow: hidden; min-height: 0; }
+.lib-kids .row { padding-left: 32px; background: color-mix(in srgb, var(--fill) 35%, var(--bg2)); }
+.lib-kids .row::before { left: 82px !important; }
+.lib-kids .row:first-child::before { content: ""; position: absolute; top: 0; right: 0; left: 0 !important; height: .5px; background: var(--sep); }
+.lib-press { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.lib-press.pressing { background: var(--fill2); transform: scale(.985); transition: transform .45s ease, background-color .2s ease; }
+
 /* Langes Drücken: kein Browser-Menü, sanftes „Eindrücken“ als Rückmeldung */
 .card-row { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
 .card-row.pressing { background: var(--fill2); transform: scale(.985); transition: transform .45s ease, background-color .2s ease; }
