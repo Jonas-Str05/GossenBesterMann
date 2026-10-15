@@ -2129,6 +2129,7 @@ function renderSettings() {
     <div class="list">
       ${(DB.meta.deckIds || []).length ? '<button class="row destructive" data-action="remove-deck"><div class="row-main"><div class="row-title">Mitgelieferte AP2-Karten entfernen</div></div></button>' : ''}
       <button class="row destructive" data-action="wipe"><div class="row-main"><div class="row-title">Alle Daten löschen</div></div></button>
+      ${DB.cards.length ? '<button class="row destructive" data-action="delete-all-cards"><div class="row-main"><div class="row-title">Alle Karten löschen</div></div></button>' : ''}
     </div>
   </div>`;
 }
@@ -4925,6 +4926,16 @@ const ACTIONS = {
     save();
     refresh();
     toast('AP2-Karten entfernt');
+  },
+  // Alle Karten in den Papierkorb – Bereiche und Kategorien bleiben erhalten
+  'delete-all-cards': async () => {
+    const n = DB.cards.length;
+    const ok = await confirmDialog({ title: `Alle ${plural(n, 'Karte', 'Karten')} löschen?`, message: `Bereiche und Kategorien bleiben. Die Karten liegen ${TRASH_DAYS} Tage im Papierkorb.`, confirm: 'Alle löschen', destructive: true });
+    if (!ok) return;
+    trashCards([...DB.cards]);
+    save();
+    refresh();
+    toast(`${plural(n, 'Karte', 'Karten')} im Papierkorb`);
   },
   wipe: async () => {
     const ok = await confirmDialog({ title: 'Alle Daten löschen?', message: `${plural(DB.cards.length, 'Karte', 'Karten')} und alle Kategorien werden unwiderruflich gelöscht. Exportiere vorher ein Backup!`, confirm: 'Alles löschen', destructive: true });
