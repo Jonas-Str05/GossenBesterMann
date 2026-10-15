@@ -1,5 +1,5 @@
 /* Service Worker: hält die App komplett offline verfügbar. */
-// Version 1.17.4 – diese Zeile bei jedem Update mit version.js erhöhen (Browser prüfen sw.js immer frisch)
+// Version 1.17.5 – diese Zeile bei jedem Update mit version.js erhöhen (Browser prüfen sw.js immer frisch)
 importScripts('version.js');
 const CACHE = `karteikarten-ap2-${self.APP_VERSION}`;
 const ASSETS = [

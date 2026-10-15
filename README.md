@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.17.5 | Button „Mitgelieferte AP2-Karten entfernen“ wieder entfernt |
 | 1.17.4 | Einstellungen: Alle Karten löschen (Bereiche und Kategorien bleiben) |
 | 1.17.3 | Einstellungen: mitgelieferte AP2-Karten entfernen (eigene bleiben) |
 | 1.17.2 | Neue Nutzer starten ohne Prüfungskarten (eigene Karten und Kategorien) |

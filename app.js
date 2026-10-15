@@ -2127,7 +2127,6 @@ function renderSettings() {
 
     <div class="section-header">Gefahrenzone</div>
     <div class="list">
-      ${(DB.meta.deckIds || []).length ? '<button class="row destructive" data-action="remove-deck"><div class="row-main"><div class="row-title">Mitgelieferte AP2-Karten entfernen</div></div></button>' : ''}
       <button class="row destructive" data-action="wipe"><div class="row-main"><div class="row-title">Alle Daten löschen</div></div></button>
       ${DB.cards.length ? '<button class="row destructive" data-action="delete-all-cards"><div class="row-main"><div class="row-title">Alle Karten löschen</div></div></button>' : ''}
     </div>
@@ -4904,28 +4903,6 @@ const ACTIONS = {
     save();
     refresh();
     toast('Lernstand zurückgesetzt');
-  },
-  // Nur den mitgelieferten Kartensatz entfernen – eigene Karten und Kategorien bleiben
-  'remove-deck': async () => {
-    const ids = new Set(DB.meta.deckIds || []);
-    const isDeck = (c) => c.deck || ids.has(c.id);
-    const n = DB.cards.filter(isDeck).length;
-    const ok = await confirmDialog({ title: 'AP2-Karten entfernen?', message: `${plural(n, 'Karte', 'Karten')} und ihre Kategorien werden gelöscht. Eigene Karten bleiben.`, confirm: 'Entfernen', destructive: true });
-    if (!ok) return;
-    const gone = new Set(DB.cards.filter(isDeck).map((c) => c.id));
-    DB.cards = DB.cards.filter((c) => !gone.has(c.id));
-    DB.reviews = DB.reviews.filter((r) => !gone.has(r[1]));
-    // Prüfungs-Kategorien und -Bereiche nur löschen, wenn nichts Eigenes mehr darin ist
-    const used = (cat) => DB.cards.some((c) => c.categoryId === cat.id) || DB.categories.some((k) => k.parentId === cat.id && !k.deck);
-    DB.categories = DB.categories.filter((c) => !(c.deck && !isGroup(c) && !used(c)));
-    DB.categories = DB.categories.filter((c) => !(c.deck && isGroup(c) && !used(c)));
-    delete DB.meta.deckIds;
-    delete DB.meta.deckCats;
-    delete DB.meta.deckHash;
-    delete DB.meta.deckTotal;
-    save();
-    refresh();
-    toast('AP2-Karten entfernt');
   },
   // Alle Karten in den Papierkorb – Bereiche und Kategorien bleiben erhalten
   'delete-all-cards': async () => {
