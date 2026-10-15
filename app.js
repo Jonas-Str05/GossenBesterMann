@@ -5145,7 +5145,8 @@ function boot() {
   if (DB.cards.length) requestPersist();
 
   Voice.checkLocal().then(() => renderSettings());
-  loadDeck().then((r) => { if (r && r.added) requestPersist(); });
+  // Prüfungskarten (deck/ap2.txt) nur für Nutzer, die sie schon haben – neue Nutzer starten leer
+  if ((DB.meta.deckIds || []).length) loadDeck().then((r) => { if (r && r.added) requestPersist(); });
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
