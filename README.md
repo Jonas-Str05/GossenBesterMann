@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.17.1 | Installationshinweis für iPhone/iPad |
 | 1.17.0 | Neues App-Icon (Auge) |
 | 1.16.2 | Beim Lernen: Löschen und Bearbeiten getauscht |
 | 1.16.1 | Play-Pfeil mittig im Kreis |

@@ -32,6 +32,8 @@ const plural = (n, one, many) => `${n.toLocaleString('de-DE')} ${n === 1 ? one :
 const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+// iPhone/iPad (iPadOS meldet sich als Mac, hat aber Touch)
+const isIOS = () => /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 function el(html) {
   const t = document.createElement('template');
@@ -1437,6 +1439,7 @@ function renderLearn() {
   const size = DB.settings.sessionSize;
   const catsWithCards = DB.categories.filter((c) => cardsIn(c.id).length).length;
   const showInstall = UI.installEvt && !isStandalone() && !DB.settings.installDismissed;
+  const showIosHint = isIOS() && !isStandalone() && !DB.settings.iosHintDismissed;
 
   v.innerHTML = navbar('Lernen', {
     left: gearBtn(),
@@ -1449,6 +1452,12 @@ function renderLearn() {
         ${rowIcon(ICON.phone, 'blue', true)}
         <div class="row-main"><div class="row-title">App installieren</div><div class="row-sub">Für Offline-Nutzung auf den Startbildschirm.</div></div>
         <button class="btn-small" data-action="install">Installieren</button>
+      </div>` : ''}
+    ${showIosHint ? `
+      <div class="banner ios-hint">
+        ${rowIcon(ICON.share, 'blue', true)}
+        <div class="row-main"><div class="row-title">Als App installieren</div><div class="row-sub">Teilen ${ICON.share} → <span style="white-space:nowrap">Zum Home-Bildschirm</span></div></div>
+        <button class="icon-btn small" data-action="dismiss-ios-hint" aria-label="Ausblenden">${ICON.x}</button>
       </div>` : ''}
     ${backupDue() ? `
       <div class="banner">
@@ -4865,6 +4874,7 @@ const ACTIONS = {
   export: () => exportBackup(),
   import: () => { const f = $('#file-input'); f.value = ''; f.click(); },
   'github-backup': () => openGitHubBackup(),
+  'dismiss-ios-hint': () => { DB.settings.iosHintDismissed = true; save(); renderLearn(); },
   'text-import': () => openTextImport(),
   install: async () => {
     if (!UI.installEvt) return;

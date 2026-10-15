@@ -495,6 +495,9 @@ button.row:active, .row.tappable:active { background: var(--fill2); transition: 
 }
 .banner .row-main { padding: 0; }
 .banner .btn-small { flex: none; }
+.ios-hint .row-sub svg { display: inline-block; width: 15px; height: 15px; vertical-align: -2px; margin: 0 1px; color: var(--blue); }
+.icon-btn.small { width: 32px; height: 32px; flex: none; color: var(--label3); }
+.icon-btn.small svg { width: 16px; height: 16px; }
 
 /* ---------- Buttons ----------------------------------------------------- */
 
