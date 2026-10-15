@@ -1,5 +1,5 @@
 /* Service Worker: hält die App komplett offline verfügbar. */
-// Version 1.16.2 – diese Zeile bei jedem Update mit version.js erhöhen (Browser prüfen sw.js immer frisch)
+// Version 1.17.0 – diese Zeile bei jedem Update mit version.js erhöhen (Browser prüfen sw.js immer frisch)
 importScripts('version.js');
 const CACHE = `karteikarten-ap2-${self.APP_VERSION}`;
 const ASSETS = [
@@ -10,11 +10,11 @@ const ASSETS = [
   './version.js',
   './manifest.webmanifest',
   './deck/ap2.txt',
-  './icons/app-icon-v2-64.png',
-  './icons/app-icon-v2-192.png',
-  './icons/app-icon-v2-512.png',
-  './icons/app-icon-v2-maskable-512.png',
-  './icons/app-icon-v2-apple-180.png',
+  './icons/app-icon-v3-64.png',
+  './icons/app-icon-v3-192.png',
+  './icons/app-icon-v3-512.png',
+  './icons/app-icon-v3-maskable-512.png',
+  './icons/app-icon-v3-apple-180.png',
 ];
 
 self.addEventListener('install', (e) => {
