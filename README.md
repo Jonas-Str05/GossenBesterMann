@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.22.1 | Doppelte Vorderseite wird schon beim Verlassen des Feldes gemeldet |
 | 1.22.0 | Hinweis bei doppelter Vorderseite, Verschlüsselung + Rückseite Vertragsstörungen |
 | 1.21.0 | Leere Kategorien ausgegraut, Kartensatz kann Karten entfernen und markieren, 43 neue AP2-Vorderseiten |
 | 1.20.0 | 60 neue Karten (Vorderseiten) für Klausur 1, Kartensatz mit @set für neu angelegte Karten |

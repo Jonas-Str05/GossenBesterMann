@@ -3235,8 +3235,11 @@ function openCardEditor(card = null, opts = {}) {
   };
 
   // Gleiche Vorderseite schon vorhanden? → Hinweis mit „Zur vorhandenen Karte“ oder „Trotzdem sichern“
+  let dupOk = '';     // Vorderseite, für die „Trotzdem sichern“ gewählt wurde
+  let dupAsked = '';  // zuletzt beim Verlassen des Feldes geprüfte Vorderseite
   const dupCheck = async () => {
     const fr = val('front').trim().toLowerCase();
+    if (!fr || fr === dupOk) return 'ok';
     if (card && card.front.trim().toLowerCase() === fr) return 'ok';
     const dup = DB.cards.find((c) => c !== card && c.front.trim().toLowerCase() === fr);
     if (!dup) return 'ok';
@@ -3254,6 +3257,7 @@ function openCardEditor(card = null, opts = {}) {
       sheet.close();
       setTimeout(() => openCardEditor(dup), 380);
     }
+    if (v === 'ok') dupOk = fr;
     return v;
   };
 
@@ -3296,6 +3300,15 @@ function openCardEditor(card = null, opts = {}) {
       updateState();
       if (e.target.dataset.f !== 'hint' || val('hint')) runSuggest();
     }
+  });
+
+  // Doppelte Vorderseite schon beim Verlassen des Feldes melden, nicht erst beim Sichern
+  sheet.body.addEventListener('focusout', (e) => {
+    if (e.target.dataset.f !== 'front') return;
+    const fr = val('front').trim().toLowerCase();
+    if (!fr || fr === dupAsked) return;
+    dupAsked = fr;
+    setTimeout(() => { if (stack.includes(sheet)) dupCheck(); }, 60);
   });
 
   sheet.body.addEventListener('click', async (e) => {
@@ -3365,6 +3378,7 @@ function openCardEditor(card = null, opts = {}) {
       toast(`Karte gesichert · ${plural(total, 'Karte', 'Karten')} insgesamt`);
       for (const t of $$('textarea', sheet.body)) { t.value = ''; autoGrow(t); }
       initial.front = initial.back = initial.hint = '';
+      dupOk = dupAsked = '';
       initial.cat = catId;
       autoPicked = false;
       $('#suggest-note', sheet.body).hidden = true;
