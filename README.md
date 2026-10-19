@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.22.2 | Unfertige Karten einklappbar (beim Tab-Wechsel wieder offen) |
 | 1.22.1 | Doppelte Vorderseite wird schon beim Verlassen des Feldes gemeldet |
 | 1.22.0 | Hinweis bei doppelter Vorderseite, Verschlüsselung + Rückseite Vertragsstörungen |
 | 1.21.0 | Leere Kategorien ausgegraut, Kartensatz kann Karten entfernen und markieren, 43 neue AP2-Vorderseiten |

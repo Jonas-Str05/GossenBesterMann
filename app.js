@@ -1305,6 +1305,12 @@ function setTab(t) {
   const prev = $(`.view[data-tab="${UI.tab}"]`);
   prev._st = prev.scrollTop;
   if (UI.select && t !== 'cards') setSelectMode(false);
+  // Unfertige Karten beim Betreten des Karten-Tabs wieder ausgeklappt
+  if (t === 'categories' && UI.draftsClosed) {
+    UI.draftsClosed = false;
+    const d = $('#lib-body .drafts');
+    if (d) { d.classList.add('open'); $('.drafts-head', d).setAttribute('aria-expanded', 'true'); }
+  }
   UI.tab = t;
   for (const v of $$('.view')) v.classList.toggle('active', v.dataset.tab === t);
   const v = $(`.view[data-tab="${t}"]`);
@@ -1973,14 +1979,18 @@ function renderCategories() {
   const drafts = DB.cards.filter(isDraft).sort((a, b) => b.created - a.created);
   v.innerHTML = `
     ${drafts.length ? `
-    <div class="section-header" style="margin-top:4px">Unfertig</div>
-    <div class="list draft-list">
-      ${drafts.map((c) => `<button class="row" data-action="edit-card" data-id="${esc(c.id)}">
-        <span class="draft-dot" aria-hidden="true"></span>
-        <div class="row-main"><div class="row-title clamp1">${esc(c.front)}</div></div>${chev}
-      </button>`).join('')}
-    </div>
-    <div style="height:20px"></div>` : ''}
+    <div class="drafts ${UI.draftsClosed ? '' : 'open'}">
+      <button class="section-header drafts-head" style="margin-top:4px" data-action="toggle-drafts" aria-expanded="${!UI.draftsClosed}">Unfertig<span class="drafts-chev" aria-hidden="true">${ICON.chevDown}</span></button>
+      <div class="drafts-body"><div>
+        <div class="list draft-list">
+          ${drafts.map((c) => `<button class="row" data-action="edit-card" data-id="${esc(c.id)}">
+            <span class="draft-dot" aria-hidden="true"></span>
+            <div class="row-main"><div class="row-title clamp1">${esc(c.front)}</div></div>${chev}
+          </button>`).join('')}
+        </div>
+        <div style="height:20px"></div>
+      </div></div>
+    </div>` : ''}
     <div class="list icons" style="--inset:66px">
       <button class="row" data-action="open-all-cards">
         ${rowIcon(ICON.cards, 'indigo', true)}
@@ -4820,6 +4830,14 @@ const ACTIONS = {
     if (open) UI.libOpen.add(id); else UI.libOpen.delete(id);
     box.classList.toggle('open', open);
     b.setAttribute('aria-expanded', String(open));
+    haptic(5);
+  },
+  // Unfertige Karten ein-/ausklappen – nur bis zum nächsten Tab-Wechsel
+  'toggle-drafts': (b) => {
+    UI.draftsClosed = !UI.draftsClosed;
+    const box = b.closest('.drafts');
+    box.classList.toggle('open', !UI.draftsClosed);
+    b.setAttribute('aria-expanded', String(!UI.draftsClosed));
     haptic(5);
   },
   'open-all-cards': () => openCardsPage(null),
