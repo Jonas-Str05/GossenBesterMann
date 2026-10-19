@@ -1,6 +1,7 @@
 @version 1
 // Aufbau: "# id | Bereich | Farbe", "## id | Kategorie | Symbol", "### Unterthema (wird Hinweis)"
-// Karte: "Vorderseite | Ausgeschriebener Name | Kurze Erklärung" oder "Vorderseite | Kurze Erklärung"
+// Karte: "Vorderseite | Ausgeschriebener Name | Kurze Erklärung" oder "Vorderseite | Kurze Erklärung" oder nur "Vorderseite" (unfertig)
+// Eigener Hinweis: am Zeilenende " || Hinweis" (sonst wird das Unterthema zum Hinweis)
 
 # k1 | Klausur 1: IT-Systemlösung | blue
 

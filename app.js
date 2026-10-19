@@ -5038,11 +5038,14 @@ function parseDeck(txt) {
       continue;
     }
     if (!cat) continue;
-    const parts = line.split(' | ').map((s) => s.trim());
-    if (parts.length < 2) continue;
+    // „Vorderseite | Rückseite | Notiz || Hinweis“ – nur die Vorderseite ist Pflicht (sonst unfertige Karte)
+    const [main, ownHint] = line.split(' || ').map((s) => s.trim());
+    const parts = main.split(' | ').map((s) => s.trim());
     const front = parts[0];
-    const back = parts.length >= 3 ? `${parts[1]}\n${parts.slice(2).join(' | ')}` : parts[1];
-    deck.cards.push({ id: `d-${fnv(`${cat.id}|${front}`)}`, front, back, hint: topic ? `Thema: ${topic}` : '', categoryId: cat.id });
+    if (!front) continue;
+    const back = parts.length >= 3 ? `${parts[1]}\n${parts.slice(2).join(' | ')}` : (parts[1] || '');
+    const hint = ownHint || (topic ? `Thema: ${topic}` : '');
+    deck.cards.push({ id: `d-${fnv(`${cat.id}|${front}`)}`, front, back, hint, categoryId: cat.id });
   }
   return deck;
 }
