@@ -6,6 +6,24 @@
 # k1 | Klausur 1: IT-Systemlösung | blue
 
 ## k1-sec | IT-Sicherheit & Datenschutz | shield
+@set 2
+Schutzziele | Vertraulichkeit, Integrität, Verfügbarkeit, Authentizität
+Vertraulichkeit
+Integrität
+Verfügbarkeit
+Authentizität
+Phishing
+Ransomware
+Man-in-the-Middle
+DDoS-Attacke
+SQL-Injection
+Datendiebstahl
+TOM
+BSI
+BDSG
+DSGVO
+GoBD
+@set
 ### Schutzziele
 Vertraulichkeit | Nur Berechtigte können die Daten einsehen.
 Integrität | Daten sind vollständig und unverändert – keine unbemerkte Manipulation.
@@ -53,6 +71,10 @@ DSGVO | Datenschutz-Grundverordnung | EU-Verordnung zum Schutz personenbezogener
 GoBD | Grundsätze ordnungsmäßiger Buchführung in elektronischer Form | Regeln für digitale Buchführung und Archivierung.
 
 ## k1-pm | Projektmanagement | calendar
+@set 2
+Scrum
+Wasserfallmodell
+@set
 ### Projektplanung und -steuerung
 Machbarkeitsanalyse | Prüft, ob ein Projekt technisch, wirtschaftlich und organisatorisch umsetzbar ist.
 Terminplanung | Legt Dauer, Reihenfolge und Termine der Vorgänge fest.
@@ -117,6 +139,16 @@ Datenanalyse-Tools | z. B. Excel, Power BI, Tableau, Python.
 KI | Künstliche Intelligenz | Systeme, die aus Daten lernen und z. B. erkennen oder vorhersagen.
 
 ## k1-sys | Systemarchitektur & Komponenten | cpu
+@set 2
+Client
+Server
+Switch
+Router
+Firewall
+Access Point
+SSD
+HDD
+@set
 ### Bewertungskriterien von IT-Systemen
 Leistungsfähigkeit | Wie schnell und belastbar ein System ist (z. B. CPU, RAM, Durchsatz).
 Funktionalität | Welche Funktionen ein System bietet und ob sie die Anforderungen erfüllen.
@@ -144,6 +176,37 @@ Ablauforganisation | Legt fest, wie Arbeitsprozesse zeitlich und räumlich ablau
 Wertschöpfungskette | Kette aus Primär- und Unterstützungsaktivitäten, die Wert schaffen (nach Porter).
 
 ## k1-net | Netzwerke & Kommunikation | network
+@set 2
+DHCP
+SAN
+NAS
+RAID
+RAID 0
+RAID 1
+RAID 5
+RAID 6
+RAID 10
+ISO-OSI-Schichtenmodell
+ISO-OSI-Layer 1
+ISO-OSI-Layer 2
+ISO-OSI-Layer 3
+ISO-OSI-Layer 4
+ISO-OSI-Layer 5
+ISO-OSI-Layer 6
+ISO-OSI-Layer 7
+NAT
+PAT
+IPv6
+IPv4
+LAN
+WAN
+WLAN
+VLAN
+GAN
+KiB, MiB, GiB, TiB
+KB, MB, GB, TB
+Unterschied GiB und GB
+@set
 ### Netzwerkinfrastruktur
 Kabelgebundenes Netz | Verbindung über Kupfer (Twisted Pair) oder Glasfaser – stabil und schnell.
 WLAN | Wireless Local Area Network | Kabelloses lokales Netz nach IEEE 802.11.
@@ -192,6 +255,13 @@ TB | Terabyte | 10¹² Byte.
 Binär- vs. Dezimalpräfix | Datenmengen mit Binärpräfixen (Basis 2), physikalische Größen wie Übertragungsraten dezimal (Basis 10).
 
 ## k1-cloud | Cloud & Betriebskonzepte | cloud
+@set 2
+VM
+SaaS
+PaaS
+IaaS
+DaaS
+@set
 ### Cloud und Online-Dienste
 Cloud Computing | Bereitstellung von IT-Ressourcen über das Internet nach Bedarf.
 Public Cloud | Öffentliche Cloud eines Anbieters, von vielen Kunden geteilt.

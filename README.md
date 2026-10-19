@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.20.0 | 60 neue Karten (Vorderseiten) für Klausur 1, Kartensatz mit @set für neu angelegte Karten |
 | 1.19.1 | Kartensatz: Karten nur mit Vorderseite und eigener Hinweis (`|| Hinweis`) |
 | 1.19.0 | Notiz erst nach Leerzeile (2× Enter), unfertige Karten nur mit Vorderseite – oben im Karten-Tab |
 | 1.18.0 | Neue Karten immer „Unsortiert“, Rückseite: Text nach Zeilenumbruch klein und grau |

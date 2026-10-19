@@ -5019,8 +5019,10 @@ function parseDeck(txt) {
   let group = null;
   let cat = null;
   let topic = '';
+  let set = ''; // „@set x“: eigene Karten-IDs, damit früher gelöschte Karten gleichen Namens neu entstehen
   for (const raw of txt.split(/\r?\n/)) {
     const line = raw.trim();
+    if (line.startsWith('@set')) { set = line.slice(4).trim(); continue; }
     if (!line || line.startsWith('//') || line.startsWith('@')) continue;
     if (line.startsWith('###')) { topic = line.slice(3).trim(); continue; }
     if (line.startsWith('##')) {
@@ -5045,7 +5047,7 @@ function parseDeck(txt) {
     if (!front) continue;
     const back = parts.length >= 3 ? `${parts[1]}\n${parts.slice(2).join(' | ')}` : (parts[1] || '');
     const hint = ownHint || (topic ? `Thema: ${topic}` : '');
-    deck.cards.push({ id: `d-${fnv(`${cat.id}|${front}`)}`, front, back, hint, categoryId: cat.id });
+    deck.cards.push({ id: `d-${fnv(`${set ? `${set}|` : ''}${cat.id}|${front}`)}`, front, back, hint, categoryId: cat.id });
   }
   return deck;
 }
