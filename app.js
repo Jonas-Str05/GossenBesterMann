@@ -3121,9 +3121,9 @@ function fieldHTML(key, label, placeholder, value, optional) {
 
 function openCardEditor(card = null, opts = {}) {
   const isNew = !card;
-  let catId = card ? card.categoryId : (opts.categoryId || DB.settings.lastCategory || 'inbox');
+  let catId = card ? card.categoryId : (opts.categoryId || 'inbox'); // neue Karten: immer „Unsortiert“ (außer direkt aus einer Kategorie)
   if (!catById(catId)) catId = 'inbox';
-  let manualCat = !!card || !!opts.categoryId;
+  let manualCat = true; // keine automatische Vorauswahl einer Kategorie
   let autoPicked = false;
   let level = card ? card.level : 0;
   let pinned = !!(card && card.pinned);
@@ -3196,7 +3196,7 @@ function openCardEditor(card = null, opts = {}) {
         note.hidden = false;
         $('span', note).textContent = `Automatisch erkannt: ${catById(catId).name}`;
       } else if (!s && autoPicked) {
-        catId = DB.settings.lastCategory && catById(DB.settings.lastCategory) ? DB.settings.lastCategory : 'inbox';
+        catId = 'inbox';
         autoPicked = false;
         renderPicker();
         note.hidden = true;
@@ -3214,7 +3214,6 @@ function openCardEditor(card = null, opts = {}) {
       if (pinned) card.pinned = true; else delete card.pinned;
       if (textChanged) delete card.deck; // eigene Änderung: Kartensatz-Updates überschreiben sie nicht mehr
     }
-    if (manualCat) DB.settings.lastCategory = catId;
     save();
     requestPersist();
     refresh();
@@ -3805,13 +3804,13 @@ function sizeClass(t) {
   return '';
 }
 
-// Prüfungskarten: „Ausgeschriebener Name\nErklärung“ → Name als Überschrift, Erklärung darunter
+// Rückseite: erste Zeile groß, alles nach dem ersten Zeilenumbruch kleiner und grau (Notiz)
 function backHTML(card) {
   const i = card.back.indexOf('\n');
-  if (card.id.startsWith('d-') && i > 0 && i <= 90) {
-    const title = card.back.slice(0, i).trim();
-    const rest = card.back.slice(i + 1).trim();
-    return `<div class="face-text ${title.length > 40 ? 'm' : ''}">${esc(title)}</div><div class="face-expl">${esc(rest)}</div>`;
+  const title = i > 0 ? card.back.slice(0, i).trim() : '';
+  const rest = i > 0 ? card.back.slice(i + 1).trim() : '';
+  if (title && rest) {
+    return `<div class="face-text ${sizeClass(title)}">${esc(title)}</div><div class="face-expl">${esc(rest)}</div>`;
   }
   return `<div class="face-text ${sizeClass(card.back)}">${esc(card.back)}</div>`;
 }
