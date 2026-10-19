@@ -1960,7 +1960,7 @@ function renderCategories() {
   const catRow = (c) => {
     const cs = cardsIn(c.id);
     const avg = cs.length ? cs.reduce((a, x) => a + x.level, 0) / cs.length : null;
-    return `<button class="row lib-press" data-action="open-category" data-id="${esc(c.id)}">
+    return `<button class="row lib-press ${cs.length ? '' : 'cat-empty'}" data-action="open-category" data-id="${esc(c.id)}">
       ${rowIcon(catIcon(c), c.color, true)}
       <div class="row-main">
         <div class="row-title clamp1">${esc(c.name)}</div>
@@ -5041,13 +5041,15 @@ function parseDeck(txt) {
     }
     if (!cat) continue;
     // „Vorderseite | Rückseite | Notiz || Hinweis“ – nur die Vorderseite ist Pflicht (sonst unfertige Karte)
-    const [main, ownHint] = line.split(' || ').map((s) => s.trim());
+    // „! “ am Zeilenanfang: Karte einmalig als gemerkt markieren
+    const pin = line.startsWith('! ');
+    const [main, ownHint] = (pin ? line.slice(2) : line).split(' || ').map((s) => s.trim());
     const parts = main.split(' | ').map((s) => s.trim());
     const front = parts[0];
     if (!front) continue;
     const back = parts.length >= 3 ? `${parts[1]}\n${parts.slice(2).join(' | ')}` : (parts[1] || '');
     const hint = ownHint || (topic ? `Thema: ${topic}` : '');
-    deck.cards.push({ id: `d-${fnv(`${set ? `${set}|` : ''}${cat.id}|${front}`)}`, front, back, hint, categoryId: cat.id });
+    deck.cards.push({ id: `d-${fnv(`${set ? `${set}|` : ''}${cat.id}|${front}`)}`, front, back, hint, categoryId: cat.id, pin });
   }
   return deck;
 }
@@ -5076,7 +5078,8 @@ function mergeDeck(deck, { restore = false } = {}) {
     seenCats.add(d.id);
   }
 
-  for (const c of deck.cards) {
+  const pinned = new Set(DB.meta.deckPinned || []);
+  for (const { pin, ...c } of deck.cards) {
     const ex = cardById(c.id);
     if (!seenCards.has(c.id) && !ex) {
       const target = catById(c.categoryId);
@@ -5086,12 +5089,23 @@ function mergeDeck(deck, { restore = false } = {}) {
       Object.assign(ex, { front: c.front, back: c.back, hint: c.hint });
       updated++;
     }
+    // Markierung aus dem Kartensatz nur einmal setzen – selbst entfernte Markierungen bleiben weg
+    if (pin && !pinned.has(c.id)) {
+      const card = cardById(c.id);
+      if (card) { card.pinned = true; pinned.add(c.id); }
+    }
     seenCards.add(c.id);
   }
+  DB.meta.deckPinned = [...pinned];
+
+  // Aus dem Kartensatz entfernte Karten in den Papierkorb – nur, solange sie nicht selbst bearbeitet wurden
+  const inDeck = new Set(deck.cards.map((c) => c.id));
+  const removed = DB.cards.filter((c) => c.deck && c.id.startsWith('d-') && !inDeck.has(c.id));
+  if (removed.length) trashCards(removed);
 
   DB.meta.deckIds = [...new Set([...(DB.meta.deckIds || []), ...seenCards])];
   DB.meta.deckCats = [...seenCats];
-  return { added, updated };
+  return { added, updated, removed: removed.length };
 }
 
 async function loadDeck(opts = {}) {
@@ -5111,8 +5125,8 @@ async function loadDeck(opts = {}) {
   DB.meta.deckTotal = deck.cards.length;
   save();
   if (!stack.length) refresh();
-  if (r.added) toast(`${plural(r.added, 'neue Prüfungskarte', 'neue Prüfungskarten')} geladen`);
-  else if (r.updated) toast(`${plural(r.updated, 'Prüfungskarte', 'Prüfungskarten')} aktualisiert`);
+  const msg = [r.added && plural(r.added, 'neue Karte', 'neue Karten'), r.updated && `${plural(r.updated, 'Karte', 'Karten')} aktualisiert`, r.removed && `${plural(r.removed, 'Karte', 'Karten')} entfernt`].filter(Boolean).join(' · ');
+  if (msg) toast(msg);
   return { ...r, total: deck.cards.length };
 }
 

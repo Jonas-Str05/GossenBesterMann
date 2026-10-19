@@ -1714,3 +1714,7 @@ svg.heat .cell.sel { stroke: var(--label); stroke-width: 1.5; }
   min-height: 34px;
   max-width: 150px;
 }
+
+/* Karten-Tab: Kategorien ohne Karten leicht ausgegraut */
+.cat-empty .row-icon { opacity: .4; filter: saturate(.3); }
+.cat-empty .row-main { opacity: .5; }

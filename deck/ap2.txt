@@ -7,6 +7,12 @@
 
 ## k1-sec | IT-Sicherheit & Datenschutz | shield
 @set 2
+IT-Sicherheitskonzept
+IT-Grundschutz
+2FA
+Symmetrische Verschlüsselung
+Asymmetrische Verschlüsselung
+Hashing
 Schutzziele | Vertraulichkeit, Integrität, Verfügbarkeit, Authentizität
 Vertraulichkeit
 Integrität
@@ -140,14 +146,13 @@ KI | Künstliche Intelligenz | Systeme, die aus Daten lernen und z. B. erkennen 
 
 ## k1-sys | Systemarchitektur & Komponenten | cpu
 @set 2
+Hardware-Kenngrößen
 Client
 Server
 Switch
 Router
 Firewall
 Access Point
-SSD
-HDD
 @set
 ### Bewertungskriterien von IT-Systemen
 Leistungsfähigkeit | Wie schnell und belastbar ein System ist (z. B. CPU, RAM, Durchsatz).
@@ -177,6 +182,14 @@ Wertschöpfungskette | Kette aus Primär- und Unterstützungsaktivitäten, die W
 
 ## k1-net | Netzwerke & Kommunikation | network
 @set 2
+Bit und Byte
+Subnetting IPv4
+IPv6-Schreibweise
+Kupferkabel (Cat)
+LWL Multimode
+LWL Singlemode
+VPN
+VPN-Arten
 DHCP
 SAN
 NAS
@@ -187,13 +200,9 @@ RAID 5
 RAID 6
 RAID 10
 ISO-OSI-Schichtenmodell
-ISO-OSI-Layer 1
-ISO-OSI-Layer 2
-ISO-OSI-Layer 3
-ISO-OSI-Layer 4
-ISO-OSI-Layer 5
-ISO-OSI-Layer 6
-ISO-OSI-Layer 7
+! ISO-OSI-Layer 2 | Switch
+! ISO-OSI-Layer 3 | Router
+! ISO-OSI-Layer 4 | Firewall
 NAT
 PAT
 IPv6
@@ -356,6 +365,12 @@ Barrierefreiheit | Nutzbar für alle Menschen, auch mit Einschränkungen – z. 
 # k2 | Klausur 2: Kaufmännische Prozesse | orange
 
 ## k2-eco | Wirtschaftlichkeit & Finanzen | coins
+@set 2
+Selbstkostenkalkulation
+Handelswarenkalkulation
+Zuschlagskalkulation
+Stundensatz
+@set
 ### Analyseverfahren
 Kosten-Nutzen-Analyse | Stellt Kosten und Nutzen einer Investition gegenüber.
 Rentabilitätsberechnung | Berechnet, wie sich das eingesetzte Kapital verzinst.
@@ -535,6 +550,12 @@ Parität | Prüfbit macht die Anzahl der Einsen gerade bzw. ungerade – erkennt
 Redundanz | Mehrfach vorhandene Komponenten oder Daten für mehr Ausfallsicherheit.
 
 ## k2-db | Datenbanken & SQL | database
+@set 2
+Normalisierung
+1. Normalform
+2. Normalform
+3. Normalform
+@set
 ### Datenbankmodelle
 Relationale Datenbank | Speichert Daten in Tabellen, verknüpft über Schlüssel.
 Nicht-relationale Datenbank | Speichert Daten ohne feste Tabellenstruktur.
@@ -622,6 +643,16 @@ DATEADD | Addiert ein Zeitintervall zu einem Datum.
 DATEDIFF | Berechnet die Differenz zwischen zwei Datumswerten.
 
 ## k2-law | Recht & Verträge | scale
+@set 2
+Vertragsarten
+Kaufvertrag
+Werkvertrag
+Dienstvertrag
+Vertragsstörungen
+Nicht-Rechtzeitig-Lieferung
+Schlechtleistung
+Mängelarten
+@set
 ### Vertragsarten
 Kaufvertrag | Übergabe und Eigentum einer Sache gegen Kaufpreis (§ 433 BGB).
 Werkvertrag | Geschuldet ist ein ERFOLG, z. B. fertige Software (§ 631 BGB).
@@ -670,6 +701,10 @@ Nacherfüllung | Erstes Recht des Käufers bei Mängeln: Reparatur oder Ersatzli
 Vertragsgestaltung | Preis und Bedingungen werden in Verhandlungen festgelegt.
 
 ## k2-buy | Beschaffung | cart
+@set 2
+Bezugskalkulation
+Nutzwertanalyse
+@set
 ### Beschaffungsplanung
 Beschaffungsstrategie | z. B. Single, Dual oder Multiple Sourcing, Global Sourcing.
 Single Sourcing | Nur ein Lieferant für ein Gut.
@@ -831,6 +866,17 @@ Potenzialanalyse | Ermittelt Stärken und Entwicklungsmöglichkeiten einer Perso
 Existenzgründung | Sich selbstständig machen – Chance: Freiheit; Risiko: Kapital, Haftung, Unsicherheit.
 
 ## k3-org | Aufbau & Organisation des Betriebs | building
+@set 2
+Rechtsformen
+Einzelunternehmen
+GbR
+OHG
+KG
+GmbH
+UG (haftungsbeschränkt)
+AG
+GmbH & Co. KG
+@set
 ### Wirtschaft und Märkte
 Primärer Sektor | Urproduktion: Land- und Forstwirtschaft, Fischerei, Bergbau.
 Sekundärer Sektor | Verarbeitung: Industrie und Handwerk.
@@ -932,6 +978,9 @@ IT-Sicherheitskonzept | Dokument mit Schutzbedarf, Risiken und Maßnahmen für d
 Clean Desk | Keine vertraulichen Unterlagen offen liegen lassen, Bildschirm beim Verlassen sperren.
 
 ## k3-env | Umweltschutz | leaf
+@set 2
+Drei Säulen der Nachhaltigkeit
+@set
 ### Ressourcenmanagement
 Rationelle Energieverwendung | Energie sparsam und effizient einsetzen.
 Regenerative Energien | Erneuerbar: Sonne, Wind, Wasser, Biomasse, Erdwärme.
