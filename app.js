@@ -3234,6 +3234,29 @@ function openCardEditor(card = null, opts = {}) {
     refresh();
   };
 
+  // Gleiche Vorderseite schon vorhanden? → Hinweis mit „Zur vorhandenen Karte“ oder „Trotzdem sichern“
+  const dupCheck = async () => {
+    const fr = val('front').trim().toLowerCase();
+    if (card && card.front.trim().toLowerCase() === fr) return 'ok';
+    const dup = DB.cards.find((c) => c !== card && c.front.trim().toLowerCase() === fr);
+    if (!dup) return 'ok';
+    const cat = catById(dup.categoryId);
+    const v = await actionSheet({
+      title: 'Diese Karte gibt es schon',
+      message: `„${dup.front}“ · ${cat ? catPath(cat) : 'Unsortiert'}`,
+      actions: [
+        { label: 'Zur vorhandenen Karte', value: 'open' },
+        { label: 'Trotzdem sichern', value: 'ok' },
+      ],
+    });
+    if (v === 'open') {
+      Voice.stop();
+      sheet.close();
+      setTimeout(() => openCardEditor(dup), 380);
+    }
+    return v;
+  };
+
   sheet = openSheet({
     title: isNew ? 'Neue Karte' : 'Karte bearbeiten',
     body,
@@ -3241,8 +3264,9 @@ function openCardEditor(card = null, opts = {}) {
     right: {
       label: 'Sichern',
       bold: true,
-      action: (sh) => {
+      action: async (sh) => {
         if (!valid()) return;
+        if ((await dupCheck()) !== 'ok') return;
         persist();
         haptic(10);
         toast(isNew ? 'Karte gesichert' : 'Änderungen gesichert');
@@ -3334,6 +3358,7 @@ function openCardEditor(card = null, opts = {}) {
         return;
       }
       Voice.stop();
+      if ((await dupCheck()) !== 'ok') return;
       persist();
       haptic(10);
       const total = DB.cards.length;

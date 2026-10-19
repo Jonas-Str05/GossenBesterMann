@@ -10,6 +10,7 @@
 IT-Sicherheitskonzept
 IT-Grundschutz
 2FA
+Verschlüsselung | Daten unlesbar machen | Ziel: Vertraulichkeit || symmetrisch oder asymmetrisch
 Symmetrische Verschlüsselung
 Asymmetrische Verschlüsselung
 Hashing
@@ -648,7 +649,7 @@ Vertragsarten
 Kaufvertrag
 Werkvertrag
 Dienstvertrag
-Vertragsstörungen
+Vertragsstörungen | Lieferverzug, Schlechtleistung, Annahmeverzug, Zahlungsverzug
 Nicht-Rechtzeitig-Lieferung
 Schlechtleistung
 Mängelarten
