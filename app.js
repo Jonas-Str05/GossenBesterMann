@@ -1087,13 +1087,16 @@ function suggestCategory(text, model = buildModel(), exclude = null) {
 // Gewicht für „Schwächen zuerst“: −5 → 32×, 0 → ~5,7×, +5 → 1×
 const weightOf = (level) => 2 ** ((MAX - level) / 2);
 
+// Unfertige Karten (nur Vorderseite) werden nicht gelernt
+const isDraft = (c) => !(c.back || '').trim();
 function poolFor(spec) {
-  if (spec.type === 'category') return DB.cards.filter((c) => c.categoryId === spec.categoryId);
-  if (spec.type === 'group') return cardsInGroup(spec.groupId);
-  if (spec.type === 'pinned') return DB.cards.filter((c) => c.pinned);
-  if (spec.type === 'level') return DB.cards.filter((c) => c.level === spec.level);
-  if (spec.type === 'retry') return spec.ids.map(cardById).filter(Boolean);
-  return DB.cards;
+  const pool = spec.type === 'category' ? DB.cards.filter((c) => c.categoryId === spec.categoryId)
+    : spec.type === 'group' ? cardsInGroup(spec.groupId)
+    : spec.type === 'pinned' ? DB.cards.filter((c) => c.pinned)
+    : spec.type === 'level' ? DB.cards.filter((c) => c.level === spec.level)
+    : spec.type === 'retry' ? spec.ids.map(cardById).filter(Boolean)
+    : DB.cards;
+  return pool.filter((c) => !isDraft(c));
 }
 // „Jetzt lernen“: sinnvolle Auswahl ohne Wiederholungen in der Runde.
 // Gewichtung: schwache Ebenen deutlich öfter, lange nicht gesehene Karten öfter,
@@ -1135,6 +1138,7 @@ function smartQueue(n) {
   const now = Date.now();
   // gewichtete Stichprobe ohne Zurücklegen (Efraimidis-Spirakis)
   return DB.cards
+    .filter((c) => !isDraft(c))
     .map((c) => ({ id: c.id, key: Math.random() ** (1 / smartWeight(c, now)) }))
     .sort((a, b) => b.key - a.key)
     .slice(0, n)
@@ -1965,7 +1969,18 @@ function renderCategories() {
     </button>`;
   };
   const gs = groups();
+  // Unfertige Karten (nur Vorderseite) ganz oben, zum Vervollständigen antippen
+  const drafts = DB.cards.filter(isDraft).sort((a, b) => b.created - a.created);
   v.innerHTML = `
+    ${drafts.length ? `
+    <div class="section-header" style="margin-top:4px">Unfertig</div>
+    <div class="list draft-list">
+      ${drafts.map((c) => `<button class="row" data-action="edit-card" data-id="${esc(c.id)}">
+        <span class="draft-dot" aria-hidden="true"></span>
+        <div class="row-main"><div class="row-title clamp1">${esc(c.front)}</div></div>${chev}
+      </button>`).join('')}
+    </div>
+    <div style="height:20px"></div>` : ''}
     <div class="list icons" style="--inset:66px">
       <button class="row" data-action="open-all-cards">
         ${rowIcon(ICON.cards, 'indigo', true)}
@@ -3164,7 +3179,7 @@ function openCardEditor(card = null, opts = {}) {
 
   let sheet;
   const val = (k) => $(`[data-f="${k}"]`, sheet.body).value;
-  const valid = () => val('front').trim() && val('back').trim();
+  const valid = () => !!val('front').trim(); // Rückseite optional: ohne sie ist die Karte „unfertig“
   const dirty = () => val('front') !== initial.front || val('back') !== initial.back || val('hint') !== initial.hint || catId !== initial.cat || level !== initial.level || (!!card && pinned !== !!card.pinned);
 
   const renderPicker = () => {
@@ -3314,9 +3329,8 @@ function openCardEditor(card = null, opts = {}) {
       }
     } else if (act === 'save-next') {
       if (!valid()) {
-        toast('Vorder- und Rückseite ausfüllen', 'error');
-        const empty = !val('front').trim() ? 'front' : 'back';
-        $(`[data-f="${empty}"]`, sheet.body).focus();
+        toast('Vorderseite ausfüllen', 'error');
+        $('[data-f="front"]', sheet.body).focus();
         return;
       }
       Voice.stop();
@@ -3804,11 +3818,15 @@ function sizeClass(t) {
   return '';
 }
 
-// Rückseite: erste Zeile groß, alles nach dem ersten Zeilenumbruch kleiner und grau (Notiz)
+// Rückseite: Text bis zur ersten Leerzeile groß, alles danach kleiner und grau (Notiz).
+// Ausnahme: Prüfungskarten nutzen weiterhin „Name\nErklärung“.
 function backHTML(card) {
-  const i = card.back.indexOf('\n');
+  const m = card.back.match(/\n[ \t]*\n/);
+  let i = m ? m.index : -1;
+  let skip = m ? m[0].length : 0;
+  if (i < 0 && card.id.startsWith('d-')) { i = card.back.indexOf('\n'); skip = 1; }
   const title = i > 0 ? card.back.slice(0, i).trim() : '';
-  const rest = i > 0 ? card.back.slice(i + 1).trim() : '';
+  const rest = i > 0 ? card.back.slice(i + skip).trim() : '';
   if (title && rest) {
     return `<div class="face-text ${sizeClass(title)}">${esc(title)}</div><div class="face-expl">${esc(rest)}</div>`;
   }

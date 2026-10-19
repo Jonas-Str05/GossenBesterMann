@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.19.0 | Notiz erst nach Leerzeile (2× Enter), unfertige Karten nur mit Vorderseite – oben im Karten-Tab |
 | 1.18.0 | Neue Karten immer „Unsortiert“, Rückseite: Text nach Zeilenumbruch klein und grau |
 | 1.17.5 | Button „Mitgelieferte AP2-Karten entfernen“ wieder entfernt |
 | 1.17.4 | Einstellungen: Alle Karten löschen (Bereiche und Kategorien bleiben) |
