@@ -3138,7 +3138,7 @@ function fieldHTML(key, label, placeholder, value, optional) {
     <div class="form-group" data-group="${key}">
       <div class="form-label">${label}${optional ? ' <span class="opt">· optional</span>' : ''}<span class="live">Höre zu …</span></div>
       <div class="field">
-        <textarea data-f="${key}" rows="1" placeholder="${esc(placeholder)}" autocapitalize="sentences" spellcheck="true">${esc(value || '')}</textarea>
+        <textarea data-f="${key}" rows="1" placeholder="${esc(placeholder)}" autocapitalize="sentences" spellcheck="false">${esc(value || '')}</textarea>
         <button class="mic" type="button" data-mic="${key}" aria-label="${label} diktieren" aria-pressed="false">${ICON.mic}</button>
       </div>
     </div>`;
@@ -3435,7 +3435,7 @@ function openCategoryEditor(cat = null, opts = {}) {
       <div class="icon-grid" id="icons"></div>
       <div class="form-group">
         <div class="form-label">Stichwörter <span class="opt">· optional</span></div>
-        <div class="field"><textarea data-c="keywords" rows="1" placeholder="z. B. Subnetz, IPv4, Router, OSI">${esc(cat ? cat.keywords.join(', ') : '')}</textarea></div>
+        <div class="field"><textarea data-c="keywords" rows="1" spellcheck="false" placeholder="z. B. Subnetz, IPv4, Router, OSI">${esc(cat ? cat.keywords.join(', ') : '')}</textarea></div>
       </div>`}
       ${cat ? `
         <div class="form-label">${plural(cs.length, 'Karte', 'Karten')}</div>
@@ -4734,7 +4734,7 @@ function openTextImport() {
   const body = `
     <p class="footnote" style="margin:4px 36px 12px">Eine Karte pro Zeile. Felder mit Semikolon <b>;</b> oder Tabulator trennen:</p>
     <div class="list" style="margin-bottom:12px"><div class="row"><div class="row-main" style="font-family:ui-monospace,monospace;font-size:13px;line-height:1.5">Vorderseite ; Rückseite ; Hinweis ; Kategorie</div></div></div>
-    <textarea class="big" data-ti placeholder="Was ist ein Subnetz?; Ein logisch abgegrenzter Teil eines IP-Netzes; denk an die Maske; Netzwerktechnik&#10;OSI-Schicht 3?; Vermittlungsschicht (Network Layer)"></textarea>
+    <textarea class="big" data-ti spellcheck="false" placeholder="Was ist ein Subnetz?; Ein logisch abgegrenzter Teil eines IP-Netzes; denk an die Maske; Netzwerktechnik&#10;OSI-Schicht 3?; Vermittlungsschicht (Network Layer)"></textarea>
     <p class="footnote">Hinweis und Kategorie sind optional. Unbekannte Kategorien werden angelegt.</p>
     <div class="form-label">Kategorie, falls keine angegeben</div>
     <div class="cat-picker" id="ti-cats"></div>
