@@ -3868,12 +3868,13 @@ function sizeClass(t) {
 }
 
 // Rückseite: Text bis zur ersten Leerzeile groß, alles danach kleiner und grau (Notiz).
-// Ausnahme: Prüfungskarten nutzen weiterhin „Name\nErklärung“.
+// Ausnahme: unveränderte Karten aus dem Kartensatz nutzen „Name / Erklärung“ (einfacher Zeilenumbruch).
+// Sobald man eine Karte selbst bearbeitet, gilt auch für sie: erst ab einer Leerzeile grau.
 function backHTML(card) {
   const m = card.back.match(/\n[ \t]*\n/);
   let i = m ? m.index : -1;
   let skip = m ? m[0].length : 0;
-  if (i < 0 && card.id.startsWith('d-')) { i = card.back.indexOf('\n'); skip = 1; }
+  if (i < 0 && card.deck) { i = card.back.indexOf('\n'); skip = 1; }
   const title = i > 0 ? card.back.slice(0, i).trim() : '';
   const rest = i > 0 ? card.back.slice(i + skip).trim() : '';
   if (title && rest) {
