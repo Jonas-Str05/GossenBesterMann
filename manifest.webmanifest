@@ -9,7 +9,7 @@
   "orientation": "portrait",
   "lang": "de",
   "background_color": "#000000",
-  "theme_color": "#F2F2F7",
+  "theme_color": "#000000",
   "categories": ["education", "productivity"],
   "icons": [
     { "src": "icons/app-icon-v3-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },

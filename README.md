@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.22.5 | Android-Navigationsleiste schwarz statt hell (Manifest theme_color) |
 | 1.22.4 | Fix: Bearbeitete Kartensatz-Karten werden erst ab Leerzeile grau |
 | 1.22.3 | Keine Rechtschreibvorschläge der App mehr in den Kartenfeldern |
 | 1.22.2 | Unfertige Karten einklappbar (beim Tab-Wechsel wieder offen) |
