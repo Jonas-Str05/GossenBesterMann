@@ -3874,7 +3874,7 @@ function backHTML(card) {
   const m = card.back.match(/\n[ \t]*\n/);
   let i = m ? m.index : -1;
   let skip = m ? m[0].length : 0;
-  if (i < 0 && card.deck) { i = card.back.indexOf('\n'); skip = 1; }
+  if (i < 0 && card.deck && card.back.split('\n').length === 2) { i = card.back.indexOf('\n'); skip = 1; }
   const title = i > 0 ? card.back.slice(0, i).trim() : '';
   const rest = i > 0 ? card.back.slice(i + skip).trim() : '';
   if (title && rest) {
@@ -5102,10 +5102,11 @@ function parseDeck(txt) {
     // „! “ am Zeilenanfang: Karte einmalig als gemerkt markieren
     const pin = line.startsWith('! ');
     const [main, ownHint] = (pin ? line.slice(2) : line).split(' || ').map((s) => s.trim());
-    const parts = main.split(' | ').map((s) => s.trim());
+    // „\n“ im Text = Zeilenumbruch; der dritte Teil (grau) steht nach einer Leerzeile
+    const parts = main.split(' | ').map((s) => s.trim().replace(/\\n/g, '\n'));
     const front = parts[0];
     if (!front) continue;
-    const back = parts.length >= 3 ? `${parts[1]}\n${parts.slice(2).join(' | ')}` : (parts[1] || '');
+    const back = parts.length >= 3 ? `${parts[1]}\n\n${parts.slice(2).join(' | ')}` : (parts[1] || '');
     const hint = ownHint || (topic ? `Thema: ${topic}` : '');
     deck.cards.push({ id: `d-${fnv(`${set ? `${set}|` : ''}${cat.id}|${front}`)}`, front, back, hint, categoryId: cat.id, pin });
   }

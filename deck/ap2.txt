@@ -2,6 +2,7 @@
 // Aufbau: "# id | Bereich | Farbe", "## id | Kategorie | Symbol", "### Unterthema (wird Hinweis)"
 // Karte: "Vorderseite | Ausgeschriebener Name | Kurze Erklärung" oder "Vorderseite | Kurze Erklärung" oder nur "Vorderseite" (unfertig)
 // Eigener Hinweis: am Zeilenende " || Hinweis" (sonst wird das Unterthema zum Hinweis)
+// Mehrere Zeilen: "\n" im Text; der dritte Teil (grau) erscheint nach einer Leerzeile
 
 # k1 | Klausur 1: IT-Systemlösung | blue
 
@@ -780,6 +781,21 @@ Qualitätsvorausplanung | Qualitätsanforderungen schon vor der Lieferung festle
 # k3 | Klausur 3: WiSo | green
 
 ## k3-job | Berufsbildung, Arbeits- & Tarifrecht | graduation
+@set 2
+Duales System | Betrieb + Berufsschule
+Mindestinhalte Ausbildungsvertrag | Art, Gliederung, Ziel\nBeginn, Dauer\nMaßnahmen außerhalb Betrieb\nTägliche Ausbildungszeit\nProbezeit\nVergütung\nUrlaub\nKündigungsvoraussetzungen\nHinweis Tarifverträge/Betriebsvereinbarungen\nForm Ausbildungsnachweis | § 11 BBiG, vor Ausbildungsbeginn || 10 Punkte
+Probezeit Ausbildung | min. 1 Monat, max. 4 Monate | § 20 BBiG || mindestens / höchstens
+Pflichten Azubi | Lernpflicht\nBerufsschule\nWeisungen befolgen\nAusbildungsnachweis\nSchweigepflicht\nArbeitsmittel pflegen | § 13 BBiG
+Pflichten Ausbildender | Ausbilden\nAusbildungsmittel kostenlos\nFreistellung Schule/Prüfung\nNur ausbildungsbezogene Aufgaben\nVergütung\nZeugnis | § 14 ff. BBiG
+Kündigungsfrist in der Probezeit | Jederzeit, ohne Frist, ohne Grund | Beide Seiten, schriftlich || Es geht um Azubis
+Kündigungsfrist nach der Probezeit (Sicht Azubi) | Ordentlich: 4 Wochen, nur bei Aufgabe/Berufswechsel\nFristlos: wichtiger Grund | Schriftlich mit Gründen, fristlos innerhalb 2 Wochen || Es geht um Azubis. Zwei Möglichkeiten
+Kündigungsfrist nach der Probezeit (Sicht Betrieb) | Ordentlich: nicht möglich\nFristlos: wichtiger Grund | Schriftlich mit Gründen, innerhalb 2 Wochen || Es geht um Azubis. Wie viele Möglichkeiten?
+Ende der Ausbildung | Ablauf Ausbildungszeit | Vorher bestanden: Bekanntgabe Prüfungsergebnis || Zwei Fälle
+Max. Verlängerung bei nicht bestandener Prüfung | 1 Jahr | Auf Verlangen Azubi, bis Wiederholungsprüfung
+Einfaches Zeugnis | Art, Dauer, Ziel, erworbene Fähigkeiten | Erhält man immer
+Qualifiziertes Zeugnis | Einfaches Zeugnis + Verhalten + Leistung | Nur auf Verlangen Azubi
+Vertrag minderjähriger Azubi | Unterschrift gesetzlicher Vertreter
+@set
 ### Berufsbildung
 Ausbildungsvertrag | Vor Beginn schriftlich: Vertragspartner, Beginn/Dauer, Probezeit, Vergütung, Urlaub, Kündigung.
 Probezeit in der Ausbildung | 1 bis 4 Monate – Kündigung jederzeit ohne Frist und ohne Grund.
@@ -868,15 +884,15 @@ Existenzgründung | Sich selbstständig machen – Chance: Freiheit; Risiko: Kap
 
 ## k3-org | Aufbau & Organisation des Betriebs | building
 @set 2
-Rechtsformen
-Einzelunternehmen
-GbR
-OHG
-KG
-GmbH
-UG (haftungsbeschränkt)
-AG
-GmbH & Co. KG
+Rechtsformen | Einzelunternehmen\nPersonengesellschaften: GbR, OHG, KG\nKapitalgesellschaften: GmbH, UG, AG | Mischform: GmbH & Co. KG || 2 Gruppen
+Einzelunternehmen | 1 Inhaber\nHaftet unbeschränkt, auch privat | Kein Mindestkapital, e. K. bei HR-Eintrag
+GbR | min. 2 Gesellschafter\nAlle haften unbeschränkt | Kein Mindestkapital, formfrei
+OHG | min. 2 Gesellschafter, Handelsgewerbe\nAlle haften unbeschränkt, solidarisch | Kein Mindestkapital, HR-Eintrag
+KG | Komplementär: unbeschränkt\nKommanditist: nur Einlage | min. je 1 von beiden || Zwei Arten Gesellschafter
+GmbH | Haftung nur Gesellschaftsvermögen\nStammkapital 25.000 € | Geschäftsführer, Gesellschafterversammlung, Notar
+UG (haftungsbeschränkt) | Mini-GmbH\nStammkapital ab 1 € | 25 % Gewinn in Rücklage bis 25.000 €
+AG | Grundkapital 50.000 €\nAktionäre haften nur mit Einlage | Vorstand, Aufsichtsrat, Hauptversammlung
+GmbH & Co. KG | KG mit GmbH als Komplementär | Haftung praktisch beschränkt
 @set
 ### Wirtschaft und Märkte
 Primärer Sektor | Urproduktion: Land- und Forstwirtschaft, Fischerei, Bergbau.
@@ -980,7 +996,7 @@ Clean Desk | Keine vertraulichen Unterlagen offen liegen lassen, Bildschirm beim
 
 ## k3-env | Umweltschutz | leaf
 @set 2
-Drei Säulen der Nachhaltigkeit
+Drei Säulen der Nachhaltigkeit | Ökologie\nÖkonomie\nSoziales | Gleichgewicht aller drei || 3 Säulen
 @set
 ### Ressourcenmanagement
 Rationelle Energieverwendung | Energie sparsam und effizient einsetzen.
