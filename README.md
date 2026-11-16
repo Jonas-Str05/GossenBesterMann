@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.24.0 | Einmaliger Import 16.11.: Rückseiten für unfertige Karten, unsortierte Karten einsortiert |
 | 1.23.1 | 43 neue Karten: Finanzen, Marketing, Cloud, AGB, Datenbanken, Wirtschaftssektoren |
 | 1.23.0 | 23 WiSo-Karten (BBiG, Rechtsformen, Nachhaltigkeit), Kartensatz mit mehrzeiligen Rückseiten |
 | 1.22.5 | Android-Navigationsleiste schwarz statt hell (Manifest theme_color) |

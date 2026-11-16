@@ -5167,6 +5167,75 @@ function mergeDeck(deck, { restore = false } = {}) {
   return { added, updated, removed: removed.length };
 }
 
+// ---------------------------------------------------------------------------
+// Einmalige Karten-Importe (z. B. ausgefüllte Rückseiten), werden je Gerät nur einmal angewendet.
+// Regel: nie vorhandenen Text überschreiben – nur leere Rückseiten/Hinweise füllen,
+// unsortierte Karten einer Kategorie zuordnen, fehlende Karten und Kategorien ergänzen.
+// ---------------------------------------------------------------------------
+const IMPORTS = ['import/2026-11-16.json'];
+
+function mergeImport(data) {
+  const now = Date.now();
+  const key = (s) => String(s || '').trim().toLowerCase();
+  const map = {};
+  const cats = data.categories || [];
+  // erst Bereiche, dann Kategorien (damit parentId zugeordnet werden kann)
+  for (const c of [...cats.filter((x) => x.kind === 'group'), ...cats.filter((x) => x.kind !== 'group')]) {
+    const group = c.kind === 'group';
+    const ex = catById(c.id) || DB.categories.find((x) => key(x.name) === key(c.name) && isGroup(x) === group);
+    if (ex) { map[c.id] = ex.id; continue; }
+    const cat = { id: c.id, name: c.name, color: COLORS.includes(c.color) ? c.color : 'blue', icon: CAT_ICONS[c.icon] ? c.icon : guessIcon(c.name), keywords: [], created: now, parentId: (c.parentId && map[c.parentId]) || null };
+    if (group) cat.kind = 'group';
+    if (Number.isFinite(c.order)) cat.order = c.order;
+    DB.categories.push(cat);
+    map[c.id] = cat.id;
+  }
+  let added = 0;
+  let filled = 0;
+  for (const c of data.cards || []) {
+    if (!key(c.front)) continue;
+    const target = map[c.categoryId] && catById(map[c.categoryId]) && !isGroup(catById(map[c.categoryId])) ? map[c.categoryId] : 'inbox';
+    const ex = cardById(c.id) || DB.cards.find((x) => key(x.front) === key(c.front));
+    if (!ex) {
+      DB.cards.push({ id: cardById(c.id) ? uid() : c.id, front: c.front.trim(), back: (c.back || '').trim(), hint: (c.hint || '').trim(), categoryId: target, level: 0, created: now, updated: now, right: 0, wrong: 0, last: 0 });
+      added++;
+      continue;
+    }
+    let changed = false;
+    if (!ex.back.trim() && (c.back || '').trim()) { ex.back = c.back.trim(); changed = true; }
+    if (!(ex.hint || '').trim() && (c.hint || '').trim()) { ex.hint = c.hint.trim(); changed = true; }
+    if (ex.categoryId === 'inbox' && target !== 'inbox') { ex.categoryId = target; changed = true; }
+    if (changed) {
+      delete ex.deck; // jetzt eigener Inhalt – der Kartensatz überschreibt ihn nicht mehr
+      ex.updated = now;
+      filled++;
+    }
+  }
+  return { added, filled };
+}
+
+async function applyImports() {
+  const done = new Set(DB.meta.importsDone || []);
+  for (const url of IMPORTS) {
+    if (done.has(url)) continue;
+    let data;
+    try {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) continue;
+      data = await res.json();
+    } catch (e) {
+      continue; // offline – beim nächsten Start erneut
+    }
+    const r = mergeImport(data);
+    done.add(url);
+    DB.meta.importsDone = [...done];
+    save();
+    if (!stack.length) refresh();
+    const msg = [r.added && plural(r.added, 'neue Karte', 'neue Karten'), r.filled && `${plural(r.filled, 'Karte', 'Karten')} ergänzt`].filter(Boolean).join(' · ');
+    if (msg) toast(msg);
+  }
+}
+
 async function loadDeck(opts = {}) {
   let txt;
   try {
@@ -5252,7 +5321,9 @@ function boot() {
 
   Voice.checkLocal().then(() => renderSettings());
   // Prüfungskarten (deck/ap2.txt) nur für Nutzer, die sie schon haben – neue Nutzer starten leer
-  if ((DB.meta.deckIds || []).length) loadDeck().then((r) => { if (r && r.added) requestPersist(); });
+  if ((DB.meta.deckIds || []).length) {
+    loadDeck().then((r) => { if (r && r.added) requestPersist(); }).then(() => applyImports());
+  }
 
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
