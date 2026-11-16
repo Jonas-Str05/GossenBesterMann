@@ -272,6 +272,10 @@ SaaS
 PaaS
 IaaS
 DaaS
+Cloud Vorteile | Keine eigene Hardware\nSkalierbar\nPay-per-Use\nZugriff von überall\nWartung durch Anbieter | Fixkosten werden variable Kosten
+Cloud Nachteile | Abhängig vom Internet\nAbhängig vom Anbieter (Lock-in)\nDatenschutz, Serverstandort\nLaufende Kosten | DSGVO: AV-Vertrag nötig
+Vor-Ort-Installation Vorteile | Volle Kontrolle über Daten\nUnabhängig vom Internet\nIndividuell anpassbar | On-Premises
+Vor-Ort-Installation Nachteile | Hohe Anschaffungskosten\nEigene Wartung und Personal\nSchlecht skalierbar | On-Premises
 @set
 ### Cloud und Online-Dienste
 Cloud Computing | Bereitstellung von IT-Ressourcen über das Internet nach Bedarf.
@@ -372,6 +376,22 @@ Selbstkostenkalkulation
 Handelswarenkalkulation
 Zuschlagskalkulation
 Stundensatz
+Deckungsbeitrag | Erlöse − variable Kosten | Stück-DB = Preis − variable Stückkosten\nDB − Fixkosten = Gewinn || Formel
+Umsatzrentabilität | Gewinn / Umsatz × 100 | Wie viel % vom Umsatz als Gewinn bleibt || Formel
+Eigenkapitalrentabilität | Gewinn / Eigenkapital × 100 | Verzinsung des Eigenkapitals || Formel
+Gesamtkapitalrentabilität | (Gewinn + FK-Zinsen) / Gesamtkapital × 100 | Verzinsung des gesamten Kapitals || Formel
+Bilanz | Aktiva: Anlagevermögen, Umlaufvermögen\nPassiva: Eigenkapital, Fremdkapital | Aktiva = Passiva, Stichtag\nAktiva = Mittelverwendung, Passiva = Mittelherkunft || 2 Seiten, 4 Posten
+Anlagevermögen (Bilanz) | Dauerhaft im Unternehmen\nz. B. Gebäude, Maschinen, Server, Lizenzen | Aktiva, oben
+Umlaufvermögen (Bilanz) | Kurzfristig, ändert sich laufend\nz. B. Waren, Forderungen, Bank, Kasse | Aktiva, unten
+Eigenkapital (Bilanz) | Mittel der Eigentümer | Passiva, oben\nLangfristig, steht für Haftung
+Fremdkapital (Bilanz) | Schulden\nz. B. Darlehen, Verbindlichkeiten, Rückstellungen | Passiva, unten
+GuV | Gewinn- und Verlustrechnung\nAufwendungen gegen Erträge\nErträge − Aufwendungen = Gewinn/Verlust | Zeitraum (Geschäftsjahr), Bilanz = Stichtag
+Fixkosten | Unabhängig von der Menge\nz. B. Miete, Gehälter
+Variable Kosten | Steigen mit der Menge\nz. B. Material, Lizenz pro Nutzer
+Preiskalkulation (Handel) | Listeneinkaufspreis\n− Liefererrabatt = Zieleinkaufspreis\n− Liefererskonto = Bareinkaufspreis\n+ Bezugskosten = Bezugspreis\n+ Handlungskosten = Selbstkosten\n+ Gewinn = Barverkaufspreis\n+ Kundenskonto = Zielverkaufspreis\n+ Kundenrabatt = Listenverkaufspreis netto\n+ USt = Listenverkaufspreis brutto | Einkauf: erst Rabatt, dann Skonto\nVerkauf: Skonto und Rabatt im Hundert || Erst Rabatt, dann Skonto
+Break-Even-Point | Erlöse = Gesamtkosten\nGewinnschwelle | Menge = Fixkosten / Stück-DB
+Amortisation | Investition durch Rückflüsse wieder eingespielt | Amortisationszeit = Anschaffungskosten / jährlicher Rückfluss
+Break-Even-Preis | Mindestpreis | Deckt alle Kosten, Gewinn = 0\nKurzfristig: variable Stückkosten
 @set
 ### Analyseverfahren
 Kosten-Nutzen-Analyse | Stellt Kosten und Nutzen einer Investition gegenüber.
@@ -455,6 +475,19 @@ Datenquellen | z. B. ERP, Warenwirtschaft, Zeiterfassung, Bankdaten.
 Schnittstelle | Technische Verbindung für den Datenaustausch zwischen Systemen.
 
 ## k2-mkt | Marketing & Vertrieb | megaphone
+@set 2
+Freemium-Modell | Basisversion kostenlos\nPremiumfunktionen kostenpflichtig | Ziel: viele Nutzer, ein Teil zahlt\nz. B. Spotify || Free + Premium
+Preisdifferenzierung | Gleiches Produkt, verschiedene Preise\nZeitlich, räumlich, personell, mengenmäßig | Auch nach Leistung (Basic/Pro)\nz. B. Studentenrabatt || 4 Arten
+Customer Journey | Awareness: Aufmerksamkeit\nConsideration: Abwägung\nConversion: Kauf\nRetention: Bindung\nAdvocacy: Weiterempfehlung | Weg vom ersten Kontakt bis zur Empfehlung || 5 Phasen
+Conversion Funnel | Trichter: viele Besucher, wenige Käufer\nJede Stufe weniger Nutzer | Zeigt, wo Nutzer abspringen
+Keywords | Suchbegriffe der Nutzer | Basis für SEO und SEA
+SEO | Search Engine Optimization\nUnbezahlte Suchergebnisse verbessern | Inhalte, Keywords, Ladezeit, Backlinks\nLangfristig || Bezahlt oder nicht?
+SEA | Search Engine Advertising\nBezahlte Anzeigen in Suchmaschinen | z. B. Google Ads, Bezahlung pro Klick\nSofort wirksam || Bezahlt oder nicht?
+Double Opt-in | Anmeldung + Bestätigung per Link in Mail | Nachweis der Einwilligung, rechtssicher || 2 Schritte
+Single Opt-in | Anmeldung ohne Bestätigung | Risiko: fremde Adressen, kein Nachweis || 1 Schritt
+CPA | Cost per Action | Kosten pro Aktion (Kauf, Anmeldung)\nWerbekosten / Anzahl Aktionen || Kennzahl
+Conversion Rate (CR) | Anteil der Klicks/Besucher, die zum Abschluss führen\nz. B. Abo-Vertrag | Conversions / Besucher × 100 || Kennzahl
+@set
 ### Markt- und Kundenanalyse
 Wettbewerbsbeobachtung | Laufende Analyse der Konkurrenz: Preise, Produkte, Strategie.
 Trendforschung | Erkennt künftige Entwicklungen in Markt und Gesellschaft.
@@ -553,10 +586,15 @@ Redundanz | Mehrfach vorhandene Komponenten oder Daten für mehr Ausfallsicherhe
 
 ## k2-db | Datenbanken & SQL | database
 @set 2
-Normalisierung
-1. Normalform
-2. Normalform
-3. Normalform
+Redundanz (Datenbank) | Gleiche Daten mehrfach gespeichert | Folge: Speicherverschwendung, Widersprüche (Anomalien)
+Normalisierung | Ziel: Redundanzen vermeiden\n1. bis 3. Normalform || Ziel davon?
+1. Normalform | Atomare Werte\nKeine Wiederholungsgruppen | z. B. Name → Vorname, Nachname
+2. Normalform | 1. NF\n+ Nichtschlüsselattribute voll vom ganzen Primärschlüssel abhängig | Nur bei zusammengesetztem Schlüssel relevant
+3. Normalform | 2. NF\n+ keine transitiven Abhängigkeiten | z. B. PLZ → Ort auslagern
+Primärschlüssel | Identifiziert Datensatz eindeutig\nEindeutig, nicht leer | PK, z. B. Kunden-ID
+Fremdschlüssel | Verweis auf Primärschlüssel einer anderen Tabelle | FK, verknüpft Tabellen
+Kardinalität | Beziehungsart zwischen Tabellen\n1:1, 1:n, n:m | n:m braucht Zwischentabelle || 3 Arten
+Atomare Spalten | Nur ein Wert pro Feld\nNicht weiter teilbar | z. B. Adresse → Straße, PLZ, Ort\nVoraussetzung 1. NF
 @set
 ### Datenbankmodelle
 Relationale Datenbank | Speichert Daten in Tabellen, verknüpft über Schlüssel.
@@ -646,6 +684,8 @@ DATEDIFF | Berechnet die Differenz zwischen zwei Datumswerten.
 
 ## k2-law | Recht & Verträge | scale
 @set 2
+AGB-Inhalte | Liefer- und Zahlungsbedingungen\nEigentumsvorbehalt\nGewährleistung, Haftung\nLaufzeit, Kündigung\nGerichtsstand | §§ 305 ff. BGB
+AGB Voraussetzungen Vertragsbestandteil | Ausdrücklicher Hinweis bei Vertragsschluss\nZumutbare Kenntnisnahme\nEinverständnis des Kunden | § 305 Abs. 2 BGB\nz. B. Checkbox bei Abo-Abschluss || 3 Voraussetzungen
 Vertragsarten
 Kaufvertrag
 Werkvertrag
@@ -884,6 +924,7 @@ Existenzgründung | Sich selbstständig machen – Chance: Freiheit; Risiko: Kap
 
 ## k3-org | Aufbau & Organisation des Betriebs | building
 @set 2
+Wirtschaftssektoren | Primär: Urproduktion, z. B. Landwirtschaft\nSekundär: Herstellung, z. B. Industrie\nTertiär: Dienstleistung, z. B. Handel, IT | Trend: Tertiärisierung || 3 Sektoren
 Rechtsformen | Einzelunternehmen\nPersonengesellschaften: GbR, OHG, KG\nKapitalgesellschaften: GmbH, UG, AG | Mischform: GmbH & Co. KG || 2 Gruppen
 Einzelunternehmen | 1 Inhaber\nHaftet unbeschränkt, auch privat | Kein Mindestkapital, e. K. bei HR-Eintrag
 GbR | min. 2 Gesellschafter\nAlle haften unbeschränkt | Kein Mindestkapital, formfrei
