@@ -1,0 +1,1674 @@
+{
+    "id":  "2026-11-20",
+    "categories":  [
+                       {
+                           "id":  "inbox",
+                           "name":  "Unsortiert",
+                           "color":  "gray",
+                           "icon":  "tray",
+                           "parentId":  null,
+                           "kind":  null,
+                           "order":  null
+                       },
+                       {
+                           "id":  "deck-k1",
+                           "name":  "IT-Systemlösung (Klausur 1)",
+                           "color":  "blue",
+                           "icon":  "cpu",
+                           "parentId":  null,
+                           "kind":  "group",
+                           "order":  0
+                       },
+                       {
+                           "id":  "deck-k2",
+                           "name":  "Kaufmännische Prozesse (Klausur 2)",
+                           "color":  "orange",
+                           "icon":  "clipboard",
+                           "parentId":  null,
+                           "kind":  "group",
+                           "order":  1
+                       },
+                       {
+                           "id":  "deck-k3",
+                           "name":  "WiSo (Klausur 3)",
+                           "color":  "green",
+                           "icon":  "book",
+                           "parentId":  null,
+                           "kind":  "group",
+                           "order":  2
+                       },
+                       {
+                           "id":  "deck-k1-sec",
+                           "name":  "IT-Sicherheit \u0026 Datenschutz",
+                           "color":  "blue",
+                           "icon":  "shield",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  0
+                       },
+                       {
+                           "id":  "deck-k1-pm",
+                           "name":  "Projektmanagement",
+                           "color":  "blue",
+                           "icon":  "calendar",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  1
+                       },
+                       {
+                           "id":  "deck-k1-req",
+                           "name":  "Anforderungsanalyse \u0026 Geschäftsprozesse",
+                           "color":  "blue",
+                           "icon":  "clipboard",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  2
+                       },
+                       {
+                           "id":  "deck-k1-sys",
+                           "name":  "Systemarchitektur \u0026 Komponenten",
+                           "color":  "blue",
+                           "icon":  "cpu",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  3
+                       },
+                       {
+                           "id":  "deck-k1-net",
+                           "name":  "Netzwerke \u0026 Kommunikation",
+                           "color":  "blue",
+                           "icon":  "network",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  4
+                       },
+                       {
+                           "id":  "deck-k1-cloud",
+                           "name":  "Cloud \u0026 Betriebskonzepte",
+                           "color":  "blue",
+                           "icon":  "cloud",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  5
+                       },
+                       {
+                           "id":  "deck-k1-lic",
+                           "name":  "Lizenzmodelle",
+                           "color":  "blue",
+                           "icon":  "key",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  6
+                       },
+                       {
+                           "id":  "deck-k1-dev",
+                           "name":  "Softwareentwicklung",
+                           "color":  "blue",
+                           "icon":  "code",
+                           "parentId":  "deck-k1",
+                           "kind":  null,
+                           "order":  7
+                       },
+                       {
+                           "id":  "deck-k2-eco",
+                           "name":  "Wirtschaftlichkeit \u0026 Finanzen",
+                           "color":  "orange",
+                           "icon":  "coins",
+                           "parentId":  "deck-k2",
+                           "kind":  null,
+                           "order":  8
+                       },
+                       {
+                           "id":  "deck-k2-mkt",
+                           "name":  "Marketing \u0026 Vertrieb",
+                           "color":  "orange",
+                           "icon":  "megaphone",
+                           "parentId":  "deck-k2",
+                           "kind":  null,
+                           "order":  9
+                       },
+                       {
+                           "id":  "deck-k2-com",
+                           "name":  "Kundenberatung \u0026 Kommunikation",
+                           "color":  "orange",
+                           "icon":  "chat",
+                           "parentId":  "deck-k2",
+                           "kind":  null,
+                           "order":  10
+                       },
+                       {
+                           "id":  "deck-k2-qm",
+                           "name":  "Qualitätsmanagement",
+                           "color":  "orange",
+                           "icon":  "seal",
+                           "parentId":  "deck-k2",
+                           "kind":  null,
+                           "order":  11
+                       },
+                       {
+                           "id":  "deck-k2-db",
+                           "name":  "Datenbanken \u0026 SQL",
+                           "color":  "orange",
+                           "icon":  "database",
+                           "parentId":  "deck-k2",
+                           "kind":  null,
+                           "order":  12
+                       },
+                       {
+                           "id":  "deck-k2-law",
+                           "name":  "Recht \u0026 Verträge",
+                           "color":  "orange",
+                           "icon":  "scale",
+                           "parentId":  "deck-k2",
+                           "kind":  null,
+                           "order":  13
+                       },
+                       {
+                           "id":  "deck-k2-buy",
+                           "name":  "Beschaffung",
+                           "color":  "orange",
+                           "icon":  "cart",
+                           "parentId":  "deck-k2",
+                           "kind":  null,
+                           "order":  14
+                       },
+                       {
+                           "id":  "deck-k3-job",
+                           "name":  "Berufsbildung, Arbeits- \u0026 Tarifrecht",
+                           "color":  "green",
+                           "icon":  "graduation",
+                           "parentId":  "deck-k3",
+                           "kind":  null,
+                           "order":  15
+                       },
+                       {
+                           "id":  "deck-k3-org",
+                           "name":  "Aufbau \u0026 Organisation des Betriebs",
+                           "color":  "green",
+                           "icon":  "building",
+                           "parentId":  "deck-k3",
+                           "kind":  null,
+                           "order":  16
+                       },
+                       {
+                           "id":  "deck-k3-safe",
+                           "name":  "Sicherheit \u0026 Gesundheitsschutz",
+                           "color":  "green",
+                           "icon":  "aid",
+                           "parentId":  "deck-k3",
+                           "kind":  null,
+                           "order":  17
+                       },
+                       {
+                           "id":  "deck-k3-env",
+                           "name":  "Umweltschutz",
+                           "color":  "green",
+                           "icon":  "leaf",
+                           "parentId":  "deck-k3",
+                           "kind":  null,
+                           "order":  18
+                       },
+                       {
+                           "id":  "deck-k3-digi",
+                           "name":  "Vernetztes Zusammenarbeiten",
+                           "color":  "green",
+                           "icon":  "people",
+                           "parentId":  "deck-k3",
+                           "kind":  null,
+                           "order":  19
+                       },
+                       {
+                           "id":  "mv8j37n8j9ifjr",
+                           "name":  "Test-Bereich",
+                           "color":  "brown",
+                           "icon":  "seal",
+                           "parentId":  null,
+                           "kind":  "group",
+                           "order":  null
+                       }
+                   ],
+    "cards":  [
+                  {
+                      "id":  "mx0ju1j88xdfst",
+                      "front":  "Default Deny Firewall",
+                      "back":  "Alles verboten, was nicht ausdrücklich erlaubt ist\n\nWhitelist, sicherer als Default Allow",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mx97dus065c4r5",
+                      "front":  "First Match Firewall",
+                      "back":  "Regeln von oben nach unten\nErste passende Regel greift\n\nLetzte Regel: alles verbieten",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mx14sbsud63n1t",
+                      "front":  "Drop / Reject Firewall",
+                      "back":  "Drop: verwerfen ohne Rückmeldung\nReject: ablehnen mit Rückmeldung\n\nDrop verrät Angreifer nichts",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxjp6oyn2wwe58",
+                      "front":  "Paketfilter Firewall",
+                      "back":  "Prüft jedes Paket einzeln\nIP, Port, Protokoll\n\nSchicht 3/4, stateless",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxww6ad60dmck0",
+                      "front":  "Stateful Inspection Firewall",
+                      "back":  "Paketfilter + Zustandstabelle\nAntworten automatisch erlaubt\nPrüft keinen Inhalt\n\nSchicht 3/4, Standard im IHK-Netzwerkplan",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxix3ru1b2dtg4",
+                      "front":  "Application Level Gateway",
+                      "back":  "Proxy, prüft Inhalt eines Dienstes\nBis Schicht 7\n\nLangsam, pro Dienst eigener Proxy",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mx8n33ct046g0x",
+                      "front":  "Next Generation Firewall",
+                      "back":  "Stateful + Inhalt, Anwendung, Benutzer\nDeep Packet Inspection\nApplication Control\nIDS/IPS\nTLS-Inspection\n\nSchicht 3 bis 7, teuer, rechenintensiv\nAP2 W 25/26: 6 Punkte",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mx06co1v7t16v0",
+                      "front":  "Personal Firewall",
+                      "back":  "Software auf einem Gerät\nSchützt nur dieses Gerät\n\nz. B. Windows Defender Firewall",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mx10oxr2fu91j1",
+                      "front":  "WAF",
+                      "back":  "Web Application Firewall\nSchützt Webserver\n\nGegen SQL-Injection, XSS",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxnbt3o0rfwrzs",
+                      "front":  "Well-known Ports",
+                      "back":  "HTTP 80, HTTPS 443\nDNS 53, SSH 22, RDP 3389\nSMTP 25, IMAPS 993\n\nBereich 0 bis 1023",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxnkcayjqhbolh",
+                      "front":  "Striping RAID",
+                      "back":  "Daten in Blöcken auf mehrere Platten verteilt\n\nSchneller",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxj0mqgaue7l92",
+                      "front":  "Mirroring RAID",
+                      "back":  "Daten 1:1 gespiegelt",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxu1n1x58bjaee",
+                      "front":  "Parität RAID",
+                      "back":  "Prüfinformation\nVerlorene Daten daraus berechenbar\n\nÜber XOR: gleiche Bits 0, ungleiche 1",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx61djz48imj9h",
+                      "front":  "Hardware- / Software-RAID",
+                      "back":  "Hardware: entlastet CPU, schnell, teurer\nSoftware: Betriebssystem, günstig, belastet CPU",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxguygg3mzqami",
+                      "front":  "Tarifautonomie",
+                      "back":  "Tarifpartner regeln Löhne selbst\nOhne Staat\n\nArt. 9 Abs. 3 GG, TVG",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxxmhkiozknmgz",
+                      "front":  "Tarifpartner",
+                      "back":  "Gewerkschaft\nArbeitgeberverband oder einzelner Arbeitgeber\n\nDachverbände DGB, BDA",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxj5vsuyeg0juq",
+                      "front":  "Flächen- / Haustarifvertrag",
+                      "back":  "Fläche: Branche + Region\nHaus: ein Unternehmen",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx0jz3mr1sxqix",
+                      "front":  "Manteltarifvertrag / Rahmentarifvertrag",
+                      "back":  "Arbeitszeit, Urlaub, Kündigungsfristen, Zuschläge\n\nLange Laufzeit",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx74gwomh25zmk",
+                      "front":  "Lohn- und Gehalts-Rahmentarifvertrag",
+                      "back":  "Entgeltgruppen\nEingruppierung",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxz5jut5nc3gcn",
+                      "front":  "Entgelttarifvertrag",
+                      "back":  "Höhe der Löhne\n\n1 bis 2 Jahre",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxlr4t2bhkoq8d",
+                      "front":  "Friedenspflicht (Tarifrecht)",
+                      "back":  "Keine Streiks während der Laufzeit\n\nNur zu geregelten Themen",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxep7xrxam0j7e",
+                      "front":  "Günstigkeitsprinzip",
+                      "back":  "Abweichung nur zugunsten Arbeitnehmer\n\nGesetz 20, Tarif 30 Urlaubstage → 30",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxlfgha4dc7ozj",
+                      "front":  "Tarifverhandlung Ablauf",
+                      "back":  "Forderung\nVerhandlung, Warnstreik\nScheitern\nSchlichtung\nUrabstimmung\nStreik\nEinigung\nUrabstimmung\nNeuer Vertrag",
+                      "hint":  "9 Schritte",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxo7bydrk4h9d4",
+                      "front":  "Urabstimmung Ergebnis ab %",
+                      "back":  "1.: mind. 75 % für Streik\n2.: mind. 25 % für Annahme",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx5egaz5m8g06f",
+                      "front":  "Streikarten",
+                      "back":  "Zulässig: Warn-, Flächen-, Schwerpunktstreik\nUnzulässig: wilder, politischer Streik\n\nBeamte dürfen nicht streiken",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxlp40m1tvby13",
+                      "front":  "Aussperrung",
+                      "back":  "Arbeitgeber schließt MA ohne Lohn aus\n\nNur als Abwehr, Arbeitsverhältnis ruht",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx8qrct0pgpv4l",
+                      "front":  "Lohnformen",
+                      "back":  "Zeitlohn\nAkkordlohn\nPrämienlohn\nProvision\nErfolgsbeteiligung",
+                      "hint":  "5",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxol0ioh85dad4",
+                      "front":  "Zeitlohn",
+                      "back":  "Nach Arbeitszeit\nKein Leistungsanreiz",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxx1deqwexsgeb",
+                      "front":  "Akkordlohn",
+                      "back":  "Nach Menge\nLeistungsanreiz, Gesundheitsrisiko\n\nFür Jugendliche verboten",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx2xtl6rju69kl",
+                      "front":  "Steuerklassen",
+                      "back":  "I ledig\nII alleinerziehend\nIII verheiratet, mehr\nIV verheiratet, gleich\nV verheiratet, weniger\nVI Zweitjob\n\nVI nicht bei Minijob oder Selbstständigkeit",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx4gsu41y9oz5p",
+                      "front":  "Soli / Kirchensteuer",
+                      "back":  "Soli: 5,5 % der Lohnsteuer, nur hohe Einkommen\nKirchensteuer: 9 % der Lohnsteuer\n\nBY, BW: 8 %",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxoc8267yfze9d",
+                      "front":  "Sozialversicherungs-Träger",
+                      "back":  "KV: Krankenkassen\nPV: Pflegekassen\nRV: Deutsche Rentenversicherung\nAV: Bundesagentur für Arbeit\nUV: Berufsgenossenschaft\n\nEinzugsstelle: Krankenkasse",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx31doeazymuml",
+                      "front":  "Unfallversicherung",
+                      "back":  "Zahlt nur der Arbeitgeber\nTräger: Berufsgenossenschaft\n\nAuch Arbeitsweg, Berufsschule",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxl1lc5ux68zwk",
+                      "front":  "Entgeltfortzahlung",
+                      "back":  "6 Wochen durch Arbeitgeber\nDanach Krankengeld\n\nKrankengeld von Krankenkasse",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxpwzrczeghyou",
+                      "front":  "Krankengeld",
+                      "back":  "70 % Brutto\nMax. 90 % Netto",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxpk8aopdjxpmd",
+                      "front":  "Arbeitslosengeld I",
+                      "back":  "60 % Netto\nMit Kind 67 %",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxx1ja8mg5w4o3",
+                      "front":  "Umlageverfahren Rente",
+                      "back":  "Beiträge der Arbeitenden zahlen aktuelle Renten\n\nGenerationenvertrag",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxpw92twueufzo",
+                      "front":  "Vermögenswirksame Leistungen",
+                      "back":  "Zusatz vom Arbeitgeber für Sparverträge\nMeist bis 40 €/Monat\n\nSteuer- und sozialversicherungspflichtig",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxxfnrc6cy2c2x",
+                      "front":  "Personengesellschaft",
+                      "back":  "Haftung: unbeschränkt\nKein Mindestkapital\n\nGbR, OHG, KG, Handelsregister Abteilung A",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxdgvdxk4i9tbf",
+                      "front":  "Kapitalgesellschaft",
+                      "back":  "Haftung: nur Gesellschaftsvermögen\nMindestkapital\nJuristische Person\n\nGmbH, UG, AG",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxshpy57pggslt",
+                      "front":  "Prinzipien: Unbeschränkt, unmittelbar, solidarisch",
+                      "back":  "Ganzes Privatvermögen\nGläubiger direkt an Gesellschafter\nJeder für die ganze Schuld",
+                      "hint":  "Bei GbR und OHG alle 3",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mx4virbcmfx3sa",
+                      "front":  "Handelsregister + Art Eintrag",
+                      "back":  "Öffentliches Verzeichnis der Kaufleute\nDeklaratorisch: bestätigt\nKonstitutiv: erzeugt Wirkung",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mx3d05jni7cshc",
+                      "front":  "GmbH Organe",
+                      "back":  "Geschäftsführer\nGesellschafterversammlung\nAufsichtsrat ab 500 MA",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxen1q346jkg4i",
+                      "front":  "AG Organe",
+                      "back":  "Vorstand: leitet\nAufsichtsrat: kontrolliert, bestellt Vorstand\nHauptversammlung: wählt Aufsichtsrat",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxuxngyhob6xst",
+                      "front":  "Gemeinnützige Organisation",
+                      "back":  "Kein Gewinnzweck\nSteuerbegünstigt, Spendenquittung\n\ne. V. (mind. 7), gGmbH, Stiftung",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxmk8ppjl7l78z",
+                      "front":  "Handelsgewerbe",
+                      "back":  "Gewerbe mit kaufmännischem Geschäftsbetrieb\n\n§ 1 HGB, keine feste Grenze\nSobald Handelsgewerbe, ist man Istkaufmann",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxpnmjlgtfrfo1",
+                      "front":  "Istkaufmann",
+                      "back":  "Betreibt Handelsgewerbe\nAutomatisch Kaufmann\n\nEintrag deklaratorisch",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxp901kif8ss2m",
+                      "front":  "Kannkaufmann",
+                      "back":  "Kleingewerbe, Land-/Forstwirte\nErst mit Eintrag Kaufmann\n\nKonstitutiv",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxuyxe8ycmrn01",
+                      "front":  "Formkaufmann",
+                      "back":  "GmbH, UG, AG, eG\nKaufmann durch Rechtsform\n\nKonstitutiv",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxm123wjkb3enr",
+                      "front":  "Fiktivkaufmann",
+                      "back":  "Im Register, aber kein Handelsgewerbe\nGilt als Kaufmann\n\n§ 5 HGB",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mx8v6w69foxzuo",
+                      "front":  "Scheinkaufmann",
+                      "back":  "Nicht im Register, tritt als Kaufmann auf\nWird so behandelt",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxyrif5aqfwn9l",
+                      "front":  "Stabsstelle",
+                      "back":  "Berät\nKeine Weisungsbefugnis\n\nz. B. Datenschutzbeauftragter",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxbkq7n8x6kasg",
+                      "front":  "Einliniensystem",
+                      "back":  "1 Vorgesetzter, Dienstweg\n+ klar\n− lange Wege",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxgtz8g2ophuhq",
+                      "front":  "Mehrliniensystem",
+                      "back":  "Mehrere Fachvorgesetzte\n+ kurze Wege\n− widersprüchliche Anweisungen",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mx4o36tdbcqo4r",
+                      "front":  "Stabliniensystem",
+                      "back":  "Einlinie + beratende Stäbe\n+ Expertenwissen\n− Stab ohne Macht",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxg9z1nqj20xh9",
+                      "front":  "Spartenorganisation",
+                      "back":  "Nach Produkt, Region, Kunde\n+ Marktnähe\n− doppelte Funktionen\n\nOft Profit-Center",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxoplie4ig9gik",
+                      "front":  "Matrixorganisation",
+                      "back":  "2 Vorgesetzte: Funktion + Objekt\n+ flexibel\n− Kompetenzkonflikte",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxqysficgk6d3p",
+                      "front":  "Lerntypen",
+                      "back":  "Visuell\nAuditiv\nMotorisch\nKommunikativ",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxnum4vfnddi6m",
+                      "front":  "Soziale Marktwirtschaft",
+                      "back":  "Freier Markt + sozialer Ausgleich durch Staat",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxaw4e9mwqaifc",
+                      "front":  "Produktivität (Ziel Unternehmen)",
+                      "back":  "Menge raus / Menge rein\n\nMengenmäßig",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxdx9fo89c8ovj",
+                      "front":  "Wirtschaftlichkeit (Ziel Unternehmen)",
+                      "back":  "Ertrag / Aufwand\n\nWertmäßig, über 1 gut",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxw28k9vmkvyin",
+                      "front":  "Rentabilität",
+                      "back":  "Gewinn / Bezugsgröße (Kapital oder Umsatz) × 100\n\nKennzahl in %",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mx8728d3qfcfq9",
+                      "front":  "Zielkonflikt",
+                      "back":  "Ziele behindern sich\n\nz. B. Gewinn vs. Umwelt",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mx67jpd9gll5uu",
+                      "front":  "IHK",
+                      "back":  "Industrie- und Handelskammer\nAusbildung überwachen\nPrüfungen abnehmen\nBeraten\n\nPflichtmitgliedschaft",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxiauwx4p4l9lt",
+                      "front":  "Prüfungsausschuss (3 Personen)",
+                      "back":  "Arbeitgeber-Vertreter\nArbeitnehmer-Vertreter\nLehrer\n\nEhrenamtlich",
+                      "hint":  "z. B. Gossen",
+                      "categoryId":  "deck-k3-org"
+                  },
+                  {
+                      "id":  "mxmhfafnkzi2pb",
+                      "front":  "Sicherheitsbeauftragter",
+                      "back":  "Ab mehr als 20 MA",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-safe"
+                  },
+                  {
+                      "id":  "mxqd3vnw1ohkgw",
+                      "front":  "Abfallhierarchie",
+                      "back":  "Vermeiden\nWiederverwenden\nRecyceln\nVerwerten\nBeseitigen",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-env"
+                  },
+                  {
+                      "id":  "mxyjke4tpfqqyk",
+                      "front":  "Roh-, Hilfs-, Betriebsstoffe",
+                      "back":  "Roh: Hauptbestandteil, z. B. Holz\nHilfs: Nebenbestandteil, z. B. Nägel\nBetrieb: nicht im Produkt, z. B. Schleifpapier\n\nBeispiele beim Tischler",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-env"
+                  },
+                  {
+                      "id":  "mxstc1w6qk4xiv",
+                      "front":  "Sozialauswahl (Kriterien für Kündigung)",
+                      "back":  "Alter\nBetriebszugehörigkeit\nUnterhaltspflichten\nSchwerbehinderung\n\nBei betriebsbedingter Kündigung",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx8tl0puramwk9",
+                      "front":  "Mindest-Urlaub Jugendliche",
+                      "back":  "Unter 16: 30\nUnter 17: 27\nUnter 18: 25 Werktage",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxd29ma3zk93a2",
+                      "front":  "Mindesturlaub",
+                      "back":  "24 Werktage\n\nBUrlG, = 20 Arbeitstage bei 5-Tage-Woche",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxhotc39shu93u",
+                      "front":  "Mutterschaftsgeld Zahler",
+                      "back":  "Krankenkasse + Arbeitgeber-Zuschuss bis Nettolohn",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx528lmcnw1sdj",
+                      "front":  "GdB",
+                      "back":  "Grad der Behinderung\n20 bis 100 in Zehnerschritten\n\nVersorgungsamt",
+                      "hint":  "20 - 100",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxhwv50dx0ojjh",
+                      "front":  "Individual- / Kollektivarbeitsrecht",
+                      "back":  "Individual: einzelner Arbeitnehmer + Arbeitgeber\nKollektiv: Gruppen, Tarif, Betriebsvereinbarung",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx357zgz1lnxtk",
+                      "front":  "Betriebsvereinbarung",
+                      "back":  "Vertrag Arbeitgeber + Betriebsrat\nGilt für alle MA\n\nSchriftlich, aushängen",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxueiod2p4rtq9",
+                      "front":  "Rangfolge Arbeitsrecht",
+                      "back":  "Grundgesetz\nGesetz\nTarifvertrag\nBetriebsvereinbarung\nArbeitsvertrag\nWeisung",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx6eqxv6fajp4v",
+                      "front":  "JAV",
+                      "back":  "Jugend- und Auszubildendenvertretung\nAktives Wahlrecht (wählen): unter 18, Azubis unter 25\nPassives Wahlrecht (gewählt werden): unter 25\n2 Jahre Amtszeit\n\nNur mit Betriebsrat, keine eigenen Rechte gegenüber dem Arbeitgeber",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxz6xh1f7spj6v",
+                      "front":  "Betriebsrat echte Mitbestimmung",
+                      "back":  "Arbeitszeit, Pausen\nÜberstunden\nUrlaubsplan\nÜberwachungstechnik\nBetriebsordnung\nHomeoffice\n\n§ 87 BetrVG",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxftcs9btfa8z2",
+                      "front":  "Betriebsversammlung",
+                      "back":  "1× pro Vierteljahr\nIn Arbeitszeit, bezahlt, nicht öffentlich\n\nBetriebsrat lädt ein",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxwq44qovk766h",
+                      "front":  "Ausbildungsrahmenplan / Rahmenlehrplan",
+                      "back":  "Rahmenplan: Betrieb (Bund)\nRahmenlehrplan: Berufsschule (KMK)",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx5y5ox7mexpbf",
+                      "front":  "Freistellung zur Prüfung",
+                      "back":  "Prüfungstag + Arbeitstag davor\n\n§ 15 BBiG",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mx6fwohfulh43d",
+                      "front":  "Weiterbeschäftigung nach Ausbildung ohne Vereinbarung",
+                      "back":  "Unbefristetes Arbeitsverhältnis\n\n§ 24 BBiG",
+                      "hint":  "",
+                      "categoryId":  "deck-k3-job"
+                  },
+                  {
+                      "id":  "mxlel6fv8t3nmo",
+                      "front":  "Liquidität",
+                      "back":  "1. Grades: flüssige Mittel\n2. Grades: + kurzfr. Forderungen\n3. Grades: Umlaufvermögen\n\nJeweils / kurzfr. Verbindlichkeiten × 100",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxfrmguhmf6z2q",
+                      "front":  "Eigenkapitalquote",
+                      "back":  "Eigenkapital / Gesamtkapital × 100",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxgha72kpmngml",
+                      "front":  "ROI",
+                      "back":  "Return on Investment\nUmsatzrentabilität × Kapitalumschlag\n\nGewinn/Umsatz × Umsatz/Kapital",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxqt609v34lcx2",
+                      "front":  "Abschreibung",
+                      "back":  "Wertverlust des Anlagevermögens\nNach Jahren (AfA-Tabelle) oder Nutzung\nLinear oder degressiv\n\nAfA",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mx6ydfqu28jy7x",
+                      "front":  "GWG (Abschreibungen)",
+                      "back":  "Geringwertiges Wirtschaftsgut\nBis 800 € netto sofort abschreibbar",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxt5asc6pb2813",
+                      "front":  "Einzel- / Gemeinkosten",
+                      "back":  "Einzel: direkt zurechenbar\nGemein: über Zuschlag",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxzw2mncz5t36y",
+                      "front":  "Teilkostenrechnung",
+                      "back":  "Nur variable Kosten zurechnen\nDeckungsbeitragsrechnung\n\nGegenteil: Vollkostenrechnung",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mx6g6vx1evmy4s",
+                      "front":  "Rückwärtskalkulation Bedeutung",
+                      "back":  "Vom Verkaufspreis zum Bezugspreis\n\nWenn Marktpreis feststeht (Gewinn und VK-Preis meist vorgegeben)",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxtxuxx1d18l9d",
+                      "front":  "Finanzierungsarten",
+                      "back":  "Eigenfinanzierung: z. B. Einlage der Inhaber\nFremdfinanzierung: z. B. Bankkredit\nInnenfinanzierung: z. B. einbehaltene Gewinne, Abschreibungen\nAußenfinanzierung: z. B. Kredit, neue Gesellschafter",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxryc650kcit9l",
+                      "front":  "Leasing",
+                      "back":  "Nutzung gegen Rate\nEigentum beim Leasinggeber\n\n+ Liquidität, immer auf dem neuesten Stand\n− teurer als Kauf, kein Eigentum",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxo5ze9cmogoo4",
+                      "front":  "Darlehensarten",
+                      "back":  "Annuität: gleiche Rate\nRaten: gleiche Tilgung, sinkende Rate und Zinsen\nFälligkeit: Tilgung am Ende",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxlpy2p9cxmcke",
+                      "front":  "Kontokorrentkredit",
+                      "back":  "Dispo auf Geschäftskonto\nKurzfristig, teuer",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxtrofthj28nez",
+                      "front":  "Lieferantenkredit",
+                      "back":  "Zahlungsziel statt Skonto\nSehr teuer\n\nJahreszins ≈ Skonto × 360 / (Ziel − Skontofrist)",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxxwfo2pij08ao",
+                      "front":  "Kreditsicherheiten",
+                      "back":  "Bürgschaft\nSicherungsübereignung\nGrundschuld\nEigentumsvorbehalt",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxndntqlcu6rf4",
+                      "front":  "Zahllast ans Finanzamt",
+                      "back":  "Umsatzsteuer − Vorsteuer\n\nForderung oder Verbindlichkeit gegenüber dem Finanzamt",
+                      "hint":  "Steuern",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mx365cfpzkmw10",
+                      "front":  "Rechnungsprüfung",
+                      "back":  "Sachlich\nRechnerisch\nBuchungstechnisch",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxd4hllyc97jgg",
+                      "front":  "Pflichtangaben Rechnung",
+                      "back":  "Namen, Anschriften\nSteuernr.\nDatum, Rechnungsnr.\nMenge, Art, Leistungszeit\nEntgelt, Steuersatz, Steuerbetrag\n\n§ 14 UStG",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-eco"
+                  },
+                  {
+                      "id":  "mxsemg1vvv3c5r",
+                      "front":  "Marketing-Mix",
+                      "back":  "Product\nPrice\nPlace\nPromotion",
+                      "hint":  "4 P",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxr738dooro98u",
+                      "front":  "SWOT-Analyse",
+                      "back":  "Stärken, Schwächen: intern\nChancen, Risiken: extern",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxpfgm6mk62qbf",
+                      "front":  "Produktlebenszyklus",
+                      "back":  "Einführung\nWachstum\nReife\nSättigung\nRückgang",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxg7b8p2axxfyb",
+                      "front":  "Primär- / Sekundärforschung",
+                      "back":  "Primär: neue Daten erheben\nSekundär: vorhandene Daten, Studien analysieren",
+                      "hint":  "Marktanalyse",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxj1hpxwsrlrnh",
+                      "front":  "Marktanalyse / Marktbeobachtung",
+                      "back":  "Analyse: Zeitpunkt\nBeobachtung: Zeitraum",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mx15svedqmfq9a",
+                      "front":  "Kundenbindung",
+                      "back":  "Treueprogramme\nWartungsverträge\nNewsletter\nKundenschulung",
+                      "hint":  "After Sales",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxfk9q85r6n2rs",
+                      "front":  "CRM",
+                      "back":  "Customer Relationship Management\nKundendaten zentral, Beziehung pflegen",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxbjwz4lujijdz",
+                      "front":  "ABC-Analyse",
+                      "back":  "A: wenige mit hohem Wert\nC: viele mit geringem Wert\n\nFür Kunden oder Material",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mx2f4cvz90vljd",
+                      "front":  "Up-Selling / Cross-Selling",
+                      "back":  "Up: höherwertiges Produkt\nCross: Zusatzprodukt",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxxzrlnen7zmcy",
+                      "front":  "CTR",
+                      "back":  "Click-Through-Rate\nKlicks / Impressionen × 100",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxbfkjeawg4x3f",
+                      "front":  "Corporate Identity",
+                      "back":  "Corporate Design\nCommunication\nBehaviour",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-mkt"
+                  },
+                  {
+                      "id":  "mxsw0ppw03ei2n",
+                      "front":  "4-Ohren-Modell",
+                      "back":  "Sachinhalt\nSelbstoffenbarung\nBeziehung\nAppell\n\nSchulz von Thun",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxfcxnufbnn1gg",
+                      "front":  "Sender-Empfänger-Modell",
+                      "back":  "Sender codiert, Empfänger decodiert\nStörungen möglich",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxtsdrk49hmbd4",
+                      "front":  "Aktives Zuhören",
+                      "back":  "Zuhören, Blickkontakt\nParaphrasieren\nNachfragen",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxeq88zsdciwuo",
+                      "front":  "Ich-Botschaft",
+                      "back":  "Eigene Wahrnehmung statt Vorwurf",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxykve18ioz0cb",
+                      "front":  "Reklamation / Beschwerde",
+                      "back":  "Reklamation: Mangel, Rechtsanspruch\nBeschwerde: allgemeine Unzufriedenheit",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxd12pnvuorhni",
+                      "front":  "SLA",
+                      "back":  "Service Level Agreement\nVereinbarte Servicequalität\n\nVerfügbarkeit, Reaktionszeit, Wiederherstellungszeit",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxi2pnwkq7osk5",
+                      "front":  "Reaktions- / Wiederherstellungszeit",
+                      "back":  "Reaktion: bis Bearbeitung beginnt\nWiederherstellung: bis Störung behoben",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxksfxuwiy45ks",
+                      "front":  "Incident / Problem",
+                      "back":  "Incident: Störung schnell beheben\nProblem: Ursache finden\n\nITIL",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxdc1brpwdeoqu",
+                      "front":  "Support-Level",
+                      "back":  "1st: Annahme, einfache Fälle (Call-Center-Sklaven)\n2nd: Fachleute\n3rd: Entwickler, Hersteller",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-com"
+                  },
+                  {
+                      "id":  "mxgznnhvbhv95t",
+                      "front":  "Soll-Ist-Vergleich",
+                      "back":  "Abweichung = Ist − Soll\nIn % = Abweichung / Soll × 100",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-qm"
+                  },
+                  {
+                      "id":  "mxgpv24uukzj9m",
+                      "front":  "SQL-Abfrage-Aufbau",
+                      "back":  "SELECT\nFROM\nWHERE\nGROUP BY\nHAVING\nORDER BY",
+                      "hint":  "Reihenfolge",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mx9rhpw5l1wklw",
+                      "front":  "Aggregatfunktionen",
+                      "back":  "COUNT, SUM, AVG, MIN, MAX",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mx2lomfow9nw7s",
+                      "front":  "INNER JOIN",
+                      "back":  "Nur Datensätze mit Treffer in beiden Tabellen",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mxtbf79c3zekyw",
+                      "front":  "LEFT JOIN",
+                      "back":  "Alle Datensätze aus linker Tabelle\nUnd alle passenden Datensätze aus rechter Tabelle\nRechts ggf. NULL",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mxnguk7b9ytn8c",
+                      "front":  "IS NULL (SQL)",
+                      "back":  "Prüft auf leeren Wert\n\nNicht = NULL",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mxfp84y6q2fnrk",
+                      "front":  "Unterabfrage (SQL)",
+                      "back":  "SELECT in WHERE oder FROM\nz. B. WHERE Preis \u003e (SELECT AVG(Preis) FROM Bestellungen)",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mxf9ua9nor52nu",
+                      "front":  "Anomalien",
+                      "back":  "Einfüge-/Änderungs-/Löschanomalie\n\nFolge von Redundanz",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mxdyn7f9ltflit",
+                      "front":  "ER-Modell",
+                      "back":  "Entität\nAttribut\nBeziehung",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mx7osg76fsmt2v",
+                      "front":  "Referentielle Integrität",
+                      "back":  "Fremdschlüssel zeigt immer auf vorhandenen Primärschlüssel",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-db"
+                  },
+                  {
+                      "id":  "mxwvt17xdj0nl4",
+                      "front":  "Annahmeverzug",
+                      "back":  "Käufer nimmt Ware nicht an\nSelbsthilfeverkauf, Klage, Rücktritt",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxhv2143ld492u",
+                      "front":  "Zahlungsverzug",
+                      "back":  "Fällig + Mahnung\nZahlung + Verzugszinsen\nRücktritt nach Nachfrist\n\nZinsen: Verbraucher +5, Unternehmen +9 %-Punkte über Basiszins",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxvfjuxo4i2he5",
+                      "front":  "Mahnverfahren",
+                      "back":  "Mahnbescheid\nWiderspruch 2 Wochen\nVollstreckungsbescheid\nEinspruch 2 Wochen\nZwangsvollstreckung",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxp9vqsvdof4n3",
+                      "front":  "Verjährung Verträge",
+                      "back":  "3 Jahre ab Jahresende\nFür Zahlungsansprüche, Lieferansprüche und Schadensersatz\n\n§§ 195, 199 BGB",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxyxye66ggu7w2",
+                      "front":  "Gewährleistung / Garantie",
+                      "back":  "Gewährleistung: gesetzlich, 2 Jahre, Verkäufer\nGarantie: freiwillig, Hersteller",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxws1x4hzxsly0",
+                      "front":  "Mietvertrag",
+                      "back":  "Gebrauchsüberlassung gegen Entgelt\n\n§§ 535 ff. BGB",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxis4tt3a627wa",
+                      "front":  "Anfrage",
+                      "back":  "Unverbindlich",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxlakjtx7gy2jk",
+                      "front":  "Angebot",
+                      "back":  "Grundsätzlich verbindlich\nMündlich: sofort annehmen\nSchriftlich: bis Antwort zu erwarten",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxp68y39kflwir",
+                      "front":  "Freizeichnungsklausel",
+                      "back":  "Macht Angebot unverbindlich\n\n„freibleibend“, „solange Vorrat reicht“, „Preisänderung vorbehalten“",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxit6rslvgxm0l",
+                      "front":  "Anpreisung",
+                      "back":  "Werbung, Katalog\nKein Angebot\n\nAufforderung zur Abgabe eines Angebots",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxisobyw0np1wa",
+                      "front":  "Eigentumsvorbehalt",
+                      "back":  "Ware bleibt Eigentum des Verkäufers bis zur Zahlung",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxbqi9t0ew4ppw",
+                      "front":  "Besitz / Eigentum",
+                      "back":  "Besitz: tatsächliche Herrschaft (wer hat die Sache gerade in der Hand)\nEigentum: rechtliche Herrschaft (wem gehört die Sache rechtlich)",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxdq0xz1hqzrj0",
+                      "front":  "Geschäftsfähigkeit nach Alter",
+                      "back":  "Unter 7: unfähig\n7 bis 17: beschränkt\nAb 18: voll\n\nTaschengeldparagraph bei 7- bis 17-Jährigen",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mx6l32mbeilegs",
+                      "front":  "Widerrufsrecht Verträge",
+                      "back":  "14 Tage bei Fernabsatz\nBeginnt mit Eintreffen der letzten Ware einer Lieferung\n\nNur Verbraucher",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxiucb5bt68b37",
+                      "front":  "Taschengeldparagraph",
+                      "back":  "Vertrag von 7- bis 17-Jährigen wirksam\nWenn mit eigenem Geld bezahlt, das zur freien Verfügung überlassen wurde\n\n§ 110 BGB, nur bei sofortiger Zahlung, keine Ratenkäufe",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-law"
+                  },
+                  {
+                      "id":  "mxcdxxlo5f5es0",
+                      "front":  "Angebotsvergleich quantitativ vs. qualitativ",
+                      "back":  "Quantitativ: Preis, Bezugskalkulation\nQualitativ: Nutzwertanalyse",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-buy"
+                  },
+                  {
+                      "id":  "mxdsqxsb5f2rkd",
+                      "front":  "Meldebestand",
+                      "back":  "Tagesverbrauch × Lieferzeit + Mindestbestand",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-buy"
+                  },
+                  {
+                      "id":  "mxeger1a44ftsm",
+                      "front":  "Mindestbestand",
+                      "back":  "Eiserner Bestand\nPuffer für Störungen",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-buy"
+                  },
+                  {
+                      "id":  "mxesj1cqs3abkn",
+                      "front":  "Refurbishing / Remarketing",
+                      "back":  "Refurbishing: Altgeräte aufbereiten\nRemarketing: wieder verkaufen",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-buy"
+                  },
+                  {
+                      "id":  "mx60lu5vcb9ue6",
+                      "front":  "Make or Buy",
+                      "back":  "Selbst erstellen oder zukaufen",
+                      "hint":  "",
+                      "categoryId":  "deck-k2-buy"
+                  },
+                  {
+                      "id":  "mxpi56797apdl5",
+                      "front":  "Personenbezogene Daten",
+                      "back":  "Infos zu identifizierbarer Person\n\nArt. 4 DSGVO",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxm8l511uli7u2",
+                      "front":  "Besondere Kategorien personenbezogener Daten",
+                      "back":  "Gesundheit\nReligion\nHerkunft\nPolitik\nGewerkschaft\nBiometrie\nSexualleben\n\nArt. 9 DSGVO",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxzg06gpa1t73h",
+                      "front":  "Rechtsgrundlagen DSGVO",
+                      "back":  "Einwilligung\nVertrag\nRechtliche Pflicht\nLebenswichtig\nÖffentliche Aufgabe\nBerechtigtes Interesse\n\nArt. 6",
+                      "hint":  "Beantworten das Ob?",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxgcvfkpbuwqdc",
+                      "front":  "Grundsätze DSGVO",
+                      "back":  "Rechtmäßigkeit\nZweckbindung\nDatenminimierung\nRichtigkeit\nSpeicherbegrenzung\nVertraulichkeit\nRechenschaft\n\nArt. 5",
+                      "hint":  "Beantworten das Wie?",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxvdi2h7zp640j",
+                      "front":  "Betroffenenrechte DSGVO",
+                      "back":  "Auskunft\nBerichtigung\nLöschung\nEinschränkung\nDatenübertragbarkeit\nWiderspruch",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxu4ai9ukuldi9",
+                      "front":  "Datenschutzbeauftragter",
+                      "back":  "Pflicht ab 20 Personen mit ständiger Datenverarbeitung\nWeisungsfrei, Kündigungsschutz\n\n§ 38 BDSG",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxw2cutu9cepmn",
+                      "front":  "Datenpanne Was zu tun?",
+                      "back":  "Meldung binnen 72 Std. an Aufsichtsbehörde\n\nBußgeld bis 20 Mio. € oder 4 % Umsatz",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mx4y945znyugsa",
+                      "front":  "AV-Vertrag",
+                      "back":  "Auftragsverarbeitung\nDienstleister verarbeitet im Auftrag\n\nArt. 28, z. B. Cloud",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxjeailyjk1wen",
+                      "front":  "VVT",
+                      "back":  "Verzeichnis von Verarbeitungstätigkeiten\n\nArt. 30",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxwgh22hqdzqyq",
+                      "front":  "Datenschutz / Datensicherheit",
+                      "back":  "Datenschutz: schützt die Person\nDatensicherheit: schützt die Daten",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxm1uvov2urt5g",
+                      "front":  "Pseudonymisierung / Anonymisierung",
+                      "back":  "Pseudo: mit Zusatzwissen zuordenbar\nAnonym: nicht mehr\n\nAnonym: DSGVO gilt nicht",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mx8dl1pleijl3u",
+                      "front":  "Zutritts-, Zugangs-, Zugriffskontrolle",
+                      "back":  "Zutritt: Räume\nZugang: Systeme\nZugriff: Daten",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxkk928adupf86",
+                      "front":  "Schutzbedarfskategorien",
+                      "back":  "Normal\nHoch\nSehr hoch\n\nBSI",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxnpgdn1od7384",
+                      "front":  "Malware-Arten",
+                      "back":  "Virus: hängt an Datei\nWurm: verbreitet sich selbst\nTrojaner: getarnt als nützlich",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxoopochtij0g5",
+                      "front":  "Social Engineering",
+                      "back":  "Manipulation von Menschen\n\nz. B. Phishing, falscher IT-Support",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mx2y14hiz1bav3",
+                      "front":  "Brute Force",
+                      "back":  "Passwörter durchprobieren\n\nSchutz: lange Passwörter, Sperre",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxop4ar0boi5zs",
+                      "front":  "Zero-Day-Exploit",
+                      "back":  "Lücke ohne verfügbaren Patch",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxabfwdbd9pgea",
+                      "front":  "Multi-Faktor-Authentifizierung Faktoren",
+                      "back":  "Wissen (Passwort, PIN)\nBesitz (Smartphone, Hardwaretoken)\nInhärenz: Biometrie (Fingerabdruck)",
+                      "hint":  "3 Faktoren",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mx5ox0l6dlo1c2",
+                      "front":  "Least Privilege",
+                      "back":  "Nur minimal nötige Rechte\n\nWas darf wer im System tun?",
+                      "hint":  "Ähnlich Need-to-know-Prinzip",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxj037xzoe0fob",
+                      "front":  "TLS",
+                      "back":  "Verschlüsselt die Übertragung (z. B. Web, Mail)\nBasis von HTTPS (Port 443)\n\nHybride Verschlüsselung\nMailversand mit TLS über Port 587",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxi5sn3y9tcbd2",
+                      "front":  "Ende-zu-Ende-Verschlüsselung",
+                      "back":  "Nur Sender und Empfänger können lesen\n\nGegenteil: Transportverschlüsselung",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sec"
+                  },
+                  {
+                      "id":  "mxy0ykxul6fzrh",
+                      "front":  "Projekt Attribute",
+                      "back":  "Einmalig\nZeitlich begrenzt\nKlares Ziel\nBegrenzte Ressourcen",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxhidswespmy6f",
+                      "front":  "Magisches Dreieck",
+                      "back":  "Zeit\nKosten\nQualität",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxxej9ofs4u6en",
+                      "front":  "Projektphasen",
+                      "back":  "Initialisierung\nPlanung\nDurchführung\nKontrolle\nAbschluss",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mx4x2h382gk131",
+                      "front":  "SMART",
+                      "back":  "Spezifisch\nMessbar\nAttraktiv\nRealistisch\nTerminiert",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxr72jvga9o5gw",
+                      "front":  "Meilenstein",
+                      "back":  "Wichtiges Zwischenziel\nDauer 0",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxld92758dm3b0",
+                      "front":  "Gantt-Diagramm",
+                      "back":  "Balkendiagramm über Zeitachse",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxdopiby16mdsp",
+                      "front":  "Netzplan",
+                      "back":  "Zeigt Vorgänge, Abhängigkeiten, Puffer\nKritischer Weg: Puffer 0\n\nBegriffe stehen in der Prüfung daneben",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxsyes4exywht5",
+                      "front":  "Product Owner",
+                      "back":  "Verantwortet Produkt\nPflegt Product Backlog",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mx450ef6ribrhm",
+                      "front":  "Scrum-Events",
+                      "back":  "Sprint Planning\nDaily Scrum\nSprint Review\nRetrospektive\n\nDaily: täglich 15 Min.",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mx16xxsurulhhd",
+                      "front":  "User Story",
+                      "back":  "Als \u003cRolle\u003e möchte ich \u003cZiel\u003e, um \u003cNutzen\u003e",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxzs7nvnimqezx",
+                      "front":  "Stakeholder",
+                      "back":  "Alle, die vom Projekt betroffen sind oder es beeinflussen",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mxp75xmlbmxoiy",
+                      "front":  "Risikoanalyse",
+                      "back":  "Eintrittswahrscheinlichkeit × Schadenshöhe",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-pm"
+                  },
+                  {
+                      "id":  "mx4ue5vdauf7l6",
+                      "front":  "Ist-Analyse",
+                      "back":  "Interview\nFragebogen\nBeobachtung\nDokumentenanalyse\n\nDanach Soll-Konzept",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-req"
+                  },
+                  {
+                      "id":  "mxk23v6j4sqsi1",
+                      "front":  "Funktionale / nicht-funktionale Anforderungen",
+                      "back":  "Funktional: was das System tut\nNicht-funktional: wie gut",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-req"
+                  },
+                  {
+                      "id":  "mx4q58tj853ih7",
+                      "front":  "Prozessarten",
+                      "back":  "Kernprozesse (direkte Wertschöpfung für Kunden)\nUnterstützungsprozesse (Bereitstellung von Ressourcen)\nManagementprozesse (Planung, Steuerung und Kontrolle)",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-req"
+                  },
+                  {
+                      "id":  "mxks44069uv29q",
+                      "front":  "EPK",
+                      "back":  "Ereignisgesteuerte Prozesskette\nStellt Geschäftsprozesse dar\n\nEreignis, Funktion, Konnektoren",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-req"
+                  },
+                  {
+                      "id":  "mxrhtpynioskdn",
+                      "front":  "BPMN",
+                      "back":  "Business Process Model and Notation\nStandard für Prozessdiagramme\n\nPools, Lanes, Gateways",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-req"
+                  },
+                  {
+                      "id":  "mxdtrf4tizgbqd",
+                      "front":  "Digitale Transformation",
+                      "back":  "Geschäftsmodell ändert sich durch Digitalisierung\n\nDisruption: alter Markt wird verdrängt",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-req"
+                  },
+                  {
+                      "id":  "mxdn5x7auxgghn",
+                      "front":  "Soll-Konzept",
+                      "back":  "Beschreibt den gewünschten Zielzustand\n\nFolgt auf Ist-Analyse",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-req"
+                  },
+                  {
+                      "id":  "mxwhsmr362p9g3",
+                      "front":  "Thin Client / Fat Client",
+                      "back":  "Thin: rechnet auf Server\nFat: rechnet lokal",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxd48b6izvd1b3",
+                      "front":  "Virtualisierung",
+                      "back":  "Mehrere VMs auf einer Hardware\nBessere Auslastung, weniger Strom",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mx4b5lezlzel04",
+                      "front":  "Hypervisor",
+                      "back":  "Virtual Machine Monitor (ermöglicht mehrere VMs gleichzeitig auf einem Host)\nTyp 1: direkt auf Hardware\nTyp 2: auf Betriebssystem\n\nESXi, Hyper-V vs. VirtualBox",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxsi2kqgffl5wy",
+                      "front":  "Container",
+                      "back":  "Teilt Kernel (Betriebssystemkern) des Hosts\nLeichter als VM, nur auf Betriebssystem-Ebene\n\nz. B. Docker",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-sys"
+                  },
+                  {
+                      "id":  "mxznmdynb2fe4b",
+                      "front":  "TCP",
+                      "back":  "Transmission Control Protocol\nTransportiert Datenpakete\nVerbindungsorientiert \u003e 3-Way-Handshake\nZuverlässig \u003e Empfang wird bestätigt, Verlorenes neu gesendet\nLangsamer\n\nOSI 4",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx8oee0ntai1eq",
+                      "front":  "UDP",
+                      "back":  "User Datagram Protocol\nTransportiert Datenpakete\nVerbindungslos \u003e kein Handshake\nUnzuverlässig \u003e keine Empfangsbestätigung, nichts wird neu gesendet\nSchneller\n\nOSI 4, z. B. Streaming, VoIP, DNS",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxlp46vhh9u70z",
+                      "front":  "Three-Way-Handshake",
+                      "back":  "Zuverlässiger Verbindungsaufbau TCP\nSYN (Synchronize, Client → Server)\nSYN-ACK (Synchronize-Acknowledge, Server → Client)\nACK (Acknowledge, Client → Server)",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx1x4tgsgshc1o",
+                      "front":  "MAC-Adresse",
+                      "back":  "48 Bit, hexadezimal\nHardware-Adresse\nWeltweit einmalig\n\nOSI 2",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxoae137e954d6",
+                      "front":  "ARP",
+                      "back":  "Ermittelt MAC zur IP-Adresse",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx4fbis4kgldgs",
+                      "front":  "Private IPv4-Adressen",
+                      "back":  "10.0.0.0/8\n172.16.0.0/12\n192.168.0.0/16",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx93tqsuc4ceir",
+                      "front":  "Netz- / Broadcastadresse",
+                      "back":  "Netz: erste Adresse (Host-Bits alle 0)\nBroadcast: letzte Adresse (Host-Bits alle 1)\n\nDeshalb Hosts = 2^n − 2",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxw5oy3zfl7bgr",
+                      "front":  "CIDR",
+                      "back":  "Präfixlänge statt Subnetzmaske\n\n/24 = 255.255.255.0",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx0w6p42mu7831",
+                      "front":  "Default Gateway",
+                      "back":  "Router ins andere Netz",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxyu24vknzm12g",
+                      "front":  "Loopback-Adresse IPv4",
+                      "back":  "127.0.0.1: eigener Rechner",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx4jz1kmtazl35",
+                      "front":  "APIPA-Adresse IPv4",
+                      "back":  "169.254.x.x: kein DHCP-Server erreichbar\n\nAutomatic Private IP Addressing, Rechner gibt sich selbst eine Adresse",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mxp5oe2f50t2pn",
+                      "front":  "Topologien",
+                      "back":  "Struktur von Geräten im Netz\nStern\nBus\nRing\nMasche\n\nHeute meist Stern",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-net"
+                  },
+                  {
+                      "id":  "mx9p5p665yd159",
+                      "front":  "Freeware / Shareware",
+                      "back":  "Freeware: dauerhaft kostenlos\nShareware: Testphase, dann zahlen",
+                      "hint":  "",
+                      "categoryId":  "deck-k1-lic"
+                  }
+              ]
+}

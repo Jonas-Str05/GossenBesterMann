@@ -5172,7 +5172,7 @@ function mergeDeck(deck, { restore = false } = {}) {
 // Regel: nie vorhandenen Text überschreiben – nur leere Rückseiten/Hinweise füllen,
 // unsortierte Karten einer Kategorie zuordnen, fehlende Karten und Kategorien ergänzen.
 // ---------------------------------------------------------------------------
-const IMPORTS = ['import/2026-11-16.json'];
+const IMPORTS = ['import/2026-11-16.json', 'import/2026-11-20.json'];
 
 function mergeImport(data) {
   const now = Date.now();
