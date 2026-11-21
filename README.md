@@ -43,6 +43,7 @@ Bei **jedem** Update die Versionsnummer in `version.js` **und** in der Kommentar
 
 | Version | Inhalt |
 | --- | --- |
+| 1.25.0 | Eigener Balken „Noch nicht gelernt“, Wiederholung der Falschen ohne Aufstieg |
 | 1.24.1 | Einmaliger Import 20.11.: 206 neue Karten |
 | 1.24.0 | Einmaliger Import 16.11.: Rückseiten für unfertige Karten, unsortierte Karten einsortiert |
 | 1.23.1 | 43 neue Karten: Finanzen, Marketing, Cloud, AGB, Datenbanken, Wirtschaftssektoren |

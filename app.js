@@ -1089,11 +1089,14 @@ const weightOf = (level) => 2 ** ((MAX - level) / 2);
 
 // Unfertige Karten (nur Vorderseite) werden nicht gelernt
 const isDraft = (c) => !(c.back || '').trim();
+// Noch nie gelernt: intern Ebene 0, wird aber getrennt von „echten“ 0er-Karten angezeigt
+const isNewCard = (c) => !isDraft(c) && c.level === 0 && c.right + c.wrong === 0;
 function poolFor(spec) {
   const pool = spec.type === 'category' ? DB.cards.filter((c) => c.categoryId === spec.categoryId)
     : spec.type === 'group' ? cardsInGroup(spec.groupId)
     : spec.type === 'pinned' ? DB.cards.filter((c) => c.pinned)
-    : spec.type === 'level' ? DB.cards.filter((c) => c.level === spec.level)
+    : spec.type === 'level' ? DB.cards.filter((c) => c.level === spec.level && !isNewCard(c))
+    : spec.type === 'new' ? DB.cards.filter(isNewCard)
     : spec.type === 'retry' ? spec.ids.map(cardById).filter(Boolean)
     : DB.cards;
   return pool.filter((c) => !isDraft(c));
@@ -1176,8 +1179,12 @@ function buildQueue(spec) {
   return size && spec.type !== 'retry' ? ids.slice(0, size) : ids;
 }
 
-function rateCard(card, correct, durMs = 0) {
+function rateCard(card, correct, durMs = 0, practice = false) {
   const t = Date.now();
+  // Übungsrunde (direkt nochmal die Falschen): „gewusst“ zählt nicht – Karte bleibt, wo sie ist
+  if (practice && correct) {
+    return { id: card.id, correct, from: card.level, to: card.level, prev: { right: card.right, wrong: card.wrong, last: card.last }, day: dayKey(), t, noop: true };
+  }
   const rec = {
     id: card.id,
     correct,
@@ -1198,6 +1205,7 @@ function rateCard(card, correct, durMs = 0) {
   return rec;
 }
 function undoRating(rec) {
+  if (rec.noop) return; // in der Übungsrunde wurde nichts verändert
   const card = cardById(rec.id);
   if (card) {
     card.level = rec.from;
@@ -1438,7 +1446,10 @@ const cardsPageOpen = () => !!(UI.cardsOv && stack.includes(UI.cardsOv));
 function renderLearn() {
   const v = $('#view-learn');
   const n = DB.cards.length;
-  const counts = levelCounts();
+  // Säulen ohne nie gelernte (eigener Balken) und ohne unfertige Karten
+  const counts = levelCounts(DB.cards.filter((c) => !isDraft(c) && !isNewCard(c)));
+  const newN = DB.cards.filter(isNewCard).length;
+  const learnable = DB.cards.filter((c) => !isDraft(c)).length;
   const maxC = Math.max(1, ...Object.values(counts));
   const today = DB.log[dayKey()] || { r: 0, w: 0 };
   const totR = DB.cards.reduce((a, c) => a + c.right, 0);
@@ -1505,6 +1516,12 @@ function renderLearn() {
       <div class="block">
         <div class="block-title">Deine Fächer</div>
         <div class="block-sub">${plural(n, 'Karte', 'Karten')} · tippe auf ein Fach, um es zu lernen</div>
+        ${newN ? `
+        <button class="new-bar" data-action="start-new" data-level="new" aria-label="Noch nicht gelernt: ${newN} Karten">
+          <span class="new-bar-fill" style="width:${Math.max(4, (newN / Math.max(1, learnable)) * 100)}%"></span>
+          <span class="new-bar-label">Noch nicht gelernt</span>
+          <span class="new-bar-count">${newN}</span>
+        </button>` : ''}
         <div class="bars">
           ${LEVELS.map((l) => `
             <button class="bar" data-action="start-level" data-level="${l}" ${counts[l] ? '' : 'disabled'} aria-label="Ebene ${fmtLevel(l)}: ${counts[l]} Karten">
@@ -1742,7 +1759,8 @@ function filteredCards() {
   else if (f === 'g:none') { const ids = ungroupedCardCats(); list = list.filter((c) => ids.has(c.categoryId)); }
   else if (f.startsWith('g:')) list = cardsInGroup(f.slice(2));
   else if (f !== 'all') list = list.filter((c) => c.categoryId === f);
-  if (UI.cardsLevel != null) list = list.filter((c) => c.level === UI.cardsLevel);
+  if (UI.cardsLevel === 'new') list = list.filter(isNewCard);
+  else if (UI.cardsLevel != null) list = list.filter((c) => c.level === UI.cardsLevel && !isNewCard(c));
   if (q) list = list.filter((c) => `${c.front}\n${c.back}\n${c.hint}`.toLowerCase().includes(q));
   const sort = SORTS[DB.settings.cardSort] || SORTS.alpha;
   return [...list].sort(sort[1]);
@@ -1839,7 +1857,7 @@ function renderCardsNavLeft() {
     : backBtn('cards-back');
 }
 const cardsPageMode = () => UI.cardsPageCat || UI.cardsLevel != null;
-const cardsPageTitle = () => (UI.cardsLevel != null ? `Ebene ${fmtLevel(UI.cardsLevel)}`
+const cardsPageTitle = () => (UI.cardsLevel === 'new' ? 'Noch nicht gelernt' : UI.cardsLevel != null ? `Ebene ${fmtLevel(UI.cardsLevel)}`
   : UI.cardsPageCat && catById(UI.cardsPageCat) ? catById(UI.cardsPageCat).name : 'Alle Karten');
 
 function setSelectMode(on, firstId = null) {
@@ -1916,7 +1934,7 @@ function bindLevelLongPress(box) {
   let start = null;
   const cancel = () => { clearTimeout(timer); timer = 0; };
   box.addEventListener('pointerdown', (e) => {
-    const bar = e.target.closest('.bar[data-level]');
+    const bar = e.target.closest('[data-level]');
     if (!bar || bar.disabled || e.button !== 0) return;
     start = { x: e.clientX, y: e.clientY };
     timer = setTimeout(() => {
@@ -1924,14 +1942,14 @@ function bindLevelLongPress(box) {
       UI.suppressAnyClick = true; // der folgende Klick soll keine Lernrunde starten
       setTimeout(() => { UI.suppressAnyClick = false; }, 700);
       haptic(15);
-      openCardsPage(null, { level: +bar.dataset.level });
+      openCardsPage(null, { level: bar.dataset.level === 'new' ? 'new' : +bar.dataset.level });
     }, 480);
   });
   box.addEventListener('pointermove', (e) => {
     if (timer && start && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) cancel();
   });
   for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) box.addEventListener(ev, cancel);
-  box.addEventListener('contextmenu', (e) => { if (e.target.closest('.bar[data-level]')) e.preventDefault(); });
+  box.addEventListener('contextmenu', (e) => { if (e.target.closest('[data-level]')) e.preventDefault(); });
 }
 
 // Suchergebnisse im Karten-Tab
@@ -4158,7 +4176,7 @@ function startSession(spec) {
   function rate(correct, velocity) {
     if (!S.revealed || S.done || !S.view) return;
     const card = currentCard();
-    const rec = rateCard(card, correct, performance.now() - S.shownAt);
+    const rec = rateCard(card, correct, performance.now() - S.shownAt, !!S.spec.practice);
     S.results.push(rec);
     haptic(correct ? 12 : [14, 50, 14]);
     S.view.leave(correct ? 1 : -1, velocity);
@@ -4341,7 +4359,8 @@ function startSession(spec) {
     else if (a === 'retry') {
       const ids = [...new Set(S.results.filter((r) => !r.correct).map((r) => r.id))];
       closeOverlay(ov);
-      setTimeout(() => startSession({ type: 'retry', ids }), 120);
+      // Übungsrunde: richtig = keine Stufe hoch, falsch = weiterhin eine Stufe runter
+      setTimeout(() => startSession({ type: 'retry', ids, practice: true, label: 'Wiederholung' }), 120);
     }
   });
 
@@ -4803,6 +4822,7 @@ const ACTIONS = {
   'start-weighted': () => startSession({ type: 'weighted' }),
   'start-equal': () => startSession({ type: 'equal' }),
   'start-level': (b) => { const l = +b.dataset.level; startSession({ type: 'level', level: l, label: `Ebene ${fmtLevel(l)}` }); },
+  'start-new': () => startSession({ type: 'new', label: 'Noch nicht gelernt' }),
   'cat-stats': (b) => { const c = catById(b.dataset.id); if (c) openCategoryStats(c); },
   'exam-dates': () => openExamDates(),
   'edit-goals': () => openGoals(),
